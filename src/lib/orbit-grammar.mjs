@@ -68,10 +68,12 @@ const httpMethods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
 
 /** @type {import("shiki").LanguageRegistration} */
 export const orbitLanguage = {
-  name: "Orbit",
-  id: "orbit",
+  // Shiki registers and looks a grammar up by `name`, so it has to be the
+  // same string callers pass as `lang`. Capitalised aliases are listed
+  // separately for anyone asking for "Orbit".
+  name: "orbit",
+  aliases: ["Orbit", "orb", "orbs"],
   scopeName: "source.orb",
-  aliases: ["orb", "Orbit"],
   patterns: [
     { include: "#comment" },
     { include: "#string" },

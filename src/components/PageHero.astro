@@ -1,0 +1,20 @@
+---
+// Inner pages share one header shape: an eyebrow that says where you are,
+// the page's own claim, and a lead sentence. Same rhythm as the home page,
+// so moving between pages doesn't feel like moving between products.
+interface Props {
+  eyebrow: string;
+  heading: string;
+  lead?: string;
+  class?: string;
+}
+
+const { eyebrow, heading, lead, class: className = "" } = Astro.props;
+---
+
+<header class:list={["pt-14 sm:pt-20", className]}>
+  <p class="text-micro font-semibold tracking-[0.12em] text-ink-subtle uppercase">{eyebrow}</p>
+  <h1 class="mt-5 max-w-3xl text-balance text-title font-semibold text-ink">{heading}</h1>
+  {lead && <p class="measure mt-6 text-lead text-ink-muted">{lead}</p>}
+  <slot />
+</header>

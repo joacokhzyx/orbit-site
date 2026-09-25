@@ -1,0 +1,85 @@
+---
+// Orbit source, highlighted at build time by Shiki. Nothing is shipped to
+// the browser except the finished markup and a few hundred bytes for the
+// copy button, so a code block costs no framework runtime.
+import { getHighlighter } from "../lib/highlighter.mjs";
+import type { ShikiTransformer } from "shiki";
+
+interface Props {
+  code: string;
+  /** Shown in the header, usually the file the snippet came from. */
+  label?: string;
+  lang?: string;
+  class?: string;
+}
+
+const { code, label, lang = "orbit", class: className = "" } = Astro.props;
+
+const trimmed = code.replace(/^\n+|\n+$/g, "");
+
+const highlighter = await getHighlighter();
+
+const html = highlighter.codeToHtml(trimmed, {
+  lang,
+  themes: { light: "github-light", dark: "github-dark" },
+  defaultColor: false,
+  transformers: [
+    {
+      name: "orbit-block",
+      pre(node) {
+        node.properties.class = `${node.properties.class ?? ""} code-surface`.trim();
+        if (label) {
+          node.properties["aria-label"] = label;
+        }
+        return node;
+      },
+    },
+  ] satisfies ShikiTransformer[],
+});
+---
+
+<figure
+  class:list={[
+    "group/code relative overflow-hidden rounded-lg border border-line bg-sunken",
+    className,
+  ]}
+>
+  {
+    label && (
+      <figcaption class="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5">
+        <span class="truncate font-mono text-micro text-ink-subtle">{label}</span>
+        <span class="text-micro text-ink-subtle">Orbit</span>
+      </figcaption>
+    )
+  }
+  <div data-code-host set:html={html} />
+  <button
+    type="button"
+    data-copy
+    data-code={trimmed}
+    class="absolute top-2.5 right-2.5 rounded-md border border-line bg-paper/90 px-2.5 py-1.5 text-micro text-ink-muted opacity-0 backdrop-blur transition-opacity group-hover/code:opacity-100 focus-visible:opacity-100 hover:text-ink"
+    aria-label="Copy code to clipboard"
+  >
+    Copy
+  </button>
+</figure>
+
+<script>
+  const labels = { idle: "Copy", done: "Copied", failed: "Press Ctrl+C" };
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    button.addEventListener("click", async () => {
+      const code = button.dataset.code ?? "";
+      const previous = button.textContent ?? labels.idle;
+      try {
+        await navigator.clipboard.writeText(code);
+        button.textContent = labels.done;
+      } catch {
+        button.textContent = labels.failed;
+      }
+      window.setTimeout(() => {
+        button.textContent = previous;
+      }, 2000);
+    });
+  }
+</script>

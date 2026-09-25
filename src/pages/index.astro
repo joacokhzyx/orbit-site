@@ -1,41 +1,223 @@
 ---
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
-import "../styles/global.css";
+import Footer from "../components/Footer.astro";
+import Section from "../components/Section.astro";
+import Callout from "../components/Callout.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import LinkButton from "../components/LinkButton.astro";
+import { SITE, REPO, docLink } from "../data/site";
+
+// Taken verbatim from examples/health_service.orb. Every value in it comes
+// from a live runtime counter, which is the point: the route has no
+// hardcoded numbers to go stale.
+const healthService = `route GET "/health" {
+    val uptime = system.uptime()
+    return ok 200 "{\\"status\\":\\"UP\\",\\"version\\":\\"0.1.0-rc.2\\",\\"uptime_seconds\\":" + uptime + "}"
+}
+
+route GET "/metrics" {
+    val total = system.http_requests_total()
+    val latency = system.latency_avg_us()
+    val workers = system.active_workers()
+    return ok 200 "{\\"metrics\\":{\\"http_requests_total\\":" + total + ",\\"latency_avg_us\\":" + latency + ",\\"active_workers\\":" + workers + "}}"
+}`;
+
+const facts = [
+  {
+    title: "The compiler is written in Orbit",
+    body: "It builds itself and reaches a fixed point you can verify. A committed C file is the trust root, so you need a C compiler and Python, nothing else.",
+    href: docLink("architecture/SELF_HOSTING.md"),
+    linkLabel: "How the bootstrap works",
+  },
+  {
+    title: "Orbit compiles to C",
+    body: "Your platform's C compiler produces the executable. A service ships as one file, with no runtime to install next to it.",
+    href: docLink("ARCHITECTURE.md"),
+    linkLabel: "The pipeline",
+  },
+  {
+    title: "Dependencies stay small",
+    body: "Starting a server doesn't pull a framework tree in. Comfort that needs giant dependencies isn't elegance, so it isn't the design.",
+    href: REPO.url,
+    linkLabel: "Read the source",
+  },
+];
+
+const limits = [
+  {
+    title: "No multipart uploads",
+    body: "`req.file()` compiles and saves nothing. The file-server tutorial uploads raw bodies and says so plainly.",
+  },
+  {
+    title: "No database migrations",
+    body: "Tables are created on startup, never altered. Adding a field later leaves the existing table alone.",
+  },
+  {
+    title: "No p50 or p99",
+    body: "`system.*` exposes mean latency in microseconds, not a distribution. What isn't measured isn't exposed.",
+  },
+  {
+    title: "One host per cluster",
+    body: "`orbit cluster` starts copies on this machine. There's no shared state, no proxying, and no failover.",
+  },
+];
 ---
 
-<Base title="Orbit">
+<Base>
   <Nav />
 
-  <main class="w-full">
-    <section
-      class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-5 pt-16 sm:px-8 md:grid-cols-5 md:items-start md:gap-12 md:pt-28 lg:pt-36"
-    >
+  <main id="main">
+    {/* Hero. Short headline, then the longer explanatory wave, then the
+        first action. No energy statistic in here: the brand system asks
+        to lead with engineering and let the planet follow. The IEA figure
+        lives on /foundation where it belongs. */}
+    <section class="mx-auto w-full max-w-6xl px-5 pt-16 pb-4 sm:px-8 sm:pt-24 lg:pt-28">
+      <p class="text-micro font-semibold tracking-[0.12em] text-ink-subtle uppercase">
+        A language for APIs and microservices
+      </p>
       <h1
-        class="text-balance text-3xl font-bold leading-tight tracking-tight text-[#111111] sm:text-4xl md:col-span-3 lg:text-5xl lg:leading-[1.08]"
+        class="mt-5 max-w-4xl text-balance text-display font-semibold text-ink"
       >
-        We believe Orbit could help data centers do the same work with less
-        energy, and less environmental cost as a result.
+        {SITE.tagline}
       </h1>
-      <div class="md:col-span-2 md:pt-2">
-        <p class="max-w-md text-lg font-semibold leading-snug sm:text-xl">
-          Data centers used about 415 TWh in 2024 — around 1.5% of global
-          electricity. Demand has grown about 12% a year since 2017.
-        </p>
-        <p class="mt-3 text-sm font-semibold text-[#111111]/70">
-          IEA Energy and AI
-        </p>
+      <p class="measure mt-7 text-lead text-ink-muted">
+        {SITE.subheadline}
+      </p>
+      <div class="mt-9 flex flex-wrap items-center gap-3">
+        <LinkButton href="/docs" variant="primary">Read the docs</LinkButton>
+        <LinkButton href={docLink("GETTING_STARTED.md")} variant="secondary">
+          Try Orbit
+        </LinkButton>
       </div>
     </section>
 
-    <section class="mt-12 w-full md:mt-20">
-      <img
-        src="/mission-street.jpg"
-        alt=""
-        aria-hidden="true"
-        class="h-64 w-full object-cover sm:h-80 md:h-[540px]"
-        loading="lazy"
-      />
+    <section class="mx-auto w-full max-w-6xl px-5 pt-10 sm:px-8 sm:pt-14">
+      <CodeBlock code={healthService} label="examples/health_service.orb" />
     </section>
+
+    <div class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+      <Section
+        class="pt-20 sm:pt-28"
+        heading="Three things worth knowing"
+        lead="Orbit is a small project on one machine. These are the decisions that shape it."
+      >
+        <div class="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3">
+          {
+            facts.map((fact) => (
+              <div class="bg-paper p-6 sm:p-7">
+                <h3 class="text-subheading font-semibold text-balance text-ink">
+                  {fact.title}
+                </h3>
+                <p class="mt-3 text-small leading-relaxed text-ink-muted">{fact.body}</p>
+                <a class="link-accent mt-4 inline-block text-small" href={fact.href}>
+                  {fact.linkLabel}
+                </a>
+              </div>
+            ))
+          }
+        </div>
+      </Section>
+
+      <Section class="pt-20 sm:pt-24" heading="What I can and can't tell you yet">
+        <div class="grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
+          <div class="measure">
+            <p>
+              The numbers I have so far come from a machine shared with other people's work.
+              Component-level gains are real and isolated. The end-to-end difference sits inside
+              the run-to-run noise, so putting a figure on this page would be decoration.
+            </p>
+            <p class="mt-5">
+              That's the honest state, not a stall. The method is written down, the gates run on
+              every change, and I'll publish the numbers when they're clean. I'll publish the bad
+              ones too.
+            </p>
+            <div class="mt-7 flex flex-wrap gap-3">
+              <LinkButton href={docLink("ENERGY.md")} variant="secondary">
+                How I measure energy
+              </LinkButton>
+              <LinkButton href={docLink("guides/benchmark-methodology.md")} variant="tertiary">
+                Benchmark methodology
+              </LinkButton>
+            </div>
+          </div>
+
+          <Callout variant="measuring" label="Still measuring">
+            <p>
+              Energy is reported in joules only where the hardware exposes sensors, which today
+              means Linux. On other systems the honest proxies are CPU time and resident memory,
+              never converted with a universal factor.
+            </p>
+          </Callout>
+        </div>
+      </Section>
+
+      <Section
+        class="pt-20 sm:pt-24"
+        heading="What 0.1 can't do yet"
+        lead="This list is next to the docs, not buried in them. Each entry says what happens and how to work around it."
+      >
+        <dl class="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
+          {
+            limits.map((limit) => (
+              <div class="bg-paper p-6">
+                <dt class="text-small font-semibold text-ink">{limit.title}</dt>
+                <dd class="mt-2 text-small leading-relaxed text-ink-muted">{limit.body}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="mt-6 text-small text-ink-muted">
+          The full list, with workarounds and what would change it, is in
+          <a class="link-accent" href={docLink("KNOWN_LIMITATIONS.md")}>known limitations</a>.
+        </p>
+      </Section>
+
+      <Section class="pt-20 sm:pt-24" heading="Start in five minutes">
+        <div class="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-12">
+          <div class="measure">
+            <p>
+              You need a C compiler, Python 3.10 or newer, and git. That's the whole toolchain.
+              Clone, build the compiler, and run one of the examples.
+            </p>
+            <div class="mt-7 flex flex-wrap gap-3">
+              <LinkButton href={docLink("GETTING_STARTED.md")} variant="primary">
+                Getting started
+              </LinkButton>
+              <LinkButton href={docLink("TOUR.md")} variant="tertiary">Language tour</LinkButton>
+            </div>
+          </div>
+          <CodeBlock
+            label="shell"
+            lang="bash"
+            code={`git clone ${REPO.url}.git
+cd orbit-lang
+python scripts/build_selfhost.py --out orbit
+./orbit build examples/health_service.orb -o health_service
+./health_service 8080
+curl http://127.0.0.1:8080/health`}
+          />
+        </div>
+      </Section>
+
+      <Section class="pt-20 sm:pt-24" heading="From the author">
+        <blockquote class="measure border-l-2 border-line-strong pl-6">
+          <p class="text-lead text-ink">
+            I'm building Orbit because I didn't have an exceptional machine. I needed a language
+            that needs little to be fast, and I wanted the toolchain to be something I could read
+            end to end.
+          </p>
+          <p class="mt-4 text-small text-ink-muted">
+            One person, a modest PC, and a compiler that compiles itself. If that sounds like a
+            small project, it is. I measure what I can and say what I can't.
+          </p>
+          <footer class="mt-5 text-small text-ink-subtle">
+            <a class="link-accent" href="/foundation">Read the longer version</a>
+          </footer>
+        </blockquote>
+      </Section>
+    </div>
   </main>
+
+  <Footer />
 </Base>

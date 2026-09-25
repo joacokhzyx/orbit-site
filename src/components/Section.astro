@@ -1,0 +1,47 @@
+---
+// A page section with an optional eyebrow, a heading, and an optional
+// lead sentence. The heading level is a prop so each page keeps one
+// correct outline instead of repeating <h2> by habit.
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingLevel?: 2 | 3;
+  lead?: string;
+  class?: string;
+}
+
+const {
+  id,
+  eyebrow,
+  heading,
+  headingLevel = 2,
+  lead,
+  class: className = "",
+} = Astro.props;
+
+const Heading = `h${headingLevel}` as "h2" | "h3";
+---
+
+<section id={id} class:list={["scroll-mt-24", className]}>
+  {
+    heading && (
+      <header class="mb-8 sm:mb-10">
+        {eyebrow && (
+          <p class="mb-3 text-micro font-semibold tracking-[0.1em] text-ink-subtle uppercase">
+            {eyebrow}
+          </p>
+        )}
+        <Heading
+          class:text-title={headingLevel === 2}
+          class:text-heading={headingLevel === 3}
+          class="text-balance"
+        >
+          {heading}
+        </Heading>
+        {lead && <p class="measure mt-4 text-lead text-ink-muted">{lead}</p>}
+      </header>
+    )
+  }
+  <slot />
+</section>

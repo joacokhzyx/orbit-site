@@ -1,40 +1,144 @@
 ---
-const links = [
-  { label: "Learn", href: "/learn" },
-  { label: "Foundation", href: "/foundation" },
-  { label: "Changelog", href: "/changelog" },
-  { label: "Docs", href: "/docs" },
-  { label: "Github", href: "https://github.com/joacokhzyx/orbit-lang" },
-];
+import Logo from "./Logo.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { NAV } from "../data/site";
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+
+function isCurrent(href: string): boolean {
+  if (href.startsWith("http")) return false;
+  const clean = href.replace(/\/+$/, "") || "/";
+  return clean === "/" ? path === "/" : path === clean || path.startsWith(`${clean}/`);
+}
+
+const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
 ---
 
-<header class="mx-auto flex w-full max-w-7xl items-center justify-between px-5 pt-4 sm:px-8">
-  <a href="/" class="flex flex-none items-center gap-2.5" aria-label="Orbit home">
-    <svg class="block h-12 w-12 shrink-0" viewBox="0 0 88 92" fill="none" aria-hidden="true">
-      <path
-        fill-rule="nonzero"
-        fill="currentColor"
-        d="M1.09142 50.1258C4.81812 45.8244 6.66107 43.6499 10.5505 38.945C11.018 38.3842 11.9801 37.1875 12.6917 36.2918C14.3855 34.1651 14.6364 33.652 14.6296 32.3392C14.6228 31.2449 14.2908 30.4723 13.1592 28.9609C9.41892 23.9621 7.30491 19.4008 7.17619 16.0703C7.12202 14.6479 7.3389 13.7384 7.96214 12.7741C8.63976 11.7279 9.87286 11.0166 11.3772 10.8114C15.1107 10.2918 20.9446 12.8494 26.4059 17.3832C27.3138 18.1355 28.7706 19.4212 28.7706 19.469C28.7706 19.5168 28.6147 19.4006 27.9574 18.8672C27.1375 18.2107 26.1145 17.479 25.0439 16.7814C21.4323 14.429 18.3185 13.5027 15.1745 13.0789C14.4223 12.983 13.2028 13.0311 12.6199 13.1882C11.2377 13.5711 10.35 14.4602 10.0384 15.7936C9.90288 16.3817 9.94345 17.9615 10.113 18.5905C10.8312 21.2849 11.8513 23.3804 14.0943 25.6986C16.0322 27.7091 17.6041 28.6119 19.2913 28.7006C20.1383 28.7484 20.7753 28.6322 21.4527 28.304C22.4216 27.8459 22.2928 27.9689 27.5917 22.2519C28.7436 21.0074 30.4984 19.1268 31.4944 18.0735C35.3227 14.0189 38.968 10.0457 41.8816 6.77007C42.3627 6.22296 43.6636 4.78015 44.7613 3.55601C45.8589 2.33873 47.0313 1.03955 47.3565 0.670168C47.6885 0.300997 47.9731 0 47.9933 0C48.0135 0 47.9865 0.0546677 47.9323 0.123057C47.7832 0.293922 46.4282 1.94212 45.9403 2.53703C45.7166 2.81745 45.0324 3.65848 44.4225 4.41076C43.8127 5.16304 43.0877 6.05874 42.8098 6.39382C42.5624 6.70422 42.3116 7.01195 42.0577 7.31697C41.0007 8.6095 35.5461 15.482 34.0216 17.4379C33.5405 18.0602 32.9984 18.7508 32.8223 18.9765C31.9008 20.1186 31.5552 21.5614 31.8872 22.8676C32.0769 23.6336 32.3751 24.2011 33.0797 25.1311C34.9635 27.6475 36.3185 29.8017 37.545 32.2431C38.602 34.3561 39.1035 35.6623 39.4016 37.1326C40.0724 40.3741 39.3 42.7744 37.2808 43.7659C36.5218 44.1351 36.1154 44.2103 34.8008 44.2034C33.7775 44.2034 33.4931 44.176 32.7341 44.012C28.2487 43.0546 22.0284 39.314 18.0646 35.1768C17.4888 34.575 17.4888 34.575 18.1324 35.163C19.4808 36.3872 21.7304 38.0146 23.4446 39.0063C26.3987 40.7227 29.0114 41.3823 31.5388 41.7926C32.3721 41.9225 33.8087 41.9225 34.3778 41.7926C35.2788 41.5737 36.0106 41.1018 36.4104 40.466C37.447 38.8384 37.6465 36.6882 36.0135 33.6793C34.1907 30.3422 31.5618 27.5041 29.143 26.2733C27.6726 25.5279 26.1075 25.4527 24.8064 26.0819C24.1492 26.3964 23.2955 27.0597 22.767 27.6821C22.1029 28.4547 18.9251 31.8055 15.5576 35.2863C13.9382 36.9617 12.1833 38.7739 11.6616 39.321C11.1331 39.8681 8.32793 42.7881 5.42117 45.8176C2.51442 48.847 0.0752021 51.3703 0.00744017 51.425C-0.0671192 51.4797 0.427395 50.8987 1.09142 50.1258Z"
-      />
-    </svg>
-    <span class="font-logo text-2xl tracking-tight">
-      Orbit<sup class="align-super text-[8px] font-semibold">TM</sup>
-    </span>
-  </a>
-  <nav class="flex items-center gap-4 text-base font-medium sm:gap-6 sm:text-lg" aria-label="Primary">
-    {
-      links.map((l) =>
-        l.href.startsWith("http") ? (
-          <a class="transition-opacity hover:opacity-60" href={l.href} target="_blank" rel="noreferrer">
-            {l.label}
-          </a>
-        ) : (
-          <a class="hidden transition-opacity hover:opacity-60 sm:inline" href={l.href}>
-            {l.label}
-          </a>
-        ),
-      )
-    }
-    <a class="transition-opacity hover:opacity-60 sm:hidden" href="/docs">Docs</a>
-  </nav>
+<header
+  class="sticky top-0 z-50 border-b border-line bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70"
+>
+  <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8">
+    <a
+      href="/"
+      class="group -ml-1 flex items-center gap-2.5 rounded-md px-1 py-1"
+      aria-label="Orbit, home"
+      aria-current={path === "/" ? "page" : undefined}
+    >
+      <Logo class="h-7 w-7 text-ink transition-transform duration-300 group-hover:rotate-[8deg]" />
+      <span class="font-logo text-[1.35rem] leading-none font-semibold tracking-tight text-ink">
+        Orbit
+      </span>
+    </a>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+      <nav class="hidden items-center gap-1 sm:flex" aria-label="Primary">
+        {
+          links.map((link) =>
+            link.external ? (
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1 rounded-md px-3 py-2 text-small text-ink-muted transition-colors hover:text-ink"
+              >
+                {link.label}
+                <svg
+                  class="h-3 w-3 opacity-60"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <path d="M4.5 2.5h5v5M9.5 2.5 4 8M7.5 9.5h-5v-5" />
+                </svg>
+              </a>
+            ) : (
+              <a
+                href={link.href}
+                aria-current={link.current ? "page" : undefined}
+                class:list={[
+                  "rounded-md px-3 py-2 text-small transition-colors",
+                  link.current
+                    ? "text-ink underline decoration-line-strong decoration-1 underline-offset-[0.35em]"
+                    : "text-ink-muted hover:text-ink",
+                ]}
+              >
+                {link.label}
+              </a>
+            ),
+          )
+        }
+      </nav>
+
+      <ThemeToggle />
+
+      {/* The mobile menu is a disclosure, not a component: no framework
+          runtime ships for it, and it works before hydration because
+          there is no hydration. */}
+      <details class="group/menu relative sm:hidden">
+        <summary
+          class="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-line-strong hover:text-ink [&::-webkit-details-marker]:hidden"
+          aria-label="Menu"
+        >
+          <svg
+            class="h-4 w-4 group-open/menu:hidden"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+          <svg
+            class="hidden h-4 w-4 group-open/menu:block"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </summary>
+
+        <nav
+          class="absolute right-0 z-50 mt-3 w-56 overflow-hidden rounded-lg border border-line bg-surface shadow-md"
+          aria-label="Primary, mobile"
+        >
+          <ul class="flex flex-col p-1.5">
+            {
+              links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                    aria-current={link.current ? "page" : undefined}
+                    class:list={[
+                      "flex items-center justify-between rounded-md px-3 py-2.5 text-small transition-colors",
+                      link.current
+                        ? "bg-accent-soft text-ink"
+                        : "text-ink-muted hover:bg-sunken hover:text-ink",
+                    ]}
+                  >
+                    {link.label}
+                    {link.external && (
+                      <span class="text-micro text-ink-subtle" aria-hidden="true">
+                        ↗
+                      </span>
+                    )}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </details>
+    </div>
+  </div>
 </header>

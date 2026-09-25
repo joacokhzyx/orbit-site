@@ -230,4 +230,35 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
   }
+
+  /* Shiki emits both palettes as custom properties when `defaultColor` is
+     false. The container keeps our own surface in both themes, and only
+     the token colours swap, so code blocks don't turn into white slabs
+     on a dark page. */
+  .code-surface {
+    margin: 0;
+    padding: 1rem 1.125rem;
+    overflow-x: auto;
+    background-color: var(--surface-sunken) !important;
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    line-height: 1.7;
+    tab-size: 2;
+  }
+
+  .code-surface,
+  .code-surface span {
+    color: var(--shiki-light) !important;
+    font-style: var(--shiki-light-font-style) !important;
+    font-weight: var(--shiki-light-font-weight) !important;
+    text-decoration: var(--shiki-light-text-decoration) !important;
+  }
+
+  .dark .code-surface,
+  .dark .code-surface span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+  }
 }

@@ -1,0 +1,221 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import PageHero from "../components/PageHero.astro";
+import Section from "../components/Section.astro";
+import Callout from "../components/Callout.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import LinkButton from "../components/LinkButton.astro";
+import Prose from "../components/Prose.astro";
+import { REPO, docLink, sourceLink } from "../data/site";
+
+// Excerpts, not invented samples. Each block is a trimmed copy of the file
+// named in its label, so what a reader copies is what the repository runs.
+const params = `// Excerpt from examples/params_service.orb
+route GET "/notes/:id" {
+    val id = req.param("id")
+    return ok 200 "{\\"note\\":\\"" + id + "\\"}"
+}
+
+route GET "/posts/search" {
+    return ok 200 "{\\"static\\":true}"
+}
+
+route GET "/posts/:id" {
+    val id = req.param("id")
+    return ok 200 "{\\"post\\":\\"" + id + "\\"}"
+}`;
+
+const shape = `// Excerpt from examples/posts_crud.orb
+model Post {
+    id: string
+    title: string
+    body: string
+    views: int
+    rating: float
+    published: bool
+}
+
+route GET "/posts" {
+    val posts = Post.all()
+    return ok 200 posts
+}
+
+route POST "/posts" {
+    val payload = req.body()
+    if payload == "" || payload == "{}" {
+        err 400 "post a JSON body with id and title"
+    }
+    val created = Post.create(payload)
+    if created {
+        return ok 201 payload
+    }
+    return ok 400 "{\\"stored\\":false}"
+}`;
+
+const build = `python scripts/build_selfhost.py --out orbit
+./orbit build examples/blog_api.orb -o blog_api
+./blog_api 8080`;
+
+const steps = [
+  {
+    title: "Clone and build the compiler",
+    body: "Two commands with a C compiler and Python. The build reaches a fixed point you can verify, and a committed C file is the trust root.",
+    href: docLink("GETTING_STARTED.md"),
+    linkLabel: "Getting started",
+  },
+  {
+    title: "Read the language tour",
+    body: "Functions, bindings, models, routes, SQLite reads, and telemetry. Every snippet is runnable and every output is verified.",
+    href: docLink("TOUR.md"),
+    linkLabel: "Language tour",
+  },
+  {
+    title: "Build a real service",
+    body: "A blog API with bearer auth, expected outputs included. Then a file server, then deploying one binary.",
+    href: docLink("tutorials/blog-api.md"),
+    linkLabel: "Blog API tutorial",
+  },
+  {
+    title: "Check what it can't do",
+    body: "Twelve known limits with workarounds, kept next to the docs that use each feature, so you don't find them at midnight.",
+    href: docLink("KNOWN_LIMITATIONS.md"),
+    linkLabel: "Known limitations",
+  },
+];
+---
+
+<Base
+  title="Learn Orbit"
+  description="What Orbit is, how to run it, and where the honest limits are. A statically typed language for APIs and microservices with a compiler written in itself."
+>
+  <Nav />
+
+  <main id="main" class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+    <PageHero
+      eyebrow="Learn"
+      heading="Start with code, not with theory."
+      lead="Orbit is a statically typed language for APIs and microservices. You need a C compiler, Python, and git. Nothing else stands between you and a running service."
+    >
+      <div class="mt-8 flex flex-wrap gap-3">
+        <LinkButton href={docLink("GETTING_STARTED.md")} variant="primary">
+          Getting started
+        </LinkButton>
+        <LinkButton href={docLink("TOUR.md")} variant="secondary">Language tour</LinkButton>
+      </div>
+    </PageHero>
+
+    <Section class="pt-16 sm:pt-20" heading="What a route looks like">
+      <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <Prose>
+          <p>
+            A service is a list of routes. Each one takes a request, does something small, and
+            returns a status and a body. There's no framework object to subclass and no plugin
+            registry to configure.
+          </p>
+          <p>
+            A segment like <code>:id</code> or <code>&#123;id&#125;</code> captures one non-empty
+            segment and binds through <code>req.param("id")</code>. Static routes win over
+            parameter routes, so <code>/posts/search</code> and <code>/posts/:id</code> both work
+            without colliding.
+          </p>
+        </Prose>
+        <CodeBlock code={params} label="examples/params_service.orb" />
+      </div>
+    </Section>
+
+    <Section
+      class="pt-16 sm:pt-20"
+      heading="Models are tables"
+      lead="Declare a model and the runtime creates its table on startup. Reads and writes work today."
+    >
+      <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <CodeBlock code={shape} label="examples/posts_crud.orb" />
+        <div>
+        <Prose>
+          <p>
+            A model becomes a table. The runtime creates it on startup from the declared fields:{" "}
+            <code>string</code> to <code>TEXT</code>, <code>int</code> and <code>bool</code> to{" "}
+            <code>INTEGER</code>, <code>float</code> to <code>REAL</code>, and an{" "}
+            <code>id</code> field to the primary key.
+          </p>
+          <p>
+            <code>Model.create()</code> stores the row and returns <code>true</code>, or{" "}
+            <code>false</code> when the id already exists or the payload has no usable fields.
+            <code>Model.delete()</code> returns <code>true</code> only when a row was actually
+            removed.
+          </p>
+          <p>
+            The honest catch: tables are <strong>created</strong>, never migrated. Adding a field
+            later doesn't alter an existing table, and there's no schema versioning yet.
+          </p>
+        </Prose>
+          <Callout variant="limit" class="mt-6">
+            <p>
+              No migration story in 0.1. The
+              <a href={docLink("guides/migrations.md")}>migrations guide</a> describes the manual
+              practice that works today.
+            </p>
+          </Callout>
+        </div>
+      </div>
+    </Section>
+
+    <Section class="pt-16 sm:pt-20" heading="Where to go next">
+      <div class="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
+        {
+          steps.map((step, index) => (
+            <div class="bg-paper p-6 sm:p-7">
+              <p class="font-mono text-micro text-ink-subtle">
+                {String(index + 1).padStart(2, "0")}
+              </p>
+              <h3 class="mt-3 text-subheading font-semibold text-ink">{step.title}</h3>
+              <p class="mt-3 text-small leading-relaxed text-ink-muted">{step.body}</p>
+              <a class="link-accent mt-4 inline-block text-small" href={step.href}>
+                {step.linkLabel}
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </Section>
+
+    <Section class="pt-16 sm:pt-20" heading="Build it yourself">
+      <div class="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-12">
+        <Prose>
+          <p>
+            Orbit's own compiler is written in Orbit, so the toolchain is something you can read
+            end to end. If a build step surprises you, the answer is in the repository, not in a
+            wiki page.
+          </p>
+          <p>
+            On Windows the same commands produce <code>.\orbit.exe</code>. The
+            <a href={docLink("SUPPORT.md")}>platform support page</a> lists what's verified where.
+          </p>
+        </Prose>
+        <CodeBlock label="shell" lang="bash" code={build} />
+      </div>
+    </Section>
+
+    <section class="mt-20 rounded-lg border border-line bg-surface p-8 sm:p-10">
+      <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div class="measure">
+          <h2 class="text-heading font-semibold text-ink">Prefer the source to the summary?</h2>
+          <p class="mt-3 text-small text-ink-muted">
+            The compiler, the runtime, the test suite, and the documentation all live in one
+            repository. I'd rather you check my claims than take them.
+          </p>
+        </div>
+        <div class="flex flex-none flex-wrap gap-3">
+          <LinkButton href={REPO.url} variant="primary">GitHub</LinkButton>
+          <LinkButton href={sourceLink("compiler/main.orb")} variant="tertiary">
+            Read the compiler
+          </LinkButton>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>

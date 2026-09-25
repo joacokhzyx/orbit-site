@@ -1,0 +1,51 @@
+---
+// Buttons follow the CTA order in section 28 of the brand system:
+// read the docs first, try Orbit second, GitHub third. The visual weight
+// follows the same order, so the primary action is never ambiguous.
+interface Props {
+  href: string;
+  variant?: "primary" | "secondary" | "tertiary";
+  external?: boolean;
+  class?: string;
+}
+
+const {
+  href,
+  variant = "secondary",
+  external = href.startsWith("http"),
+  class: className = "",
+} = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center gap-1.5 rounded-full text-small font-medium transition-colors";
+
+const variants = {
+  primary: "bg-ink px-5 py-2.5 text-paper hover:bg-ink-muted",
+  secondary: "border border-line-strong px-5 py-2.5 text-ink hover:border-ink hover:bg-sunken",
+  tertiary: "px-1 py-1 text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink",
+} as const;
+---
+
+<a
+  href={href}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
+  class:list={[base, variants[variant], className]}
+>
+  <slot />
+  {
+    external && (
+      <svg
+        class="h-3 w-3 opacity-55"
+        viewBox="0 0 12 12"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M4.5 2.5h5v5M9.5 2.5 4 8M7.5 9.5h-5v-5" />
+      </svg>
+    )
+  }
+</a>
