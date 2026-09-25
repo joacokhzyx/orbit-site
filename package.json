@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && node scripts/check-links.mjs",
     "preview": "astro preview",
     "check": "astro check",
+    "check:links": "node scripts/check-links.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "astro": "astro"
   },
