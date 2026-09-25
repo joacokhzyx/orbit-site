@@ -1,36 +1,233 @@
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/outfit/wght.css";
 @import "tailwindcss";
 
-@theme {
-  --color-orbit-bg: #f7f6f2;
-  --color-orbit-ink: #111111;
-  --font-sans: "SF Pro", -apple-system, BlinkMacSystemFont, "Inter",
-    ui-sans-serif, system-ui, sans-serif;
-  --font-logo: "Outfit", "SF Pro", ui-sans-serif, system-ui, sans-serif;
-}
+/* Dark mode is a class on <html>, set before first paint by the inline
+   script in Base.astro, so the toggle never flashes the wrong palette. */
+@custom-variant dark (&:where(.dark, .dark *));
 
+/* ---------------------------------------------------------------------------
+   Palette
+   The mark is monochrome, so the interface stays monochrome. Ink does the
+   work and one deep indigo is reserved for interactive states, so nothing
+   on the page competes with the words. Colours are checked for contrast
+   against their own surface, not against each other.
+--------------------------------------------------------------------------- */
 :root {
+  --paper: #f7f6f2;
+  --surface: #fffefb;
+  --surface-sunken: #f1efe8;
+  --ink: #111110;
+  --ink-muted: #56534c;
+  --ink-subtle: #86827a;
+  --line: #e6e3da;
+  --line-strong: #d6d2c6;
+  --accent: #322c87;
+  --accent-hover: #241f63;
+  --accent-soft: #eceaf7;
+  --accent-ink: #ffffff;
+  --status-measuring-bg: #fbf0d9;
+  --status-measuring-ink: #6b4c05;
+  --elevation-sm: 0 1px 2px rgb(17 17 16 / 0.04);
+  --elevation-md: 0 2px 4px rgb(17 17 16 / 0.04), 0 8px 24px rgb(17 17 16 / 0.06);
+
   color-scheme: light;
 }
 
-html {
-  background: var(--color-orbit-bg);
-  color: var(--color-orbit-ink);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(17, 17, 17, 0.25) transparent;
+.dark {
+  --paper: #0d0d0f;
+  --surface: #16161a;
+  --surface-sunken: #111114;
+  --ink: #f2f0ec;
+  --ink-muted: #a8a49c;
+  --ink-subtle: #7a766e;
+  --line: #26262b;
+  --line-strong: #35353c;
+  --accent: #a9b0f5;
+  --accent-hover: #c3c8f9;
+  --accent-soft: #1d1d2b;
+  --accent-ink: #0d0d0f;
+  --status-measuring-bg: #2a2312;
+  --status-measuring-ink: #e8c877;
+  --elevation-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --elevation-md: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.45);
+
+  color-scheme: dark;
 }
 
-::-webkit-scrollbar {
-  width: 10px;
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-measuring: var(--status-measuring-ink);
+  --color-measuring-bg: var(--status-measuring-bg);
+
+  --font-sans:
+    "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-logo: "Outfit Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  /* Fluid scale. Short headline, then a longer explanatory wave. */
+  --text-display: clamp(2.5rem, 1.35rem + 5.2vw, 5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.03em;
+  --text-title: clamp(2rem, 1.3rem + 3.2vw, 3.25rem);
+  --text-title--line-height: 1.08;
+  --text-title--letter-spacing: -0.025em;
+  --text-heading: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
+  --text-heading--line-height: 1.2;
+  --text-heading--letter-spacing: -0.02em;
+  --text-subheading: clamp(1.25rem, 1.1rem + 0.7vw, 1.5rem);
+  --text-subheading--line-height: 1.3;
+  --text-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.65;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.6;
+  --text-micro: 0.8125rem;
+  --text-micro--line-height: 1.5;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: var(--elevation-md);
+
+  --container-measure: 68ch;
+  --container-prose: 46rem;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--color-orbit-bg);
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+@layer base {
+  html {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-size: var(--text-body);
+    line-height: 1.65;
+    font-synthesis-weight: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    font-weight: 600;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Focus is always visible and always the accent, on every surface. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--line-strong);
+    border: 2px solid var(--paper);
+    border-radius: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(17, 17, 17, 0.22);
-  border-radius: 8px;
-  border: 2px solid var(--color-orbit-bg);
+@layer components {
+  /* One definition of the editorial measure, used by every text block. */
+  .measure {
+    max-width: var(--container-measure);
+  }
+
+  .prose-measure {
+    max-width: var(--container-prose);
+  }
+
+  /* Link underline that sits under the text, not through the descenders. */
+  .link {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--line-strong);
+    transition: text-decoration-color 150ms ease;
+
+    &:hover {
+      text-decoration-color: var(--ink);
+    }
+  }
+
+  .link-accent {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    transition: text-decoration-color 150ms ease;
+
+    &:hover {
+      text-decoration-color: var(--accent);
+    }
+  }
+
+  /* Rules and cards are separated by hairlines, not by heavy shadows. */
+  .card {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
 }
