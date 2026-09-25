@@ -1,5 +1,8 @@
 ---
-import "../styles/global.css";
+// This file is the HTML shell only. Stylesheets are imported by the
+// pages, not from here, because the design prototypes bring their own
+// tokens and a conditional import here gets hoisted into a shared chunk
+// anyway, which leaked the site fonts into all three of them.
 import { SITE } from "../data/site";
 
 interface Props {
@@ -7,21 +10,29 @@ interface Props {
   description?: string;
   /** Set on pages that shouldn't be indexed (none today, but the escape hatch exists). */
   noindex?: boolean;
+  /** Extra attributes for <html>, used by the design prototypes to scope a palette. */
+  htmlClass?: string;
+  htmlAttrs?: Record<string, string>;
 }
 
 const {
   title,
   description = SITE.description,
   noindex = false,
+  htmlClass = "",
+  htmlAttrs = {},
 } = Astro.props;
 
-const pageTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
+// A middle dot rather than a dash. The em dash reads as a tic once it is
+// in every title on the site, and the dot is what an editorial title
+// page would use anyway.
+const pageTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} · ${SITE.tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
 const ogImage = new URL("/og.png", Astro.site ?? SITE.url).href;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class={htmlClass} {...htmlAttrs}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

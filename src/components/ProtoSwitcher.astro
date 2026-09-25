@@ -1,0 +1,44 @@
+---
+// Fixed switcher shown on every prototype. The point is to make the
+// comparison cheap: one click moves between the three directions and
+// back to the real site, without losing your place.
+const { current } = Astro.props;
+
+const items = [
+  { id: "a", label: "A", name: "Informe" },
+  { id: "b", label: "B", name: "Manuscrito" },
+  { id: "c", label: "C", name: "Manual" },
+];
+---
+
+<div
+  class="fixed bottom-4 left-4 z-50 flex items-center gap-1 rounded-full border border-line bg-surface p-1"
+  style="border-color: var(--line-2); box-shadow: 0 4px 20px rgb(0 0 0 / 0.18)"
+>
+  <span class="mono px-2" style="font-size: 0.6875rem; color: var(--ink-3)">PROTOTIPO</span>
+  {
+    items.map((item) => (
+      <a
+        href={`/p/${item.id}`}
+        class="mono flex h-9 items-center gap-1.5 rounded-full px-3 transition-colors"
+        style={`font-size: 0.75rem; ${
+          item.id === current
+            ? "background-color: var(--ink); color: var(--paper);"
+            : "color: var(--ink-2);"
+        }`}
+        aria-current={item.id === current ? "true" : undefined}
+        title={item.name}
+      >
+        {item.label}
+        <span class="hidden sm:inline">{item.name}</span>
+      </a>
+    ))
+  }
+  <a
+    href="/"
+    class="mono flex h-9 items-center rounded-full px-3"
+    style="font-size: 0.75rem; color: var(--ink-3)"
+  >
+    Salir
+  </a>
+</div>

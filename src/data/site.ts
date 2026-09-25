@@ -14,7 +14,7 @@ export const SITE = {
     "Orbit is a statically typed language for APIs and microservices, with a compiler written in itself. It compiles to C, so a service ships as one native binary.",
   locale: "en",
   author: "Joaquín",
-  founderLine: "Built by Joaquín — Argentina. Early research.",
+  founderLine: "Built by Joaquín, in Argentina. Early research.",
 } as const;
 
 export const REPO = {

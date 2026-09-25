@@ -1,0 +1,219 @@
+---
+// B. MANUSCRITO
+// A magazine set properly. A serif carries the headlines and the body,
+// the column is narrow, the leading is open, and the section number
+// hangs in the outer margin. Oxblood is the only colour, and it exists
+// because a link has to look like a link.
+import "@fontsource-variable/newsreader";
+import "@fontsource-variable/ibm-plex-sans";
+import "@fontsource-variable/jetbrains-mono";
+import "../../styles/proto-tokens.css";
+import Base from "../../layouts/Base.astro";
+import Logo from "../../components/Logo.astro";
+import ProtoSwitcher from "../../components/ProtoSwitcher.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+import { HERO, SECTIONS, FOUNDER, NAV } from "../../data/proto-content";
+---
+
+<Base
+  title="Prototype B: Manuscrito"
+  description="Design direction B. A serif editorial column with a hanging margin and one oxblood for links."
+  noindex
+  htmlAttrs={{ "data-proto": "b" }}
+>
+  <div class="flex min-h-dvh flex-col">
+    <header class="mx-auto w-full max-w-5xl px-6 pt-8 sm:px-8">
+      <div class="flex items-center justify-between gap-6 pb-8">
+        <a href="/p" class="flex items-center gap-2.5" aria-label="Orbit, home">
+          <Logo class="h-6 w-6" />
+          <span class="display-face t-4">Orbit</span>
+        </a>
+        <nav aria-label="Primary" class="flex flex-wrap items-center gap-x-5 gap-y-1">
+          {
+            NAV.map((item) => (
+              <a
+                href={item.href}
+                class="t-6 transition-colors"
+                style="color: var(--ink-2)"
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+      <div class="rule" />
+    </header>
+
+    <main class="flex-1">
+      {/* The lead spread: a wide outer margin, a narrow measure, and the
+          section number hanging where a folio would sit. */}
+      <section class="mx-auto w-full max-w-5xl px-6 pt-16 pb-14 sm:px-8 sm:pt-24">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem">
+          <p class="label">{HERO.eyebrow}</p>
+          <h1 class="display-face t-1" style="max-width: 16ch; font-weight: 500">
+            {HERO.headline}
+          </h1>
+          <p
+            class="display-face t-4 mt-2"
+            style="max-width: 44ch; color: var(--ink-2); font-weight: 400"
+          >
+            {HERO.lead}
+          </p>
+          <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <a
+              href="/p"
+              class="t-6 inline-flex h-11 items-center rounded-full px-6"
+              style="background-color: var(--ink); color: var(--paper)"
+            >
+              {HERO.primary}
+            </a>
+            <a
+              href="/p"
+              class="t-6 inline-flex h-11 items-center rounded-full px-6 underline underline-offset-4"
+              style="color: var(--link); text-decoration-color: var(--line-2)"
+            >
+              {HERO.secondary}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {
+        SECTIONS.map((section) => (
+          <section class="mx-auto w-full max-w-5xl px-6 sm:px-8" style="padding: 3.25rem 0">
+            <div class="rule" style="margin-bottom: 2.5rem" />
+
+            <div
+              style="display: grid; grid-template-columns: 1fr; gap: 1.25rem; max-width: 34rem"
+            >
+              <div class="flex items-baseline gap-4">
+                <span class="mono t-7" style="color: var(--ink-3)">
+                  {section.number}
+                </span>
+                <h2 class="display-face t-2" style="max-width: 22ch; font-weight: 500">
+                  {section.heading}
+                </h2>
+              </div>
+
+              {"lead" in section && section.lead && (
+                <p class="display-face t-4" style="color: var(--ink-2); font-weight: 400">
+                  {section.lead}
+                </p>
+              )}
+
+              {"items" in section && section.items && (
+                <div class="mt-4 flex flex-col gap-6">
+                  {section.items.map((item) => (
+                    <div>
+                      <h3 class="display-face t-4" style="font-weight: 600">
+                        {item.title}
+                      </h3>
+                      <p class="t-5 mt-1" style="color: var(--ink-2)">
+                        {item.body}
+                      </p>
+                      {"link" in item && item.link && (
+                        <a
+                          href={item.link.href}
+                          class="t-6 mt-2 inline-block underline underline-offset-4"
+                          style="color: var(--link); text-decoration-color: var(--line-2)"
+                        >
+                          {item.link.label}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {"paragraphs" in section && section.paragraphs && (
+                <div class="mt-2 flex flex-col gap-4">
+                  {section.paragraphs.map((p) => (
+                    <p class="t-5" style="color: var(--ink-2)">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {"chip" in section && section.chip && (
+                <div class="mt-3">
+                  <span class="chip">{section.chip}</span>
+                  {/* No box. A hanging note with a short rule, the way a
+                      margin note is set. */}
+                  <div
+                    class="mt-4 pl-4"
+                    style="border-left: 2px solid var(--line-2); max-width: 46ch"
+                  >
+                    <p class="t-5" style="color: var(--ink-2)">
+                      {section.aside}
+                    </p>
+                  </div>
+                  <div class="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+                    {section.actions.map((action) => (
+                      <a
+                        href={action.href}
+                        class="t-6 underline underline-offset-4"
+                        style="color: var(--link); text-decoration-color: var(--line-2)"
+                      >
+                        {action.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {"footnote" in section && section.footnote && (
+                <p class="t-6" style="color: var(--ink-3)">
+                  {section.footnote}
+                </p>
+              )}
+
+              {"code" in section && section.code && (
+                <div class="mt-3">
+                  <CodeBlock class="code-figure" code={section.code} label="shell" lang="bash" />
+                </div>
+              )}
+
+              {"link" in section && section.link && (
+                <a
+                  href={section.link.href}
+                  class="t-6 inline-block underline underline-offset-4"
+                  style="color: var(--link); text-decoration-color: var(--line-2)"
+                >
+                  {section.link.label}
+                </a>
+              )}
+            </div>
+          </section>
+        ))
+      }
+    </main>
+
+    <footer class="rule" style="background-color: var(--surface)">
+      <div
+        class="mx-auto flex w-full max-w-5xl flex-col gap-5 px-6 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-8"
+      >
+        <div>
+          <p class="display-face t-4">Orbit</p>
+          <p class="t-6 mt-1" style="color: var(--ink-3)">{FOUNDER}</p>
+        </div>
+        <nav aria-label="Footer" class="flex flex-wrap gap-x-6 gap-y-2">
+          {
+            NAV.map((item) => (
+              <a
+                href={item.href}
+                class="t-6 underline underline-offset-4"
+                style="color: var(--ink-2); text-decoration-color: var(--line-2)"
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </footer>
+  </div>
+
+  <ProtoSwitcher current="b" />
+</Base>

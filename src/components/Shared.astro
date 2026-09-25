@@ -1,0 +1,107 @@
+---
+// SHARED PARTS
+// The nav, the hero and the footer are drawn once here and rendered by
+// each direction with its own arrangement. The copy is never duplicated,
+// so the three prototypes can only differ visually.
+//
+// Directions that do not want this part (C builds a sidebar instead)
+// simply do not use it.
+import Logo from "./Logo.astro";
+import { HERO, FOUNDER, NAV } from "../data/proto-content";
+
+interface Props {
+  /** Which parts to draw. C uses the footer without the nav or the hero. */
+  nav?: boolean;
+  hero?: boolean;
+  footer?: boolean;
+}
+
+const { nav = false, hero = false, footer = false } = Astro.props;
+---
+
+{
+  nav && (
+    <header
+      class="sticky top-0 z-40 bg-paper"
+      style="border-bottom: 1px solid var(--line)"
+    >
+      <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-4 sm:px-8">
+        <a href="/p" class="flex items-center gap-2.5" aria-label="Orbit, home">
+          <Logo class="h-6 w-6" />
+          <span class="display-face t-4" style="letter-spacing: -0.02em">
+            Orbit
+          </span>
+        </a>
+        <nav aria-label="Primary" class="flex items-center gap-1">
+          {NAV.map((item) => (
+            <a
+              href={item.href}
+              class="t-6 rounded-md px-3 py-2 transition-colors hover:bg-surface-2"
+              style="color: var(--ink-2)"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+  )
+}
+
+{
+  hero && (
+    <section class="mx-auto w-full max-w-6xl px-6 pt-20 pb-16 sm:px-8 sm:pt-28">
+      <p class="label">{HERO.eyebrow}</p>
+      <h1 class="display-face t-1 mt-6" style="max-width: 18ch">
+        {HERO.headline}
+      </h1>
+      <p class="t-4 mt-8" style="max-width: var(--measure); color: var(--ink-2)">
+        {HERO.lead}
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a
+          href="/p"
+          class="t-6 inline-flex h-11 items-center rounded-full px-6 transition-opacity hover:opacity-85"
+          style="background-color: var(--ink); color: var(--paper)"
+        >
+          {HERO.primary}
+        </a>
+        <a
+          href="/p"
+          class="t-6 inline-flex h-11 items-center rounded-full px-6 transition-colors"
+          style="border: 1px solid var(--line-2); color: var(--ink)"
+        >
+          {HERO.secondary}
+        </a>
+      </div>
+    </section>
+  )
+}
+
+{
+  footer && (
+    <footer class="mt-auto rule" style="background-color: var(--surface)">
+      <div
+        class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-8"
+      >
+        <div>
+          <p class="display-face t-4">Orbit</p>
+          <p class="t-6 mt-2" style="color: var(--ink-3)">
+            {FOUNDER}
+          </p>
+        </div>
+        <nav aria-label="Footer" class="flex flex-wrap gap-x-6 gap-y-2">
+          {NAV.map((item) => (
+            <a
+              href={item.href}
+              class="t-6 underline underline-offset-4 transition-colors"
+              style="color: var(--ink-2); text-decoration-color: var(--line-2)"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </footer>
+  )
+}
