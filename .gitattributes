@@ -1,0 +1,12 @@
+# Normalize line endings in the repository; check out LF everywhere.
+# The CI and the local dev server should see the same bytes on every OS.
+* text=auto eol=lf
+
+# Binary assets stay binary.
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.avif binary
+*.woff2 binary
+*.ico binary
