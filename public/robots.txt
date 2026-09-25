@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Nothing here is private, and nothing here needs a crawler to guess at.
+# The documentation lives in the repository, linked from every page.
+Sitemap: https://orbit-lang.dev/sitemap-index.xml

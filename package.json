@@ -8,6 +8,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "icons": "node scripts/generate-icons.mjs",
     "astro": "astro"
   },
   "keywords": [

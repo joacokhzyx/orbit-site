@@ -17,6 +17,15 @@ const { code, label, lang = "orbit", class: className = "" } = Astro.props;
 
 const trimmed = code.replace(/^\n+|\n+$/g, "");
 
+/** The header shows the language, but only when the label doesn't already say it. */
+const LANG_NAMES: Record<string, string> = {
+  orbit: "Orbit",
+  bash: "Shell",
+  json: "JSON",
+  diff: "Diff",
+};
+const langName = LANG_NAMES[lang] ?? lang;
+
 const highlighter = await getHighlighter();
 
 const html = highlighter.codeToHtml(trimmed, {
@@ -45,10 +54,10 @@ const html = highlighter.codeToHtml(trimmed, {
   ]}
 >
   {
-    label && (
+    (label || lang !== "orbit") && (
       <figcaption class="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5">
-        <span class="truncate font-mono text-micro text-ink-subtle">{label}</span>
-        <span class="text-micro text-ink-subtle">Orbit</span>
+        <span class="truncate font-mono text-micro text-ink-subtle">{label ?? langName}</span>
+        {label && <span class="text-micro text-ink-subtle">{langName}</span>}
       </figcaption>
     )
   }

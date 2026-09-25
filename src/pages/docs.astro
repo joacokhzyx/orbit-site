@@ -1,0 +1,87 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import PageHero from "../components/PageHero.astro";
+import Section from "../components/Section.astro";
+import Callout from "../components/Callout.astro";
+import LinkButton from "../components/LinkButton.astro";
+import { REPO } from "../data/site";
+import { DOC_GROUPS, hrefFor, labelFor } from "../data/docs";
+
+const count = DOC_GROUPS.reduce((total, group) => total + group.entries.length, 0);
+---
+
+<Base
+  title="Documentation"
+  description="Start with the question you're trying to answer. Every Orbit document lives in the repository, where it can't go quietly out of date."
+>
+  <Nav />
+
+  <main id="main" class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+    <PageHero
+      eyebrow="Documentation"
+      heading="Start with the question you have."
+      lead={`The documentation isn't on this site. It lives in the repository, next to the code it describes, where it can't go quietly out of date. Here are the ${count} documents, grouped by what you're trying to do.`}
+    >
+      <div class="mt-8 flex flex-wrap gap-3">
+        <LinkButton href={hrefFor("GETTING_STARTED.md")} variant="primary">Getting started</LinkButton>
+        <LinkButton href={REPO.url} variant="secondary">Browse the repository</LinkButton>
+      </div>
+    </PageHero>
+
+    <Callout variant="note" class="mt-12" label="Why the docs aren't mirrored here">
+      <p>
+        Two copies of the same document is one copy too many. The moment one of them falls behind,
+        readers stop trusting both. So this page is an index: it tells you which document answers
+        your question, and links straight to it on GitHub where the tests live beside it.
+      </p>
+    </Callout>
+
+    <div class="pt-14">
+      {
+        DOC_GROUPS.map((group) => (
+          <Section class="pt-12 first:pt-0" heading={group.title} headingLevel={2}>
+            {group.note && <p class="-mt-4 mb-6 text-small text-ink-subtle">{group.note}</p>}
+            <ul class="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
+              {group.entries.map((entry) => (
+                <li class="bg-paper">
+                  <a
+                    href={hrefFor(entry.doc)}
+                    class="group/entry block h-full p-5 transition-colors hover:bg-sunken sm:p-6"
+                  >
+                    <p class="text-small font-semibold text-balance text-ink group-hover/entry:text-accent">
+                      {entry.question}
+                    </p>
+                    <p class="mt-2 text-small leading-relaxed text-ink-muted">{entry.blurb}</p>
+                    <p class="mt-3 font-mono text-micro text-ink-subtle">
+                      docs/{entry.doc}
+                    </p>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        ))
+      }
+    </div>
+
+    <section class="mt-20 rounded-lg border border-line bg-surface p-8 sm:p-10">
+      <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div class="measure">
+          <h2 class="text-heading font-semibold text-ink">Can't find what you need?</h2>
+          <p class="mt-3 text-small text-ink-muted">
+            Ask. I read every issue, and a question that the docs don't answer is a gap in the
+            docs, not in your understanding.
+          </p>
+        </div>
+        <div class="flex flex-none flex-wrap gap-3">
+          <LinkButton href={REPO.issues} variant="primary">Open an issue</LinkButton>
+          <LinkButton href={hrefFor("FAQ.md")} variant="tertiary">Read the FAQ first</LinkButton>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>

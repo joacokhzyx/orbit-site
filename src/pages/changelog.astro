@@ -1,0 +1,100 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import PageHero from "../components/PageHero.astro";
+import Section from "../components/Section.astro";
+import Callout from "../components/Callout.astro";
+import LinkButton from "../components/LinkButton.astro";
+import { REPO, docLink } from "../data/site";
+import { RELEASES } from "../data/releases";
+
+const ordered = [...RELEASES].sort((a, b) => b.date.localeCompare(a.date));
+const formatted = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
+---
+
+<Base
+  title="Changelog"
+  description="What changed in Orbit, newest first. Every entry comes from the git history, and the changelog in the repository is the authoritative record."
+>
+  <Nav />
+
+  <main id="main" class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+    <PageHero
+      eyebrow="Changelog"
+      heading="What changed, and when."
+      lead="Condensed from the git history: one line per change, grouped by what it was for. Nothing here is reconstructed from memory."
+    >
+      <div class="mt-8 flex flex-wrap gap-3">
+        <LinkButton href={REPO.releases} variant="secondary">Releases and tags</LinkButton>
+        <LinkButton href={REPO.changelog} variant="tertiary">Full changelog</LinkButton>
+      </div>
+    </PageHero>
+
+    <Callout variant="note" class="mt-12" label="This page is a reading of the changelog">
+      <p>
+        The authoritative record is <a href={docLink("CHANGELOG.md")}>docs/CHANGELOG.md</a> in the
+        repository, written from the commit history. This page selects the entries worth showing to
+        someone who hasn't read it, so it can be behind. If the two disagree, the repository wins.
+      </p>
+    </Callout>
+
+    <ol class="mt-14 flex flex-col gap-4 pb-4">
+      {
+        ordered.map((release) => (
+          <li class="card overflow-hidden">
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-line px-6 py-4 sm:px-7">
+              <h2 class="font-mono text-small font-semibold text-ink">{release.version}</h2>
+              <p class="text-small text-ink-muted">{release.period}</p>
+              {release.unreleased ? (
+                <span class="rounded-full bg-measuring-bg px-2.5 py-1 text-micro text-measuring">
+                  In progress
+                </span>
+              ) : (
+                <time class="ml-auto text-micro text-ink-subtle" datetime={release.date}>
+                  {formatted(release.date)}
+                </time>
+              )}
+            </div>
+            <ul class="flex flex-col gap-3 px-6 py-5 sm:px-7">
+              {release.highlights.map((item) => (
+                <li class="flex gap-3 text-small leading-relaxed text-ink-muted">
+                  <span class="mt-2 h-1 w-1 flex-none rounded-full bg-ink-subtle" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+
+    <Section class="pt-10" heading="Versioning">
+      <div class="card p-6 sm:p-7">
+        <p class="text-small leading-relaxed text-ink-muted">
+          <code class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]">orbit
+          --version</code>{" "}
+          prints <code class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]"
+            >orbit 0.1.0</code
+          >, and services still report <code
+            class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]"
+            >0.1.0-rc.2</code
+          > in <code class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]"
+            >/health</code
+          >. The rules for what counts as a breaking change are in{" "}
+          <a
+            class="link-accent"
+            href={docLink("VERSIONING.md")}>versioning and compatibility</a
+          >.
+        </p>
+      </div>
+    </Section>
+  </main>
+
+  <Footer />
+</Base>

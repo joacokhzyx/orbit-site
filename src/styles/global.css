@@ -78,20 +78,22 @@
   --font-mono:
     ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
-  /* Fluid scale. Short headline, then a longer explanatory wave. */
-  --text-display: clamp(2.5rem, 1.35rem + 5.2vw, 5rem);
-  --text-display--line-height: 1.02;
+  /* Fluid scale. Short headline, then a longer explanatory wave. The jump
+     from display to heading is deliberately modest: a 5rem headline over a
+     2rem subhead reads as two unrelated pages. */
+  --text-display: clamp(2.375rem, 1.5rem + 4.2vw, 4.25rem);
+  --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.03em;
-  --text-title: clamp(2rem, 1.3rem + 3.2vw, 3.25rem);
-  --text-title--line-height: 1.08;
+  --text-title: clamp(2rem, 1.35rem + 2.8vw, 3rem);
+  --text-title--line-height: 1.1;
   --text-title--letter-spacing: -0.025em;
-  --text-heading: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
+  --text-heading: clamp(1.5rem, 1.25rem + 1.3vw, 2.125rem);
   --text-heading--line-height: 1.2;
   --text-heading--letter-spacing: -0.02em;
-  --text-subheading: clamp(1.25rem, 1.1rem + 0.7vw, 1.5rem);
+  --text-subheading: clamp(1.1875rem, 1.08rem + 0.5vw, 1.375rem);
   --text-subheading--line-height: 1.3;
-  --text-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
-  --text-lead--line-height: 1.5;
+  --text-lead: clamp(1.0625rem, 1rem + 0.45vw, 1.3125rem);
+  --text-lead--line-height: 1.55;
   --text-body: 1.0625rem;
   --text-body--line-height: 1.65;
   --text-small: 0.9375rem;

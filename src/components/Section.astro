@@ -33,9 +33,10 @@ const Heading = `h${headingLevel}` as "h2" | "h3";
           </p>
         )}
         <Heading
-          class:text-title={headingLevel === 2}
-          class:text-heading={headingLevel === 3}
-          class="text-balance"
+          class:list={[
+            "text-balance",
+            headingLevel === 2 ? "text-title" : "text-heading",
+          ]}
         >
           {heading}
         </Heading>
