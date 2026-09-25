@@ -44,8 +44,17 @@ const count = DOC_GROUPS.reduce((total, group) => total + group.entries.length, 
           <Section class="pt-12 first:pt-0" heading={group.title} headingLevel={2}>
             {group.note && <p class="-mt-4 mb-6 text-small text-ink-subtle">{group.note}</p>}
             <ul class="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
-              {group.entries.map((entry) => (
-                <li class="bg-paper">
+              {group.entries.map((entry, index) => (
+                <li
+                  class:list={[
+                    "bg-paper",
+                    // An odd number of entries would leave a hole in the
+                    // hairline grid, so the last one takes the full width.
+                    index === group.entries.length - 1 && group.entries.length % 2 === 1
+                      ? "sm:col-span-2"
+                      : "",
+                  ]}
+                >
                   <a
                     href={hrefFor(entry.doc)}
                     class="group/entry block h-full p-5 transition-colors hover:bg-sunken sm:p-6"
