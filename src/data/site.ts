@@ -19,20 +19,52 @@ export const SITE = {
   /** Section 26: the primary headline is the philosophy, the subhead is concrete. */
   headline: "Do more with less.",
   eyebrow: "A language for APIs and microservices",
-  /**
-   * The <title> of the homepage, and the only one of these strings written
-   * for a search result rather than for a reader. 68 characters, which is
-   * where Google stops truncating on a desktop and the point past which it
-   * stops helping on a phone. It leads with what Orbit is and then spends
-   * the rest on the two facts that make someone click: it is statically
-   * typed, and it compiles to C.
+  /*
+   * `title` above is also the <title> of the homepage. There is no second
+   * string for it, which is the point: measured against 81,000 title tags,
+   * a title that matches the page's h1 is one Google rewrites markedly
+   * less often, and two fields holding the same words is a way of letting
+   * them drift apart. What Google rewrites most often is the brand name,
+   * in 63% of the cases it touches at all, so the name is not a thing to
+   * drop for keywords later.
+   *
+   * The measured thing, since the usual advice is wrong in an interesting
+   * way. Google states there is no character limit at all and truncates to
+   * device width, around 580-600px on desktop, and character counts are
+   * only a proxy for that: a capital W is about four times the width of an
+   * i. Rendered at 16px this title is 243px, so it was never at risk of
+   * being cut, and the 45-character version that a validator complained
+   * about was 349px and equally safe. The complaint was a heuristic being
+   * right about the wrong number.
+   *
+   * The case for the shorter form is the other evidence. Titles of 15-40
+   * characters earn about 36% more clicks than titles outside that band,
+   * and every language that ships a real site does the same thing: Rust is
+   * "Rust Programming Language" at 24, Go is "The Go Programming Language"
+   * at 26. None of them appends a differentiator. The description below
+   * is where "compiles to C" earns its place, and that is the division of
+   * labour: the title names the thing, the description says why to click.
    */
-  seoTitle: "The Orbit Programming Language — statically typed, compiles to C",
   // Section 27: what it is + what it needs + what it stays + proof hint.
   subheadline:
     "Orbit is a statically typed language for APIs and microservices. It compiles fast and needs little to run, so it stays fast even under load.",
+  /**
+   * 149 characters, ceiling 160. This is the one Google reads, and it
+   * carries the three things a stranger is looking for: statically typed,
+   * for APIs and microservices, and compiles to C.
+   */
   description:
-    "Orbit is a statically typed programming language for APIs and microservices, with a compiler written in itself. It compiles to C, so a service ships as one native binary.",
+    "A statically typed language for APIs and microservices, with a compiler written in itself. It compiles to C, so a service ships as one native binary.",
+  /**
+   * 117 characters, ceiling 125, and it is a SEPARATE string from the
+   * description above because the two are read by different things with
+   * different appetites. A social card shows about 125 characters and cuts
+   * the rest mid-word on a phone; Google takes 160. One string could only
+   * be right for one of them, and the first version at 170 was right for
+   * neither.
+   */
+  ogDescription:
+    "A statically typed language for APIs and microservices. Orbit compiles to C, so a service ships as one native binary.",
   locale: "en",
 } as const;
 

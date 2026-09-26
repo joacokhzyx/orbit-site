@@ -8,6 +8,15 @@ import { SITE } from "../data/site";
 interface Props {
   title?: string;
   description?: string;
+  /**
+   * The social description, which is NOT the meta description. A search
+   * result takes about 160 characters and a social card about 125, and a
+   * phone cuts the overflow mid-word, so one string cannot be right for
+   * both. Defaults to the site's own, which is written to the shorter of
+   * the two limits; a page that wants a different line for a feed passes
+   * it here and keeps its full description for Google.
+   */
+  ogDescription?: string;
   /** Set on pages that shouldn't be indexed (none today, but the escape hatch exists). */
   noindex?: boolean;
   /** Extra attributes for <html>, used by the design prototypes to scope a palette. */
@@ -18,6 +27,7 @@ interface Props {
 const {
   title,
   description = SITE.description,
+  ogDescription = SITE.ogDescription,
   noindex = false,
   htmlClass = "",
   htmlAttrs = {},
@@ -32,9 +42,10 @@ const {
 // than by someone who has already navigated here, and "Orbit \ The Orbit
 // Programming Language" says the word Orbit twice while the half that
 // would have carried the keywords is decoration. So the homepage takes
-// SITE.seoTitle whole, which leads with what Orbit is and spends the rest
-// on the two facts that make someone click.
-const pageTitle = title ? `${SITE.name} \\ ${title}` : SITE.seoTitle;
+// SITE.title whole, which is also its h1: a title that matches the h1 is
+// the shape least likely to be rewritten, and there is no second string
+// that could drift away from the heading.
+const pageTitle = title ? `${SITE.name} \\ ${title}` : SITE.title;
 
 // A page that asks not to be indexed gets no canonical either. A
 // self-referencing canonical on an error page is a request to index it,
@@ -60,7 +71,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? SITE.url).href;
 // The alt describes this page, not the homepage. It used to be the
 // headline on every page, so /learn, /foundation and /changelog all
 // shipped a social image labelled "Orbit \ Do more with less."
-const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.seoTitle;
+const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.title;
 
 ---
 
@@ -79,7 +90,7 @@ const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.seoTitle;
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={ogDescription} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:type" content="image/jpeg" />
