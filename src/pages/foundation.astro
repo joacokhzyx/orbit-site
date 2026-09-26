@@ -10,9 +10,9 @@ import Prose from "../components/Prose.astro";
 import LinkButton from "../components/LinkButton.astro";
 import { REPO, docLink } from "../data/site";
 
-// The context figure, quoted with its source. It belongs here and not in
-// the hero: it explains why the project exists, it isn't a claim about
-// Orbit, and a statistic in a headline reads as a pitch.
+// Quoted with its source. It belongs here and not in the hero: it explains
+// why the project exists, it isn't a claim about Orbit, and a statistic
+// in a headline reads as a pitch.
 const context = {
   headline: "Data centres used about 415 TWh in 2024, around 1.5% of global electricity.",
   growth: "Demand has grown about 12% a year since 2017.",
@@ -23,11 +23,11 @@ const context = {
 const beliefs = [
   {
     title: "Scaling by adding consumption is clumsy",
-    body: "Adding machines, compute, or parameters just because it's possible is bad engineering. It's clumsy, and it hides the cost instead of paying it.",
+    body: "Adding machines, compute, or parameters just because it's possible is bad engineering. It hides the cost instead of paying it.",
   },
   {
     title: "Software is physical",
-    body: "Digital doesn't mean clean. Every request costs energy, usually drawn from sources that aren't renewable. Treating that as abstract is how it stays expensive.",
+    body: "Digital doesn't mean clean. Every request costs energy, usually drawn from sources that aren't renewable.",
   },
   {
     title: "Comfort is philosophical",
@@ -42,15 +42,15 @@ const beliefs = [
 const method = [
   {
     title: "Name the machine",
-    body: "Processor, cores, memory, and whether the box is shared. Run-to-run noise is expected on a shared machine, so medians of repeats get reported.",
+    body: "Processor, cores, memory, and whether the box is shared. Run to run noise is expected on a shared machine, so medians of repeats get reported.",
   },
   {
     title: "Bracket every pair",
-    body: "Before-and-after runs alternate A-B-A-B rather than measuring A fully and then B. A shared box drifts, and bracketing keeps the comparison honest.",
+    body: "Before and after runs alternate rather than measuring A fully and then B. A shared box drifts, and bracketing keeps the comparison honest.",
   },
   {
     title: "Report the failures",
-    body: "Attempts that didn't pay off get published too, with the reason. A benchmark document that only lists wins isn't a measurement, it's marketing.",
+    body: "Attempts that didn't pay off get published too, with the reason. A document that only lists wins isn't a measurement.",
   },
   {
     title: "Never fake energy",
@@ -61,19 +61,19 @@ const method = [
 
 <Base
   title="Foundation"
-  description="Why Orbit exists: scaling by adding consumption is clumsy, software is physical, and efficiency has to be measured before it's claimed. Built by Joaquín in Argentina."
+  description="Why Orbit exists: scaling by adding consumption is clumsy, software is physical, and efficiency has to be measured before it is claimed. Built by Joaquín in Argentina."
 >
   <Nav />
 
-  <main id="main" class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+  <main id="main" class="mx-auto w-full max-w-6xl px-6 sm:px-8">
     <PageHero
       eyebrow="Foundation"
-      heading="I'm building Orbit to see how far less can go."
+      heading="How far less can go"
       lead="The hypothesis is simple to state and awkward to prove: a server shouldn't need so much energy to be fast. I'm testing it, and this page is what I'm testing."
     />
 
-    <Section class="pt-14 sm:pt-16" heading="The context">
-      <div class="grid gap-8 border-t border-line pt-8 lg:grid-cols-[1.2fr_1fr] lg:gap-14">
+    <Section number="01" heading="Why this exists">
+      <div style="display: grid; gap: 2.5rem; grid-template-columns: 1fr" class="lg:grid-cols-[1.2fr_1fr]">
         <Prose>
           <p>
             {context.headline} {context.growth} That growth is the reason a language that compiles
@@ -81,70 +81,68 @@ const method = [
           </p>
           <p>
             <a href={context.sourceHref} target="_blank" rel="noopener noreferrer">{context.source}</a>.
-            It's context for the project, not a measurement of Orbit, and I'm not claiming any
-            causal link between the two.
+            It's context for the project, not a measurement of Orbit. I'm not claiming a causal
+            link between the two.
           </p>
           <p>
-            Orbit is not an ecological project that happens to make a language. It's an engineering
-            project whose natural result happens to be ecological. The engineering has to hold up
-            first, on its own terms, or the rest is decoration.
+            Orbit is not an ecological project that happens to make a language. It's an
+            engineering project whose natural result is ecological. The engineering has to hold up
+            first, or the rest is decoration.
           </p>
         </Prose>
-        <div class="card p-6 sm:p-7">
-          <p class="font-mono text-micro text-ink-subtle">Source</p>
-          <p class="mt-3 text-lead font-semibold text-ink">{context.headline}</p>
-          <p class="mt-2 text-small text-ink-muted">{context.growth}</p>
-          <p class="mt-5 text-micro text-ink-subtle">
-            {context.source}. A third-party figure, quoted with its source rather than measured by
+        <div class="rounded-[var(--radius-lg)] bg-surface p-6 sm:p-7">
+          <p class="label">Source</p>
+          <p class="text-lead mt-3 font-semibold text-balance">{context.headline}</p>
+          <p class="text-small mt-2 text-ink-2">{context.growth}</p>
+          <p class="text-micro mt-5 text-ink-3">
+            {context.source}. A third party figure, quoted with its source rather than measured by
             me.
           </p>
         </div>
       </div>
     </Section>
 
-    <Section class="pt-16 sm:pt-20" heading="What I believe about the trade">
-      <div class="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
+    <Section number="02" heading="What I think is clumsy">
+      <div class="grid gap-8 sm:grid-cols-2 sm:gap-x-12">
         {
           beliefs.map((belief) => (
-            <div class="bg-paper p-6 sm:p-7">
-              <h3 class="text-subheading font-semibold text-balance text-ink">{belief.title}</h3>
-              <p class="mt-3 text-small leading-relaxed text-ink-muted">{belief.body}</p>
+            <div class="rule pt-4">
+              <h3 class="text-lead text-balance">{belief.title}</h3>
+              <p class="text-body mt-2 text-ink-2">{belief.body}</p>
             </div>
           ))
         }
       </div>
-      <Prose class="mt-8">
+      <Prose class="mt-9">
         <p>
           I have no interest in claiming Orbit beats a named language. Plenty of languages optimise
-          for peak benchmark power, and that often needs more memory and energy to stay fast. Orbit
-          tries a different trade, and whether it's a better one is something the measurements have
-          to answer, not the marketing.
+          for peak benchmark power, and that often needs more memory and energy to stay fast.
         </p>
       </Prose>
     </Section>
 
     <Section
-      class="pt-16 sm:pt-20"
+      number="03"
       heading="How I measure"
       lead="The method is written down before the numbers, so I can't quietly change one to suit the other."
     >
-      <div class="grid gap-8 lg:grid-cols-[1fr_1.05fr] lg:gap-12">
+      <div style="display: grid; gap: 2.5rem; grid-template-columns: 1fr" class="lg:grid-cols-[1fr_1.05fr]">
         <ol class="flex flex-col gap-5">
           {
             method.map((step, index) => (
               <li class="flex gap-4">
-                <span class="mt-0.5 font-mono text-micro text-ink-subtle">
+                <span class="mono text-small shrink-0 text-ink-3">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
                   <h3 class="text-small font-semibold text-ink">{step.title}</h3>
-                  <p class="mt-1.5 text-small leading-relaxed text-ink-muted">{step.body}</p>
+                  <p class="text-small mt-1.5 leading-relaxed text-ink-2">{step.body}</p>
                 </div>
               </li>
             ))
           }
         </ol>
-        <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-4">
           <Callout variant="note" label="Where the method lives">
             <p>
               The full procedure, including the run counts, the discarded runs, and the rule about
@@ -154,26 +152,24 @@ const method = [
           </Callout>
           <Callout variant="measuring" label="What I don't know yet">
             <p>
-              I don't know how far this goes. I don't have a clean measurement on a quiet machine
-              yet, and the component-level wins I can isolate don't show up end to end, because the
-              round trip is dominated by the loopback, the client, and the per-request access log.
+              I don't have a clean measurement on a quiet machine yet. The component gains I can
+              isolate don't show up end to end, because the round trip is dominated by the
+              loopback, the client, and the per-request access log.
             </p>
             <p>
-              I'd rather say that plainly than put a round number on the home page. When the numbers
-              are clean, they'll be here, with the bad runs included.
+              I'd rather say that plainly than put a round number on the home page. When the
+              numbers are clean, they'll be here, with the bad runs included.
             </p>
           </Callout>
         </div>
       </div>
     </Section>
 
-    <Section class="pt-16 sm:pt-20" heading="Why it's built this way">
+    <Section number="04" heading="How it's built" class="pb-4">
       <Prose>
         <p>
-          The compiler is written in Orbit and compiles itself. That wasn't chosen for the logo; it
-          was chosen because a toolchain you can't read is a toolchain you can't fix. The build
-          reaches a fixed point, and a committed C file is the trust root, so verification doesn't
-          need anything exotic.
+          The compiler is written in Orbit and compiles itself. That wasn't chosen for the logo.
+          A toolchain you can't read is a toolchain you can't fix.
         </p>
         <p>
           Orbit compiles to C, and your platform's C compiler produces the executable. One file per
@@ -181,8 +177,8 @@ const method = [
           practice, or it means nothing.
         </p>
         <p>
-          The project runs on one modest PC, with no team behind it. Every performance claim on this
-          site has to survive that constraint, because it's the reason the project exists.
+          The project runs on one modest PC, with no team behind it. Every performance claim here
+          has to survive that constraint, because it's the reason the project exists.
         </p>
       </Prose>
       <div class="mt-8 flex flex-wrap gap-3">
@@ -196,16 +192,16 @@ const method = [
       </div>
     </Section>
 
-    <section class="mt-20 rounded-lg border border-line bg-surface p-8 sm:p-10">
+    <section class="rule mt-20 py-10">
       <Prose>
         <h2>What I'm testing next</h2>
         <p>
-          The honest next step isn't another transform. It's measuring the accept, parse, and
-          send path on a machine I can account for, then deciding whether Superluminal is worth
+          The honest next step isn't another transform. It's measuring the accept, parse, and send
+          path on a machine I can account for, then deciding whether Superluminal is worth
           continuing at all. If the answer is no, I'll say so here and in the repository.
         </p>
         <p>
-          If you want to follow that, the <a href={docLink("ROADMAP.md")}>roadmap</a> and{" "}
+          To follow that, the <a href={docLink("ROADMAP.md")}>roadmap</a> and{" "}
           <a href={docLink("STATUS.md")}>dated status</a> pages are the two places I update
           honestly, including the parts that didn't work.
         </p>

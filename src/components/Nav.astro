@@ -1,4 +1,9 @@
 ---
+// No border on the header. The old one had a hairline under the bar, and
+// with a rule under every section as well, the page read as a stack of
+// bands. The bar now separates itself with space and a blurred paper
+// background, and the active link is a background step rather than an
+// underline, which is the same language the sections use.
 import Logo from "./Logo.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 import { NAV } from "../data/site";
@@ -14,18 +19,18 @@ function isCurrent(href: string): boolean {
 const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
 ---
 
-<header
-  class="sticky top-0 z-50 border-b border-line bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70"
->
-  <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8">
+<header class="sticky top-0 z-50 bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70">
+  <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4 sm:px-8">
     <a
       href="/"
-      class="group -ml-1 flex items-center gap-2.5 rounded-md px-1 py-1"
+      class="group -ml-2 flex items-center gap-2.5 rounded-[var(--radius)] px-2 py-1"
       aria-label="Orbit, home"
       aria-current={path === "/" ? "page" : undefined}
     >
-      <Logo class="h-7 w-7 text-ink transition-transform duration-300 group-hover:rotate-[8deg]" />
-      <span class="font-logo text-[1.35rem] leading-none font-semibold tracking-tight text-ink">
+      <Logo
+        class="h-6 w-6 text-ink transition-transform duration-300 group-hover:rotate-[8deg]"
+      />
+      <span class="font-logo text-lead leading-none font-semibold tracking-tight text-ink">
         Orbit
       </span>
     </a>
@@ -39,7 +44,7 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex items-center gap-1 rounded-md px-3 py-2 text-small text-ink-muted transition-colors hover:text-ink"
+                class="text-small flex h-10 items-center gap-1.5 rounded-[var(--radius)] px-3 text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
               >
                 {link.label}
                 <svg
@@ -59,10 +64,8 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
                 href={link.href}
                 aria-current={link.current ? "page" : undefined}
                 class:list={[
-                  "rounded-md px-3 py-2 text-small transition-colors",
-                  link.current
-                    ? "text-ink underline decoration-line-strong decoration-1 underline-offset-[0.35em]"
-                    : "text-ink-muted hover:text-ink",
+                  "text-small flex h-10 items-center rounded-[var(--radius)] px-3 transition-colors",
+                  link.current ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
                 ]}
               >
                 {link.label}
@@ -74,12 +77,10 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
 
       <ThemeToggle />
 
-      {/* The mobile menu is a disclosure, not a component: no framework
-          runtime ships for it, and it works before hydration because
-          there is no hydration. */}
+      {/* A disclosure rather than a component, so nothing ships for it. */}
       <details class="group/menu relative sm:hidden">
         <summary
-          class="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-line-strong hover:text-ink [&::-webkit-details-marker]:hidden"
+          class="text-small flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-[var(--radius)] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink [&::-webkit-details-marker]:hidden"
           aria-label="Menu"
         >
           <svg
@@ -107,10 +108,10 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
         </summary>
 
         <nav
-          class="absolute right-0 z-50 mt-3 w-56 overflow-hidden rounded-lg border border-line bg-surface shadow-md"
+          class="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-[var(--radius-lg)] bg-surface p-1.5 shadow-[0_8px_30px_rgb(0_0_0/0.12)]"
           aria-label="Primary, mobile"
         >
-          <ul class="flex flex-col p-1.5">
+          <ul class="flex flex-col">
             {
               links.map((link) => (
                 <li>
@@ -120,15 +121,13 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
                     rel={link.external ? "noopener noreferrer" : undefined}
                     aria-current={link.current ? "page" : undefined}
                     class:list={[
-                      "flex items-center justify-between rounded-md px-3 py-2.5 text-small transition-colors",
-                      link.current
-                        ? "bg-accent-soft text-ink"
-                        : "text-ink-muted hover:bg-sunken hover:text-ink",
+                      "text-small flex min-h-11 items-center justify-between rounded-[var(--radius)] px-3 py-2.5 transition-colors",
+                      link.current ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
                     ]}
                   >
                     {link.label}
                     {link.external && (
-                      <span class="text-micro text-ink-subtle" aria-hidden="true">
+                      <span class="text-micro text-ink-3" aria-hidden="true">
                         ↗
                       </span>
                     )}

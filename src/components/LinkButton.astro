@@ -1,7 +1,7 @@
 ---
 // Buttons follow the CTA order in section 28 of the brand system:
-// read the docs first, try Orbit second, GitHub third. The visual weight
-// follows the same order, so the primary action is never ambiguous.
+// read the docs first, try Orbit second, GitHub third. Weight follows the
+// same order, and every variant shares one radius and one height.
 interface Props {
   href: string;
   variant?: "primary" | "secondary" | "tertiary";
@@ -17,12 +17,13 @@ const {
 } = Astro.props;
 
 const base =
-  "inline-flex items-center justify-center gap-1.5 rounded-full text-small font-medium transition-colors";
+  "text-small inline-flex items-center justify-center gap-1.5 font-medium transition-colors";
 
 const variants = {
-  primary: "bg-ink px-5 py-2.5 text-paper hover:bg-ink-muted",
-  secondary: "border border-line-strong px-5 py-2.5 text-ink hover:border-ink hover:bg-sunken",
-  tertiary: "px-1 py-1 text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink",
+  primary: "h-11 rounded-[var(--radius-pill)] bg-ink px-6 text-paper hover:bg-ink-2",
+  secondary:
+    "h-11 rounded-[var(--radius-pill)] border border-line-2 px-6 text-ink hover:border-ink hover:bg-surface-2",
+  tertiary: "h-11 rounded-[var(--radius)] px-1 text-ink underline decoration-line-2 underline-offset-4 hover:decoration-ink",
 } as const;
 ---
 

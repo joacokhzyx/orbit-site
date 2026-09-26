@@ -27,7 +27,6 @@ const SCHEMES = {
   b: { light: '[data-proto="b"]', dark: '[data-proto="b"].dark' },
   c: { light: '[data-proto="c"]', dark: '[data-proto="c"].dark' },
 };
-
 /**
  * Every pair the interface is allowed to put on screen. Anything not
  * listed here is not a pairing the design is allowed to make.

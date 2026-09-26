@@ -15,14 +15,14 @@ const count = DOC_GROUPS.reduce((total, group) => total + group.entries.length, 
 
 <Base
   title="Documentation"
-  description="Start with the question you're trying to answer. Every Orbit document lives in the repository, where it can't go quietly out of date."
+  description="Start with the question you are trying to answer. Every Orbit document lives in the repository, where it cannot go quietly out of date."
 >
   <Nav />
 
-  <main id="main" class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+  <main id="main" class="mx-auto w-full max-w-6xl px-6 sm:px-8">
     <PageHero
       eyebrow="Documentation"
-      heading="Start with the question you have."
+      heading="Indexed by question"
       lead={`The documentation isn't on this site. It lives in the repository, next to the code it describes, where it can't go quietly out of date. Here are the ${count} documents, grouped by what you're trying to do.`}
     >
       <div class="mt-8 flex flex-wrap gap-3">
@@ -31,42 +31,28 @@ const count = DOC_GROUPS.reduce((total, group) => total + group.entries.length, 
       </div>
     </PageHero>
 
-    <Callout variant="note" class="mt-12" label="Why the docs aren't mirrored here">
+    <Callout variant="note" class="mt-12" label="Why the docs aren't mirrored">
       <p>
         Two copies of the same document is one copy too many. The moment one of them falls behind,
-        readers stop trusting both. So this page is an index: it tells you which document answers
-        your question, and links straight to it on GitHub where the tests live beside it.
+        readers stop trusting both. So this page is an index: it names the document that answers
+        your question and links straight to it, where the tests live beside it.
       </p>
     </Callout>
 
-    <div class="pt-14">
+    <div class="pt-12">
       {
         DOC_GROUPS.map((group) => (
-          <Section class="pt-12 first:pt-0" heading={group.title} headingLevel={2}>
-            {group.note && <p class="-mt-4 mb-6 text-small text-ink-subtle">{group.note}</p>}
-            <ul class="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
-              {group.entries.map((entry, index) => (
-                <li
-                  class:list={[
-                    "bg-paper",
-                    // An odd number of entries would leave a hole in the
-                    // hairline grid, so the last one takes the full width.
-                    index === group.entries.length - 1 && group.entries.length % 2 === 1
-                      ? "sm:col-span-2"
-                      : "",
-                  ]}
-                >
-                  <a
-                    href={hrefFor(entry.doc)}
-                    class="group/entry block h-full p-5 transition-colors hover:bg-sunken sm:p-6"
-                  >
-                    <p class="text-small font-semibold text-balance text-ink group-hover/entry:text-accent">
+          <Section heading={group.title}>
+            {group.note && <p class="-mt-6 mb-6 text-small text-ink-3">{group.note}</p>}
+            <ul class="grid gap-6 sm:grid-cols-2 sm:gap-x-12">
+              {group.entries.map((entry) => (
+                <li class="rule pt-4">
+                  <a href={hrefFor(entry.doc)} class="group/entry block">
+                    <p class="text-small font-semibold text-balance text-ink transition-colors group-hover/entry:text-ink-2">
                       {entry.question}
                     </p>
-                    <p class="mt-2 text-small leading-relaxed text-ink-muted">{entry.blurb}</p>
-                    <p class="mt-3 font-mono text-micro text-ink-subtle">
-                      docs/{entry.doc}
-                    </p>
+                    <p class="text-small mt-2 leading-relaxed text-ink-2">{entry.blurb}</p>
+                    <p class="mono text-micro mt-3 text-ink-3">docs/{entry.doc}</p>
                   </a>
                 </li>
               ))}
@@ -76,18 +62,18 @@ const count = DOC_GROUPS.reduce((total, group) => total + group.entries.length, 
       }
     </div>
 
-    <section class="mt-20 rounded-lg border border-line bg-surface p-8 sm:p-10">
+    <section class="rule mt-20 py-10">
       <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div class="measure">
-          <h2 class="text-heading font-semibold text-ink">Can't find what you need?</h2>
-          <p class="mt-3 text-small text-ink-muted">
-            Ask. I read every issue, and a question that the docs don't answer is a gap in the
-            docs, not in your understanding.
+          <h2 class="text-heading">Can't find what you need?</h2>
+          <p class="text-body mt-3 text-ink-2">
+            Ask. I read every issue, and a question the docs don't answer is a gap in the docs,
+            not in your understanding.
           </p>
         </div>
         <div class="flex flex-none flex-wrap gap-3">
           <LinkButton href={REPO.issues} variant="primary">Open an issue</LinkButton>
-          <LinkButton href={hrefFor("FAQ.md")} variant="tertiary">Read the FAQ first</LinkButton>
+          <LinkButton href={hrefFor("FAQ.md")} variant="tertiary">Read the FAQ</LinkButton>
         </div>
       </div>
     </section>

@@ -35,41 +35,37 @@ const columns = [
 ];
 ---
 
-<footer class="mt-24 border-t border-line bg-surface">
-  <div class="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
+<footer class="rule mt-24">
+  <div class="mx-auto w-full max-w-6xl px-6 py-14 sm:px-8 sm:py-16">
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-8">
       <div>
         <a href="/" class="inline-flex items-center gap-2.5" aria-label="Orbit, home">
-          <Logo class="h-7 w-7 text-ink" />
-          <span class="font-logo text-[1.35rem] leading-none font-semibold tracking-tight">
-            Orbit
-          </span>
+          <Logo class="h-6 w-6 text-ink" />
+          <span class="font-logo text-lead leading-none font-semibold tracking-tight">Orbit</span>
         </a>
-        <p class="measure mt-4 text-small text-ink-muted">
-          {SITE.tagline} A statically typed language for APIs and microservices, with a compiler
+        <p class="measure text-small mt-4 text-ink-2">
+          {SITE.headline} A statically typed language for APIs and microservices, with a compiler
           written in itself.
         </p>
-        <p class="mt-5 text-micro text-ink-subtle">{SITE.founderLine}</p>
+        <p class="text-micro mt-5 text-ink-3">{SITE.founderLine}</p>
       </div>
 
       {
         columns.map((column) => (
           <nav aria-label={column.heading}>
-            <h2 class="text-micro font-semibold tracking-[0.08em] text-ink-subtle uppercase">
-              {column.heading}
-            </h2>
-            <ul class="mt-4 flex flex-col gap-2.5">
+            <h2 class="label">{column.heading}</h2>
+            <ul class="mt-4 flex flex-col gap-1">
               {column.links.map((link) => (
                 <li>
                   <a
                     href={link.href}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
-                    class="inline-flex items-center gap-1 text-small text-ink-muted transition-colors hover:text-ink"
+                    class="text-small inline-flex min-h-9 items-center gap-1 text-ink-2 transition-colors hover:text-ink"
                   >
                     {link.label}
                     {link.external && (
-                      <span class="text-[0.7em] opacity-50" aria-hidden="true">
+                      <span class="opacity-50" aria-hidden="true">
                         ↗
                       </span>
                     )}
@@ -83,13 +79,10 @@ const columns = [
     </div>
 
     <div
-      class="mt-14 flex flex-col gap-3 border-t border-line pt-6 text-micro text-ink-subtle sm:flex-row sm:items-center sm:justify-between"
+      class="text-micro mt-14 flex flex-col gap-2 border-t border-line pt-6 text-ink-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <p>MIT licensed. Orbit {year}.</p>
-      <p>
-        Documentation lives in the repository and is authoritative. The site links to it instead of
-        copying it, so nothing here can go quietly out of date.
-      </p>
+      <p>The repository is the source of the documentation.</p>
     </div>
   </div>
 </footer>

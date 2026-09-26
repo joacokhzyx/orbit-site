@@ -1,46 +1,27 @@
 ---
-// A page section with an optional eyebrow, a heading, and an optional
-// lead sentence. The heading level is a prop so each page keeps one
-// correct outline instead of repeating <h2> by habit.
+// A numbered section with one hairline above it. The number is the
+// identity of this direction: every section on the site is numbered in
+// mono, the way a standards document numbers its clauses.
 interface Props {
   id?: string;
-  eyebrow?: string;
+  number?: string;
   heading?: string;
-  headingLevel?: 2 | 3;
   lead?: string;
   class?: string;
 }
 
-const {
-  id,
-  eyebrow,
-  heading,
-  headingLevel = 2,
-  lead,
-  class: className = "",
-} = Astro.props;
-
-const Heading = `h${headingLevel}` as "h2" | "h3";
+const { id, number, heading, lead, class: className = "" } = Astro.props;
 ---
 
-<section id={id} class:list={["scroll-mt-24", className]}>
+<section id={id} class:list={["rule scroll-mt-24 pt-12 sm:pt-14", className]}>
   {
     heading && (
       <header class="mb-8 sm:mb-10">
-        {eyebrow && (
-          <p class="mb-3 text-micro font-semibold tracking-[0.1em] text-ink-subtle uppercase">
-            {eyebrow}
-          </p>
-        )}
-        <Heading
-          class:list={[
-            "text-balance",
-            headingLevel === 2 ? "text-title" : "text-heading",
-          ]}
-        >
-          {heading}
-        </Heading>
-        {lead && <p class="measure mt-4 text-lead text-ink-muted">{lead}</p>}
+        <div class="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+          {number && <span class="mono text-small text-ink-3">{number}</span>}
+          <h2 class="text-title text-balance">{heading}</h2>
+        </div>
+        {lead && <p class="measure text-lead mt-4 text-ink-2">{lead}</p>}
       </header>
     )
   }

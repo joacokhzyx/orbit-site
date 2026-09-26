@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && node scripts/check-links.mjs",
+    "build": "astro check && astro build && node scripts/check-contrast.mjs --file src/styles/global.css --scheme site && node scripts/check-links.mjs",
     "preview": "astro preview",
     "check": "astro check",
-    "check:contrast": "node scripts/check-contrast.mjs --file src/styles/proto-tokens.css --scheme a && node scripts/check-contrast.mjs --file src/styles/proto-tokens.css --scheme b && node scripts/check-contrast.mjs --file src/styles/proto-tokens.css --scheme c",
+    "check:contrast": "node scripts/check-contrast.mjs --file src/styles/global.css --scheme site",
     "check:links": "node scripts/check-links.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "astro": "astro"

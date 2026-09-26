@@ -1,13 +1,19 @@
 ---
-// Sun/moon toggle. The initial class is set by an inline script in
-// Base.astro before first paint, so this button only ever reflects a
-// decision the reader already made.
+interface Props {
+  /** Shown when the reader has chosen a theme, and in the page head. */
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
 ---
 
 <button
   type="button"
   data-theme-toggle
-  class="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
+  class:list={[
+    "flex h-10 w-10 items-center justify-center rounded-[var(--radius)] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink",
+    className,
+  ]}
   aria-label="Switch to dark theme"
 >
   <svg
@@ -20,7 +26,8 @@
     aria-hidden="true"
   >
     <circle cx="12" cy="12" r="4"></circle>
-    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+    <path
+      d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
     ></path>
   </svg>
   <svg
@@ -66,7 +73,6 @@
     });
   }
 
-  // Another tab changed the preference.
   window.addEventListener("storage", (event) => {
     if (event.key === STORAGE_KEY && (event.newValue === "light" || event.newValue === "dark")) {
       apply(event.newValue);

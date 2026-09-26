@@ -4,7 +4,6 @@ import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import PageHero from "../components/PageHero.astro";
-import Section from "../components/Section.astro";
 import Callout from "../components/Callout.astro";
 import LinkButton from "../components/LinkButton.astro";
 import { REPO, docLink } from "../data/site";
@@ -25,10 +24,10 @@ const formatted = (iso: string) =>
 >
   <Nav />
 
-  <main id="main" class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+  <main id="main" class="mx-auto w-full max-w-6xl px-6 sm:px-8">
     <PageHero
       eyebrow="Changelog"
-      heading="What changed, and when."
+      heading="What changed, and when"
       lead="Condensed from the git history: one line per change, grouped by what it was for. Nothing here is reconstructed from memory."
     >
       <div class="mt-8 flex flex-wrap gap-3">
@@ -37,7 +36,7 @@ const formatted = (iso: string) =>
       </div>
     </PageHero>
 
-    <Callout variant="note" class="mt-12" label="This page is a reading of the changelog">
+    <Callout variant="note" class="mt-12" label="This page is a reading">
       <p>
         The authoritative record is <a href={docLink("CHANGELOG.md")}>docs/CHANGELOG.md</a> in the
         repository, written from the commit history. This page selects the entries worth showing to
@@ -45,28 +44,29 @@ const formatted = (iso: string) =>
       </p>
     </Callout>
 
-    <ol class="mt-14 flex flex-col gap-4 pb-4">
+    <ol class="mt-14 flex flex-col gap-10 pb-4">
       {
         ordered.map((release) => (
-          <li class="card overflow-hidden">
-            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-line px-6 py-4 sm:px-7">
-              <h2 class="font-mono text-small font-semibold text-ink">{release.version}</h2>
-              <p class="text-small text-ink-muted">{release.period}</p>
+          <li class="rule pt-5">
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+              <h2 class="mono text-body font-semibold text-ink">{release.version}</h2>
+              <p class="text-body text-ink-2">{release.period}</p>
               {release.unreleased ? (
-                <span class="ml-auto rounded-full bg-measuring-bg px-2.5 py-1 text-micro text-measuring">
-                  In progress
-                </span>
+                <span class="chip ml-auto">In progress</span>
               ) : (
-                <time class="ml-auto text-micro text-ink-subtle" datetime={release.date}>
+                <time class="text-micro ml-auto text-ink-3" datetime={release.date}>
                   {formatted(release.date)}
                 </time>
               )}
             </div>
-            <ul class="flex flex-col gap-3 px-6 py-5 sm:px-7">
+            <ul class="mt-5 flex flex-col gap-3">
               {release.highlights.map((item) => (
-                <li class="flex gap-3 text-small leading-relaxed text-ink-muted">
-                  <span class="mt-2 h-1 w-1 flex-none rounded-full bg-ink-subtle" aria-hidden="true" />
-                  <span>{item}</span>
+                <li class="flex gap-3">
+                  <span
+                    class="mt-2.5 h-1 w-1 flex-none rounded-full bg-ink-3"
+                    aria-hidden="true"
+                  />
+                  <span class="text-body max-w-prose text-ink-2">{item}</span>
                 </li>
               ))}
             </ul>
@@ -75,26 +75,19 @@ const formatted = (iso: string) =>
       }
     </ol>
 
-    <Section class="pt-10" heading="Versioning">
-      <div class="card p-6 sm:p-7">
-        <p class="text-small leading-relaxed text-ink-muted">
-          <code class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]">orbit
-          --version</code>{" "}
-          prints <code class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]"
-            >orbit 0.1.0</code
-          >, and services still report <code
-            class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]"
-            >0.1.0-rc.2</code
-          > in <code class="rounded border border-line bg-sunken px-1 py-0.5 font-mono text-[0.85em]"
-            >/health</code
-          >. The rules for what counts as a breaking change are in{" "}
-          <a
-            class="link-accent"
-            href={docLink("VERSIONING.md")}>versioning and compatibility</a
-          >.
-        </p>
-      </div>
-    </Section>
+    <section class="rule mt-16 py-10">
+      <h2 class="text-heading">Versioning</h2>
+      <p class="prose-measure text-body mt-4 text-ink-2">
+        <code class="code-inline">orbit --version</code>
+        prints <code class="code-inline"
+          >orbit 0.1.0</code
+        >, and services still report
+        <code class="code-inline">0.1.0-rc.2</code> in
+        <code class="code-inline">/health</code>. The rules
+        for what counts as a breaking change are in
+        <a class="link" href={docLink("VERSIONING.md")}>versioning and compatibility</a>.
+      </p>
+    </section>
   </main>
 
   <Footer />

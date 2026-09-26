@@ -1,121 +1,115 @@
-@import "@fontsource-variable/inter/wght.css";
-@import "@fontsource-variable/outfit/wght.css";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/outfit";
 @import "tailwindcss";
 
-/* Dark mode is a class on <html>, set before first paint by the inline
-   script in Base.astro, so the toggle never flashes the wrong palette. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ---------------------------------------------------------------------------
-   Palette
-   The mark is monochrome, so the interface stays monochrome. Ink does the
-   work and one deep indigo is reserved for interactive states, so nothing
-   on the page competes with the words. Colours are checked for contrast
-   against their own surface, not against each other.
---------------------------------------------------------------------------- */
-:root {
-  --paper: #f7f6f2;
-  --surface: #fffefb;
-  --surface-sunken: #f1efe8;
-  --ink: #111110;
-  --ink-muted: #56534c;
-  --ink-subtle: #86827a;
-  --line: #e6e3da;
-  --line-strong: #d6d2c6;
-  --accent: #322c87;
-  --accent-hover: #241f63;
-  --accent-soft: #eceaf7;
-  --accent-ink: #ffffff;
-  --status-measuring-bg: #fbf0d9;
-  --status-measuring-ink: #6b4c05;
-  --elevation-sm: 0 1px 2px rgb(17 17 16 / 0.04);
-  --elevation-md: 0 2px 4px rgb(17 17 16 / 0.04), 0 8px 24px rgb(17 17 16 / 0.06);
+/* ===========================================================================
+   TOKENS
+   Direction A: nine greys and no accent. The only colour on the page is
+   the amber that marks a state.
 
-  color-scheme: light;
+   The two blocks below are parsed by scripts/check-contrast.mjs, which
+   fails the build when a pair misses WCAG AA. Every value must therefore
+   stay a single hex on a single line. The previous palette shipped seven
+   failing pairs, the most used at 3.54:1, because nothing was
+   measuring.
+   =========================================================================== */
+:root {
+  --paper: #faf9f6;
+  --surface: #ffffff;
+  --surface-2: #f4f2ec;
+  --sunken: #f1efe9;
+  --code-bg: #f1efe9;
+  --ink: #16150f;
+  --ink-2: #4a4841;
+  --ink-3: #6b6860;
+  --link: #16150f;
+  --line: #dedad0;
+  --line-2: #8d8a80;
+  --focus: #16150f;
+  --signal-bg: #f7ecd2;
+  --signal-ink: #6b4a05;
 }
 
 .dark {
-  --paper: #0d0d0f;
-  --surface: #16161a;
-  --surface-sunken: #111114;
-  --ink: #f2f0ec;
-  --ink-muted: #a8a49c;
-  --ink-subtle: #7a766e;
-  --line: #26262b;
-  --line-strong: #35353c;
-  --accent: #a9b0f5;
-  --accent-hover: #c3c8f9;
-  --accent-soft: #1d1d2b;
-  --accent-ink: #0d0d0f;
-  --status-measuring-bg: #2a2312;
-  --status-measuring-ink: #e8c877;
-  --elevation-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --elevation-md: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.45);
-
-  color-scheme: dark;
+  --paper: #0b0b0c;
+  --surface: #141416;
+  --surface-2: #1d1d20;
+  --sunken: #191a1c;
+  --code-bg: #191a1c;
+  --ink: #f4f2ed;
+  --ink-2: #b4b0a7;
+  --ink-3: #8b877e;
+  --link: #f4f2ed;
+  --line: #27272b;
+  --line-2: #64605b;
+  --focus: #f4f2ed;
+  --signal-bg: #2c2511;
+  --signal-ink: #e0bd6d;
 }
 
 @theme inline {
   --color-paper: var(--paper);
   --color-surface: var(--surface);
-  --color-sunken: var(--surface-sunken);
+  --color-surface-2: var(--surface-2);
+  --color-sunken: var(--sunken);
+  --color-code-bg: var(--code-bg);
   --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
-  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-link: var(--link);
   --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-soft: var(--accent-soft);
-  --color-accent-ink: var(--accent-ink);
-  --color-measuring: var(--status-measuring-ink);
-  --color-measuring-bg: var(--status-measuring-bg);
+  --color-line-2: var(--line-2);
+  --color-focus: var(--focus);
+  --color-signal: var(--signal-bg);
+  --color-signal-ink: var(--signal-ink);
 
-  --font-sans:
-    "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", ui-sans-serif,
-    system-ui, sans-serif;
-  --font-logo: "Outfit Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono:
-    ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --font-display: "Space Grotesk Variable", "IBM Plex Sans Variable", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", monospace;
+  --font-logo: "Outfit Variable", "IBM Plex Sans Variable", system-ui, sans-serif;
 
-  /* Fluid scale. Short headline, then a longer explanatory wave. The jump
-     from display to heading is deliberately modest: a 5rem headline over a
-     2rem subhead reads as two unrelated pages. */
-  --text-display: clamp(2.375rem, 1.5rem + 4.2vw, 4.25rem);
-  --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.03em;
-  --text-title: clamp(2rem, 1.35rem + 2.8vw, 3rem);
-  --text-title--line-height: 1.1;
-  --text-title--letter-spacing: -0.025em;
-  --text-heading: clamp(1.5rem, 1.25rem + 1.3vw, 2.125rem);
-  --text-heading--line-height: 1.2;
-  --text-heading--letter-spacing: -0.02em;
-  --text-subheading: clamp(1.1875rem, 1.08rem + 0.5vw, 1.375rem);
-  --text-subheading--line-height: 1.3;
-  --text-lead: clamp(1.0625rem, 1rem + 0.45vw, 1.3125rem);
-  --text-lead--line-height: 1.55;
-  --text-body: 1.0625rem;
-  --text-body--line-height: 1.65;
-  --text-small: 0.9375rem;
+  /* Seven sizes and nothing outside them. The old build carried sixteen
+     declarations, four of them ad hoc at 0.7em, 0.85em, 75% and 80%.
+     What is left besides the seven is .code-inline below, the ordered
+     list marker, and Tailwind's own preflight for small and sub. */
+  --text-display: clamp(2.25rem, 1.4rem + 3.8vw, 4rem);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.022em;
+  --text-title: clamp(1.875rem, 1.35rem + 2.4vw, 2.75rem);
+  --text-title--line-height: 1.14;
+  --text-title--letter-spacing: -0.018em;
+  --text-heading: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  --text-heading--line-height: 1.28;
+  --text-heading--letter-spacing: -0.01em;
+  --text-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
+  --text-lead--line-height: 1.5;
+  --text-body: 1rem;
+  --text-body--line-height: 1.7;
+  --text-small: 0.875rem;
   --text-small--line-height: 1.6;
-  --text-micro: 0.8125rem;
+  --text-micro: 0.75rem;
   --text-micro--line-height: 1.5;
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  /* One spacing rhythm on a 4px base. */
+  --spacing: 0.25rem;
 
-  --shadow-sm: var(--elevation-sm);
-  --shadow-md: var(--elevation-md);
+  /* One radius, plus a pill. The old build mixed 0.375, 0.625, 1 and
+     1.5rem across the same page. */
+  --radius: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-pill: 999px;
 
-  --container-measure: 68ch;
-  --container-prose: 46rem;
+  --container-measure: 66ch;
+  --container-prose: 44rem;
 }
 
-/* ---------------------------------------------------------------------------
-   Base
---------------------------------------------------------------------------- */
+/* ===========================================================================
+   BASE
+=========================================================================== */
 @layer base {
   html {
     background-color: var(--paper);
@@ -123,16 +117,16 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     scrollbar-width: thin;
-    scrollbar-color: var(--line-strong) transparent;
+    scrollbar-color: var(--line-2) transparent;
     scroll-behavior: smooth;
   }
 
   body {
     font-size: var(--text-body);
-    line-height: 1.65;
-    font-synthesis-weight: none;
+    line-height: 1.7;
   }
 
   h1,
@@ -140,23 +134,29 @@
   h3,
   h4 {
     text-wrap: balance;
+    /* Three weights only. Reaching for 700 everywhere is most of why the
+       old site read heavy. */
     font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  h1 {
+    font-family: var(--font-display);
   }
 
   p {
     text-wrap: pretty;
   }
 
-  /* Focus is always visible and always the accent, on every surface. */
   :focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
     border-radius: 2px;
   }
 
   ::selection {
-    background-color: var(--accent);
-    color: var(--accent-ink);
+    background-color: var(--focus);
+    color: var(--paper);
   }
 
   ::-webkit-scrollbar {
@@ -169,7 +169,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: var(--line-strong);
+    background-color: var(--line-2);
     border: 2px solid var(--paper);
     border-radius: 8px;
   }
@@ -190,7 +190,7 @@
 }
 
 @layer components {
-  /* One definition of the editorial measure, used by every text block. */
+  /* The one measure every block of prose uses. */
   .measure {
     max-width: var(--container-measure);
   }
@@ -199,49 +199,68 @@
     max-width: var(--container-prose);
   }
 
-  /* Link underline that sits under the text, not through the descenders. */
+  /* A link is ink with an underline, and the underline is the affordance.
+     The old palette gave links a colour that never appeared anywhere
+     else, so it carried no meaning. */
   .link {
+    color: var(--link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--line-2);
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .link:hover {
+    text-decoration-color: var(--link);
+  }
+
+  /* A hairline divides a section. It never encloses a box. */
+  .rule {
+    border-top: 1px solid var(--line);
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--signal-bg);
+    color: var(--signal-ink);
+    border-radius: var(--radius-pill);
+    padding: 0.3rem 0.75rem;
+    font-size: var(--text-micro);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  /* The one relative size on the site. Inline code has to track whatever
+     it sits inside, so a fixed step would be wrong inside a lead sentence
+     and inside a footnote. */
+  .code-inline {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background-color: var(--sunken);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
     color: var(--ink);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-    text-decoration-color: var(--line-strong);
-    transition: text-decoration-color 150ms ease;
-
-    &:hover {
-      text-decoration-color: var(--ink);
-    }
   }
 
-  .link-accent {
-    color: var(--accent);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
-    transition: text-decoration-color 150ms ease;
-
-    &:hover {
-      text-decoration-color: var(--accent);
-    }
-  }
-
-  /* Rules and cards are separated by hairlines, not by heavy shadows. */
-  .card {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-  }
-
-  /* Shiki emits both palettes as custom properties when `defaultColor` is
-     false. The container keeps our own surface in both themes, and only
-     the token colours swap, so code blocks don't turn into white slabs
-     on a dark page. */
+  /* Code blocks arrive from CodeBlock, which is shared with the
+     prototypes, so their surface styling lives here too. */
   .code-surface {
     margin: 0;
     padding: 1rem 1.125rem;
     overflow-x: auto;
-    background-color: var(--surface-sunken) !important;
+    background-color: var(--code-bg) !important;
     font-family: var(--font-mono);
     font-size: var(--text-small);
     line-height: 1.7;
@@ -253,7 +272,6 @@
     color: var(--shiki-light) !important;
     font-style: var(--shiki-light-font-style) !important;
     font-weight: var(--shiki-light-font-weight) !important;
-    text-decoration: var(--shiki-light-text-decoration) !important;
   }
 
   .dark .code-surface,
@@ -261,6 +279,5 @@
     color: var(--shiki-dark) !important;
     font-style: var(--shiki-dark-font-style) !important;
     font-weight: var(--shiki-dark-font-weight) !important;
-    text-decoration: var(--shiki-dark-text-decoration) !important;
   }
 }

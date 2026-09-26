@@ -6,8 +6,10 @@
 export const SITE = {
   name: "Orbit",
   url: "https://orbit-lang.dev",
-  tagline: "Do more with less.",
-  // Section 27 of the brand system: what it is + what it needs + what it stays.
+  /** Section 26: the primary headline is the philosophy, the subhead is concrete. */
+  headline: "Do more with less.",
+  eyebrow: "A language for APIs and microservices",
+  // Section 27: what it is + what it needs + what it stays + proof hint.
   subheadline:
     "Orbit is a statically typed language for APIs and microservices. It compiles fast and needs little to run, so it stays fast even under load.",
   description:

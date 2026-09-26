@@ -4,7 +4,7 @@ import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import LinkButton from "../components/LinkButton.astro";
-import { docLink, REPO } from "../data/site";
+import { REPO, docLink } from "../data/site";
 ---
 
 <Base
@@ -13,31 +13,47 @@ import { docLink, REPO } from "../data/site";
   noindex
 >
   <Nav />
-  <main id="main" class="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-    <p class="font-mono text-small text-ink-subtle">404</p>
-    <h1 class="mt-4 max-w-2xl text-balance text-title">That page isn't here.</h1>
-    <p class="measure mt-5 text-lead text-ink-muted">
+
+  <main id="main" class="mx-auto w-full max-w-6xl px-6 py-20 sm:px-8 sm:py-28">
+    <p class="mono text-small text-ink-3">404</p>
+    <h1 class="text-title mt-4 max-w-2xl text-balance font-display">That page isn't here.</h1>
+    <p class="measure text-lead mt-6 text-ink-2">
       The address may be mistyped, or the page may have moved when I reorganised the
       documentation. Nothing is broken on your side.
     </p>
 
-    <div class="mt-8 flex flex-wrap gap-3">
+    <div class="mt-9 flex flex-wrap gap-3">
       <LinkButton href="/" variant="primary">Go to the home page</LinkButton>
       <LinkButton href="/docs" variant="secondary">Find a document</LinkButton>
       <LinkButton href={REPO.issues} variant="tertiary">Tell me the link that broke</LinkButton>
     </div>
 
-    <div class="mt-14 border-t border-line pt-8">
-      <h2 class="text-micro font-semibold tracking-[0.08em] text-ink-subtle uppercase">
-        Common starting points
-      </h2>
-      <ul class="mt-4 flex flex-col gap-2.5 text-small">
-        <li><a class="link" href={docLink("GETTING_STARTED.md")}>Getting started</a></li>
-        <li><a class="link" href={docLink("TOUR.md")}>Language tour</a></li>
-        <li><a class="link" href={docLink("KNOWN_LIMITATIONS.md")}>What 0.1 can't do yet</a></li>
-        <li><a class="link" href={docLink("FAQ.md")}>Frequently asked questions</a></li>
+    <div class="rule mt-14 pt-6">
+      <h2 class="label">Common starting points</h2>
+      <ul class="mt-4 flex flex-col">
+        <li>
+          <a class="link text-small inline-flex min-h-10 items-center" href={docLink("GETTING_STARTED.md")}
+            >Getting started</a
+          >
+        </li>
+        <li>
+          <a class="link text-small inline-flex min-h-10 items-center" href={docLink("TOUR.md")}
+            >Language tour</a
+          >
+        </li>
+        <li>
+          <a class="link text-small inline-flex min-h-10 items-center" href={docLink("KNOWN_LIMITATIONS.md")}
+            >What 0.1 can't do</a
+          >
+        </li>
+        <li>
+          <a class="link text-small inline-flex min-h-10 items-center" href={docLink("FAQ.md")}
+            >Frequently asked questions</a
+          >
+        </li>
       </ul>
     </div>
   </main>
+
   <Footer />
 </Base>

@@ -1,7 +1,7 @@
 ---
-// Orbit source, highlighted at build time by Shiki. Nothing is shipped to
-// the browser except the finished markup and a few hundred bytes for the
-// copy button, so a code block costs no framework runtime.
+// Orbit source, highlighted at build time by Shiki. Nothing reaches the
+// browser except the finished markup and a few hundred bytes for the
+// copy button.
 import { getHighlighter } from "../lib/highlighter.mjs";
 import type { ShikiTransformer } from "shiki";
 
@@ -17,7 +17,7 @@ const { code, label, lang = "orbit", class: className = "" } = Astro.props;
 
 const trimmed = code.replace(/^\n+|\n+$/g, "");
 
-/** The header shows the language, but only when the label doesn't already say it. */
+/** The header shows the language, but only when the label doesn't say it. */
 const LANG_NAMES: Record<string, string> = {
   orbit: "Orbit",
   bash: "Shell",
@@ -49,15 +49,17 @@ const html = highlighter.codeToHtml(trimmed, {
 
 <figure
   class:list={[
-    "group/code relative overflow-hidden rounded-lg border border-line bg-sunken",
+    // No border. A background step is enough, and a radius is the only
+    // shape on the page.
+    "group/code relative overflow-hidden rounded-[var(--radius-lg)] bg-sunken",
     className,
   ]}
 >
   {
     (label || lang !== "orbit") && (
-      <figcaption class="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5">
-        <span class="truncate font-mono text-micro text-ink-subtle">{label ?? langName}</span>
-        {label && <span class="text-micro text-ink-subtle">{langName}</span>}
+      <figcaption class="flex items-center justify-between gap-3 bg-code-bg px-4 pt-3 pb-1">
+        <span class="truncate font-mono text-micro text-ink-3">{label ?? langName}</span>
+        {label && <span class="text-micro text-ink-3">{langName}</span>}
       </figcaption>
     )
   }
@@ -66,7 +68,7 @@ const html = highlighter.codeToHtml(trimmed, {
     type="button"
     data-copy
     data-code={trimmed}
-    class="absolute top-2.5 right-2.5 rounded-md border border-line bg-paper/90 px-2.5 py-1.5 text-micro text-ink-muted opacity-0 backdrop-blur transition-opacity group-hover/code:opacity-100 focus-visible:opacity-100 hover:text-ink"
+    class="absolute top-2.5 right-2.5 rounded-[var(--radius)] bg-paper/90 px-2.5 py-1.5 text-micro text-ink-2 opacity-0 backdrop-blur transition-opacity group-hover/code:opacity-100 focus-visible:opacity-100 hover:text-ink"
     aria-label="Copy code to clipboard"
   >
     Copy
