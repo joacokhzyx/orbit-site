@@ -2,6 +2,10 @@
 // A numbered section with one hairline above it. The number is the
 // identity of this direction: every section on the site is numbered in
 // mono, the way a standards document numbers its clauses.
+//
+// The padding below is the point. The first pass used pt-12, which put
+// the next heading 48px under the last paragraph, and a page of six
+// sections read as a wall. It is now a full section's worth of air.
 interface Props {
   id?: string;
   number?: string;
@@ -13,15 +17,15 @@ interface Props {
 const { id, number, heading, lead, class: className = "" } = Astro.props;
 ---
 
-<section id={id} class:list={["rule scroll-mt-24 pt-12 sm:pt-14", className]}>
+<section id={id} class:list={["rule scroll-mt-24 pt-16 sm:pt-24 lg:pt-28", className]}>
   {
     heading && (
-      <header class="mb-8 sm:mb-10">
+      <header class="mb-10 sm:mb-14">
         <div class="flex flex-wrap items-baseline gap-x-5 gap-y-2">
           {number && <span class="mono text-small text-ink-3">{number}</span>}
           <h2 class="text-title text-balance">{heading}</h2>
         </div>
-        {lead && <p class="measure text-lead mt-4 text-ink-2">{lead}</p>}
+        {lead && <p class="measure text-lead mt-6 text-ink-2">{lead}</p>}
       </header>
     )
   }
