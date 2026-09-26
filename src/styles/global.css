@@ -4,7 +4,14 @@
 @import "@fontsource-variable/outfit";
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+/* Two things mark the theme as dark and both have to work. The site sets a
+   class on <html> before first paint; Starlight sets data-theme on the same
+   element from its own inline script. Listening for only one of them left
+   /docs stuck in light mode, because Starlight's markup never gets a class
+   and this stylesheet never saw its attribute. */
+@custom-variant dark (
+  &:where(.dark, [data-theme="dark"], .dark *, [data-theme="dark"] *)
+);
 
 /* ===========================================================================
    TOKENS
@@ -34,7 +41,8 @@
   --signal-ink: #6b4a05;
 }
 
-.dark {
+.dark,
+:root[data-theme="dark"] {
   --paper: #0b0b0c;
   --surface: #141416;
   --surface-2: #1d1d20;
@@ -291,7 +299,9 @@
   }
 
   .dark .code-surface,
-  .dark .code-surface span {
+  .dark .code-surface span,
+  [data-theme="dark"] .code-surface,
+  [data-theme="dark"] .code-surface span {
     color: var(--shiki-dark) !important;
     font-style: var(--shiki-dark-font-style) !important;
     font-weight: var(--shiki-dark-font-weight) !important;

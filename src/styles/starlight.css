@@ -1,0 +1,174 @@
+/* Starlight runs the documentation, and it brings its own design tokens.
+   Rather than fight them, they are remapped onto ours, so /docs and the
+   marketing pages are visibly the same site. Anything Starlight names that
+   ours doesn't have is mapped to the nearest equivalent, which is what
+   keeps the sidebar, the table of contents, and the code blocks from
+   looking borrowed. */
+
+:root {
+  /* Surfaces */
+  --sl-color-bg: var(--paper);
+  --sl-color-bg-inline: var(--sunken);
+  --sl-color-bg-sidebar: var(--paper);
+  --sl-color-bg-nav: var(--paper);
+  --sl-color-bg-card: var(--surface);
+  --sl-color-bg-card-hover: var(--surface-2);
+  --sl-color-bg-badge: var(--surface-2);
+
+  /* Text */
+  --sl-color-white: var(--ink);
+  --sl-color-gray-1: var(--ink);
+  --sl-color-gray-2: var(--ink-2);
+  --sl-color-gray-3: var(--ink-3);
+  --sl-color-gray-4: var(--ink-3);
+  --sl-color-gray-5: var(--ink-3);
+  --sl-color-gray-6: var(--line-2);
+  --sl-color-black: var(--ink);
+
+  /* Accents. The site has none, so a link stays ink with an underline,
+     and the accents are reserved for the states a reader must notice. */
+  --sl-color-accent: var(--ink);
+  --sl-color-accent-high: var(--ink);
+  --sl-color-accent-low: var(--line);
+  --sl-color-accent-lowest: var(--surface-2);
+
+  --sl-color-white: var(--ink);
+  --sl-color-success: var(--signal-ink);
+  --sl-color-success-high: var(--signal-ink);
+  --sl-color-success-low: var(--signal-bg);
+  --sl-color-success-lowest: var(--signal-bg);
+  --sl-color-warning: var(--signal-ink);
+  --sl-color-warning-high: var(--signal-ink);
+  --sl-color-warning-low: var(--signal-bg);
+  --sl-color-warning-lowest: var(--signal-bg);
+  --sl-color-danger: var(--signal-ink);
+  --sl-color-danger-high: var(--signal-ink);
+  --sl-color-danger-low: var(--signal-bg);
+  --sl-color-danger-lowest: var(--signal-bg);
+
+  --sl-color-text-accent: var(--ink);
+  --sl-color-text-accent-high: var(--ink);
+  --sl-color-text-inverted: var(--paper);
+  --sl-color-text-inverted-high: var(--paper);
+
+  /* Type. Same faces, same seven steps. */
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+  --sl-text-xs: 0.8125rem;
+  --sl-text-sm: 0.9375rem;
+  --sl-text-base: 1.0625rem;
+  --sl-text-lg: 1.125rem;
+  --sl-text-xl: 1.25rem;
+  --sl-text-2xl: 1.5rem;
+  --sl-text-3xl: 1.875rem;
+  --sl-text-4xl: 2.25rem;
+
+  --sl-line-height: 1.75;
+  --sl-content-width: 48rem;
+  --sl-sidebar-width: 15rem;
+  --sl-nav-height: 4.5rem;
+
+  --sl-border-radius-sm: var(--radius);
+  --sl-border-radius: var(--radius);
+  --sl-border-radius-lg: var(--radius-lg);
+}
+
+/* One radius on the page, including the controls Starlight ships. */
+.star {
+  --sl-radius: var(--radius);
+}
+
+.star *,
+.star *::before,
+.star *::after {
+  border-color: var(--line);
+}
+
+/* The brand system asks for a hairline that divides and never a box that
+   encloses, so the sidebar and the on this page list get one rule each
+   and nothing else. */
+.sidebar-content {
+  border-inline-end: 1px solid var(--line);
+}
+
+.right-sidebar-panel {
+  border-inline-start: 1px solid var(--line);
+}
+
+.content-panel {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Code, both fences and inline, follows the site's own treatment. */
+.star pre,
+.sl-markdown-content pre {
+  background-color: var(--sunken) !important;
+  border: 0;
+  border-radius: var(--radius-lg);
+}
+
+.sl-markdown-content :is(code):not(:where([class~="not-content"] *)) {
+  background-color: var(--sunken);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.85em;
+}
+
+.sl-markdown-content :is(code):not(:where([class~="not-content"] *))::before,
+.sl-markdown-content :is(code):not(:where([class~="not-content"] *))::after {
+  content: none;
+}
+
+/* A link is ink with an underline, on this site and in the docs. */
+.sl-markdown-content :is(a):not(:where([class~="not-content"] *)) {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--line-2);
+}
+
+.sl-markdown-content :is(a):not(:where([class~="not-content"] *)):hover {
+  text-decoration-color: var(--ink);
+}
+
+/* Code blocks keep the Shiki dual palette, which the site stylesheet
+   already switches on the .dark class. */
+.star .shiki,
+.star .shiki span {
+  color: var(--shiki-light) !important;
+  font-style: var(--shiki-light-font-style) !important;
+  font-weight: var(--shiki-light-font-weight) !important;
+}
+
+.dark .star .shiki,
+.dark .star .shiki span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+}
+
+/* Starlight marks the current page with aria-current and paints it with
+   the accent, which here is ink. Ink on ink made the active item a black
+   block with invisible text, so the active state is a surface step like
+   everywhere else on the site. */
+.sidebar-content a[aria-current="page"] {
+  background-color: var(--surface-2) !important;
+  color: var(--ink) !important;
+  font-weight: 500;
+}
+
+.sidebar-content a[aria-current="page"] .large {
+  color: var(--ink) !important;
+}
+
+/* Uppercase, no tracking, same as the marketing pages. */
+.sl-markdown-content h2 {
+  letter-spacing: -0.012em;
+}
+
+.sidebar-pill {
+  border-radius: var(--radius);
+}

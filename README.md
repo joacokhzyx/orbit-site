@@ -1,11 +1,11 @@
 # orbit-site
 
-The official Orbit site. Astro 7 + Tailwind 4 + TypeScript in strict mode.
+The official Orbit site. Astro 7 + Tailwind 4 + TypeScript in strict mode, with
+[Starlight](https://starlight.astro.build) running the documentation at `/docs`.
 
-The documentation itself is **not** here. It lives in
-[orbit-lang](https://github.com/joacokhzyx/orbit-lang/blob/main/docs), next to the
-code and the tests that back it, and every page here links to it. One copy of a
-document is enough to keep in sync.
+The documentation is written here, not mirrored from the repository. The
+repository stays the authority on the code and the tests; where a page here and
+a file there disagree, the file is right, and every page says so.
 
 ## Commands
 
@@ -22,22 +22,37 @@ document is enough to keep in sync.
 pnpm is the only package manager for this project. `package-lock.json` was removed
 so installs are reproducible.
 
-## The design
-
-Direction A from the prototype review, applied to every page.
+## How it's put together
 
 | Path | What lives there |
 | --- | --- |
 | `src/styles/global.css` | The token block, the seven step type scale, the one radius, the focus and motion rules |
-| `src/components/` | Nav, Footer, Logo, ThemeToggle, Section, Prose, Callout, CodeBlock, LinkButton, PageHero |
+| `src/styles/starlight.css` | Starlight's tokens remapped onto ours, so `/docs` and the pages are the same site |
+| `src/content/docs/` | The documentation, as Markdown with the Orbit grammar on every fence |
+| `src/content.config.ts` | The `docs` collection, and the prefix that puts it at `/docs` |
+| `src/components/` | Nav, Footer, Logo, ThemeToggle, Section, Prose, Callout, CodeBlock, LinkButton, PageHero, plus `DocsHeader` and `DocsFooter` for Starlight |
 | `src/data/site.ts` | Canonical URL, brand wording, navigation, pointers into the repository |
-| `src/data/docs.ts` | The documentation map that `/docs` renders |
+| `src/data/docs.ts` | The old documentation map, kept as the source for the footer and the landing page |
 | `src/data/releases.ts` | The curated changelog, read from `docs/CHANGELOG.md` |
 | `src/lib/orbit-grammar.mjs` | TextMate grammar for `.orb`, keywords copied from the compiler's lexer |
-| `src/lib/highlighter.mjs` | One memoised Shiki instance for the whole build |
+| `src/lib/highlighter.mjs` | One memoised Shiki instance for the build-time blocks |
 | `scripts/check-contrast.mjs` | Fails the build when a colour pair misses AA |
 | `scripts/check-links.mjs` | Fails the build on a dead internal link or a renamed document |
 | `scripts/generate-icons.mjs` | Renders the PNG icons and `og.png` from the SVG mark |
+
+### Two decisions worth knowing
+
+**The docs live at `/docs`, and Starlight puts them at the root.** Starlight
+injects its route at `/[...slug]`, so `start/tour` would land next to the home
+page. `src/content.config.ts` prefixes every entry id with `docs/`, which moves
+the whole tree under `/docs` without a second Astro instance and without
+duplicating the content directory.
+
+**The theme has two markers.** The site sets a `dark` class on `<html>` before
+first paint. Starlight sets `data-theme` on the same element from its own
+inline script. The tokens listen for both, because listening for only one left
+`/docs` permanently in light mode.
+
 
 ### The rules the design holds to
 

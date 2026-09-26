@@ -1,0 +1,39 @@
+---
+// Starlight's footer, replaced with the site's own. The documentation is
+// the authority, so the line at the bottom says so.
+import Logo from "./Logo.astro";
+import { SITE, REPO } from "../data/site";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="rule">
+  <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-8">
+    <div>
+      <a href="/" class="inline-flex items-center gap-2.5" aria-label="Orbit, home">
+        <Logo class="h-6 w-6 text-ink" />
+        <span class="font-logo text-lead leading-none font-semibold tracking-tight">Orbit</span>
+      </a>
+      <p class="text-small mt-3 text-ink-2">
+        {SITE.headline} A statically typed language for APIs and microservices.
+      </p>
+    </div>
+    <nav aria-label="Footer" class="flex flex-wrap gap-x-6 gap-y-2">
+      <a class="text-small text-ink-2 transition-colors hover:text-ink" href="/learn">Learn</a>
+      <a class="text-small text-ink-2 transition-colors hover:text-ink" href="/foundation">Foundation</a>
+      <a class="text-small text-ink-2 transition-colors hover:text-ink" href="/changelog">Changelog</a>
+      <a
+        class="text-small text-ink-2 transition-colors hover:text-ink"
+        href={REPO.url}
+        target="_blank"
+        rel="noopener noreferrer">GitHub ↗</a
+      >
+    </nav>
+  </div>
+  <div
+    class="text-micro mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 pb-10 text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-8"
+  >
+    <p>MIT licensed. Orbit {year}.</p>
+    <p>The repository is the source of the documentation.</p>
+  </div>
+</footer>

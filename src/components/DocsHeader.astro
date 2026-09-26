@@ -1,0 +1,11 @@
+---
+// Starlight's header, replaced with the site's own navigation so /docs
+// and the marketing pages are the same site rather than two products.
+// ThemeSelect is overridden with the site's toggle, which keeps the two
+// themes in sync through one storage key.
+import Nav from "./Nav.astro";
+---
+
+<header class="sticky top-0 z-40 bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70">
+  <Nav />
+</header>
