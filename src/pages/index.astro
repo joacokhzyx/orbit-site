@@ -95,8 +95,6 @@ const limits = [
         >
           {
             decisions.map((item) => (
-              /* The card is a flex column so the three links sit on one
-                 line even when the paragraphs above are different lengths. */
               <div style="display: flex; flex-direction: column; align-items: flex-start">
                 <h3 class="text-lead">{item.title}</h3>
                 <p class="mt-3 text-body text-ink-2">{item.body}</p>
@@ -107,9 +105,6 @@ const limits = [
                   {item.link.label}
                 </a>
               </div>
-            ))
-          }
-        </div>
             ))
           }
         </div>
