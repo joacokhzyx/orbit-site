@@ -1,11 +1,20 @@
 ---
-// Starlight's header, replaced with the site's own navigation so /docs
+// Starlight's header slot, filled with the site's own navigation so /docs
 // and the marketing pages are the same site rather than two products.
 // ThemeSelect is overridden with the site's toggle, which keeps the two
 // themes in sync through one storage key.
+//
+// A div, not a header. Nav.astro is already a <header>, and this slot
+// already sits inside Starlight's own banner, so wrapping it again put
+// three nested banner landmarks on every documentation page: two of them
+// named nothing, and one inside another, which is not a landmark
+// arrangement a screen reader can navigate. The sticky positioning and
+// the edge treatment live on Nav itself, so nothing is lost.
+//
+// `search` is on here and only here. Pagefind indexes the documentation
+// and nothing else, so this is the one bar where a search field has an
+// index behind it.
 import Nav from "./Nav.astro";
 ---
 
-<header class="sticky top-0 z-40 bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70">
-  <Nav />
-</header>
+<Nav as="div" search />

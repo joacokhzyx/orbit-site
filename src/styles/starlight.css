@@ -1,174 +1,1015 @@
-/* Starlight runs the documentation, and it brings its own design tokens.
-   Rather than fight them, they are remapped onto ours, so /docs and the
-   marketing pages are visibly the same site. Anything Starlight names that
-   ours doesn't have is mapped to the nearest equivalent, which is what
-   keeps the sidebar, the table of contents, and the code blocks from
-   looking borrowed. */
+/* Starlight runs /docs and it brings its own design system: sixty-odd colour
+   tokens, a seven-step type scale of its own, a layout vocabulary, and
+   Expressive Code alongside it with fourteen more colour properties. This
+   file is the entire integration between the two, and it does one thing:
+   every one of those values is pointed at the tokens in
+   .impeccable/review/DESIGN-CONTRACT.md, once, so the documentation and the
+   marketing pages are one product rather than two that share a header.
 
+   Three rules govern what follows.
+
+   1. Remap, do not replace. A Starlight token is remapped to a contract
+      token, and Starlight's own rules are then left to do the drawing. Where
+      a component is overridden below, it is because Starlight's rule and
+      the contract disagree about something structural (a radius, a surface
+      step, an inversion), not because a colour needed chasing. Every
+      `--ec-*` colour is repointed at a token rather than fought per element,
+      which is why the code window below has no component rules at all.
+
+   2. One owner per edge. The previous version of this file drew a rule on
+      `.sidebar-content` while Starlight drew one on `.sidebar-pane`, and
+      the same happened on the right, so both edges of the page carried two
+      hairlines a pixel apart. It also carried `.star * { border-color }`,
+      which repainted every border in the tree, focusable controls included.
+      Each edge below has exactly one owner, named in the comment that
+      introduces it, and the blanket rule is gone.
+
+   3. Two markers mean dark. The site sets a `.dark` class on <html> before
+      first paint; Starlight sets `data-theme` on the same element from its
+      own script, and /docs never receives the class from the site. Both have
+      to work, so every theme-dependent rule here is written against
+      `:is([data-theme="dark"], .dark)`.
+
+      That is an either, and it is deliberate. On a documentation page the
+      two can disagree, because the site's toggle writes the class and knows
+      nothing about Starlight's attribute: a reader who presses the toggle to
+      go dark on /docs gets the class and not the attribute. An either means
+      that press works, which is what they asked for. The alternative, letting
+      the attribute veto the class, leaves the button reading "dark theme,
+      pressed" over a page that stayed light, which is the worse of the two
+      failures. The mixing that disagreement could cause is neutralised here:
+      every rule below that paints is keyed on the either, and the two
+      Starlight rules that key on the attribute directly are both overridden
+      further down.
+
+   Cascade note, because it decides whether any of this works: this file is
+   imported by Starlight *before* its own stylesheets, and unlayered rules
+   beat layered ones regardless of order. Starlight's props, its component
+   rules and Expressive Code's palette all live in `@layer starlight.*`, so
+   everything below wins without a single `!important`.
+
+   Note also that `.star` no longer exists. Starlight 0.42 does not put that
+   class on <html>, and Expressive Code does not emit `.shiki`, so every rule
+   in the previous version of this file that began `.star` matched nothing at
+   all: the blanket border reset, the two shiki theme rules, and the radius
+   override were all dead. This stylesheet is only ever loaded on /docs, so
+   the selectors below are written plain.
+   ========================================================================= */
+
+/* ---------------------------------------------------------------------------
+   SURFACES
+   The page is the ground. There is no separate documentation chrome to tint:
+   the sidebar, the top bar, the rail and the mobile contents bar are all the
+   same page, which is why they are separated by rules and space rather than
+   by a second and third background.
+   ------------------------------------------------------------------------ */
 :root {
-  /* Surfaces */
   --sl-color-bg: var(--paper);
-  --sl-color-bg-inline: var(--sunken);
-  --sl-color-bg-sidebar: var(--paper);
   --sl-color-bg-nav: var(--paper);
-  --sl-color-bg-card: var(--surface);
-  --sl-color-bg-card-hover: var(--surface-2);
-  --sl-color-bg-badge: var(--surface-2);
+  --sl-color-bg-sidebar: var(--paper);
 
-  /* Text */
+  /* Inline code is a surface, not a box. The marketing half's `.code-inline`
+     draws a hairline around it; inside running prose that is a rule touching
+     the text it sits in, which the contract forbids, so the documentation
+     uses the background step alone. */
+  --sl-color-bg-inline-code: var(--sunken);
+
+  /* Only reachable from Starlight's banner, which this site does not render.
+     It is the ink because the banner is a bar of primary information. */
+  --sl-color-bg-accent: var(--ink);
+
+  /* Every hairline in the documentation. This one value is the whole reason
+     the doubled rules went away: Starlight draws its rules from three
+     different tokens depending on which component draws them, and all three
+     now resolve to the same hairline. */
+  --sl-color-hairline: var(--line);
+  --sl-color-hairline-light: var(--line);
+  --sl-color-hairline-shade: var(--line);
+
+  /* Behind the search dialog, which this site also does not render. A tint
+     of the ink rather than a grey of its own. */
+  --sl-color-backdrop-overlay: color-mix(in srgb, var(--ink) 45%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   INK
+   Three weights of one ink, which is the whole palette. Starlight's greys
+   are numbered by lightness, so the mapping is by role rather than by step:
+   gray-2 and gray-3 are body text, gray-4 is metadata, and gray-5 through
+   gray-7 exist here to be hairlines and one tinted fill.
+
+   `--sl-color-white` is the ink, and it has to stay the ink. It is what
+   Starlight sets every heading, every sidebar label and every aside from, so
+   pointing it at the ground is what made the documentation titles white on
+   white once. The code window's background belongs on `--ec-codeBg`, below,
+   which is where it belongs.
+   ------------------------------------------------------------------------ */
+:root {
   --sl-color-white: var(--ink);
+  --sl-color-black: var(--paper);
+
   --sl-color-gray-1: var(--ink);
   --sl-color-gray-2: var(--ink-2);
-  --sl-color-gray-3: var(--ink-3);
+  --sl-color-gray-3: var(--ink-2);
   --sl-color-gray-4: var(--ink-3);
-  --sl-color-gray-5: var(--ink-3);
-  --sl-color-gray-6: var(--line-2);
-  --sl-color-black: var(--ink);
 
-  /* Accents. The site has none, so a link stays ink with an underline,
-     and the accents are reserved for the states a reader must notice. */
+  /* gray-5 through gray-7 are not text at all. Starlight reaches for gray-5
+     to draw the borders of its search field, its mobile contents control, its
+     pagination and its dropdowns -- controls, which the contract gives the
+     one visible boundary -- and for the rules that divide content, which it
+     gives a hairline. The two are separated below, where each control that
+     needs a real boundary is named, rather than by giving one Starlight
+     token two jobs. gray-7 is a tinted fill. */
+  --sl-color-gray-5: var(--line);
+  --sl-color-gray-6: var(--line);
+  --sl-color-gray-7: var(--surface-2);
+
+  /* Body copy. */
+  --sl-color-text: var(--ink-2);
+
+  /* The accent is the ink, because a link in this system is the ink with an
+     underline. What it is used as a *background* for is remapped per
+     component below, since "the ink as a background" means a filled control
+     and that is a decision, not a colour. */
   --sl-color-accent: var(--ink);
   --sl-color-accent-high: var(--ink);
-  --sl-color-accent-low: var(--line);
+  --sl-color-accent-low: var(--surface-2);
   --sl-color-accent-lowest: var(--surface-2);
 
-  --sl-color-white: var(--ink);
-  --sl-color-success: var(--signal-ink);
-  --sl-color-success-high: var(--signal-ink);
-  --sl-color-success-low: var(--signal-bg);
-  --sl-color-success-lowest: var(--signal-bg);
-  --sl-color-warning: var(--signal-ink);
-  --sl-color-warning-high: var(--signal-ink);
-  --sl-color-warning-low: var(--signal-bg);
-  --sl-color-warning-lowest: var(--signal-bg);
-  --sl-color-danger: var(--signal-ink);
-  --sl-color-danger-high: var(--signal-ink);
-  --sl-color-danger-low: var(--signal-bg);
-  --sl-color-danger-lowest: var(--signal-bg);
-
   --sl-color-text-accent: var(--ink);
-  --sl-color-text-accent-high: var(--ink);
-  --sl-color-text-inverted: var(--paper);
-  --sl-color-text-inverted-high: var(--paper);
+  --sl-color-text-invert: var(--paper);
 
-  /* Type. Same faces, same seven steps. */
+  /* Two levels, low and higher, as the contract has them. Starlight has three
+     and its own are tinted greys; the skip link and the search dialog are the
+     only things that ask for the third. */
+  --sl-shadow-sm: var(--shadow-sm);
+  --sl-shadow-md: var(--shadow-md);
+  --sl-shadow-lg: var(--shadow-md);
+}
+
+/* ---------------------------------------------------------------------------
+   ASIDES
+   Four kinds, one treatment. Starlight paints each kind from its own hue
+   (blue, purple, orange, red) and, in the previous version of this file,
+   four sets of `--sl-color-success-*` and `--sl-color-warning-*` were mapped
+   that do not exist in 0.42 and did nothing at all: every aside was still
+   rendering in Starlight's blue.
+
+   A state in this system is a tint with dark text on it, never an inversion,
+   so all four are the state tint, and the title inside carries the label
+   rather than a second colour. The left rule goes: the tint is the boundary
+   and the radius carries the shape.
+   ------------------------------------------------------------------------ */
+.starlight-aside {
+  --sl-color-asides-text-accent: var(--signal-ink);
+  --sl-color-asides-border: transparent;
+
+  background-color: var(--signal-bg);
+  color: var(--signal-ink);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.starlight-aside a {
+  color: var(--signal-ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--signal-ink) 40%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.starlight-aside__title {
+  color: var(--signal-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-small);
+}
+
+/* ---------------------------------------------------------------------------
+   TYPE
+   Archivo carries display, headings and the wordmark at 400 and 600. IBM Plex
+   Sans carries prose at 400. JetBrains Mono carries labels, numbers, file
+   names and code. So the three families map straight across, and the
+   documentation's own ladder is four steps off the seven-step scale rather
+   than nine invented sizes.
+
+   Starlight sizes headings with a single variable per level and redefines
+   three of them at 50em, so all six are set here. Those media-query values
+   live in a layer and lose to this block, which is what keeps the h1 on the
+   title step at every width.
+
+   A note on the references themselves: Tailwind emits a theme variable only
+   when something in the project reads it, and this stylesheet is read by the
+   Tailwind plugin like any other. So the `--text-title` below is not only a
+   mapping, it is also what keeps `--text-title` in the build.
+   ------------------------------------------------------------------------ */
+:root {
   --sl-font: var(--font-sans);
   --sl-font-mono: var(--font-mono);
-  --sl-text-xs: 0.8125rem;
-  --sl-text-sm: 0.9375rem;
-  --sl-text-base: 1.0625rem;
-  --sl-text-lg: 1.125rem;
-  --sl-text-xl: 1.25rem;
-  --sl-text-2xl: 1.5rem;
-  --sl-text-3xl: 1.875rem;
-  --sl-text-4xl: 2.25rem;
+
+  /* Seven steps down to two. There is no twelfth-pixel step on this site, so
+     the two smallest collapse onto the smallest one rather than inventing a
+     size that exists nowhere else. */
+  --sl-text-2xs: var(--text-micro);
+  --sl-text-xs: var(--text-micro);
+  --sl-text-sm: var(--text-small);
+  --sl-text-base: var(--text-body);
+  --sl-text-lg: var(--text-lead);
+  --sl-text-xl: var(--text-lead);
+  --sl-text-2xl: var(--text-lead);
+  --sl-text-3xl: var(--text-heading);
+  --sl-text-4xl: var(--text-title);
+  --sl-text-5xl: var(--text-title);
+  --sl-text-6xl: var(--text-display);
+
+  --sl-text-body: var(--text-body);
+  --sl-text-body-sm: var(--text-small);
+  --sl-text-code: var(--text-small);
+  --sl-text-code-sm: var(--text-micro);
+
+  /* h1 is the same step as a marketing page title, h2 is a section, h3 is
+     prose. The documentation is denser than the marketing pages by exactly
+     one step and no more. */
+  --sl-text-h1: var(--text-title);
+  --sl-text-h2: var(--text-heading);
+  --sl-text-h3: var(--text-lead);
+  --sl-text-h4: var(--text-body);
+  --sl-text-h5: var(--text-small);
+  --sl-text-h6: var(--text-micro);
 
   --sl-line-height: 1.75;
-  --sl-content-width: 48rem;
-  --sl-sidebar-width: 15rem;
-  --sl-nav-height: 4.5rem;
+  --sl-line-height-headings: 1.25;
+}
 
-  --sl-border-radius-sm: var(--radius);
+/* ---------------------------------------------------------------------------
+   LAYOUT
+   Every number below is off the site's own 4px rhythm, or off a measure the
+   marketing pages already use. Starlight's defaults are a 45rem column, an
+   18.75rem sidebar and a 3.5rem bar, which is none of this site's shape.
+
+   `--sl-nav-height` is the one number here that has to be *measured* rather
+   than chosen, and it is measured from the site's own header: a 2.75rem
+   control, its padding above and below, and a 1px keyline under the bar. It
+   was 3.5rem before, which is 13px shorter than the bar it was supposed to
+   describe, so the header overflowed the fixed bar and the content started
+   underneath it. Nav.astro's padding is 0.625rem below its own `sm`
+   breakpoint and 0.75rem above it, so the bar is 65px and then 69px, and
+   both are declared rather than interpolated. If Nav.astro changes its
+   height, these two numbers are what has to follow.
+
+   `--sl-mobile-toc-height` is the height of the mobile contents bar, which
+   exists only below 72rem. Starlight resets that token to zero at 72rem in
+   its own layer; an unlayered declaration here would beat that reset at
+   every width and leave a bar's worth of dead space above the content on a
+   desktop screen, which is why it is declared as zero and re-declared
+   inside a media query rather than set once.
+   ------------------------------------------------------------------------ */
+:root {
+  --sl-content-width: 44rem; /* the site's prose measure */
+  --sl-sidebar-width: 16rem; /* 64 steps of the 4px base */
+  --sl-content-pad-x: 1.5rem;
+  --sl-sidebar-pad-x: 1.25rem;
+  --sl-content-gap-y: 1.5rem;
+  --sl-main-pad: 0 0 4rem 0;
+
+  --sl-nav-height: 4.0625rem; /* 2.75rem + 0.625rem + 0.625rem + 1px */
+  --sl-nav-pad-y: 0; /* the site's header brings its own gutter */
+  --sl-nav-pad-x: 0.5rem; /* only the sidebar button reads this */
+  --sl-menu-button-size: 2.75rem; /* the site's control height, and 44px */
+  --sl-mobile-toc-height: 0rem;
+
+  --sl-outline-offset-inside: -2px;
+
+  /* Starlight 0.42 hardcodes its radii rather than reading these, so they
+     are declared for the components that do read a token and the real ones
+     are set per component below. Nothing in the documentation is square. */
+  --sl-border-radius-sm: var(--radius-sm);
   --sl-border-radius: var(--radius);
   --sl-border-radius-lg: var(--radius-lg);
 }
 
-/* One radius on the page, including the controls Starlight ships. */
-.star {
-  --sl-radius: var(--radius);
+@media (min-width: 40rem) {
+  :root {
+    --sl-nav-height: 4.3125rem; /* 2.75rem + 0.75rem + 0.75rem + 1px */
+  }
 }
 
-.star *,
-.star *::before,
-.star *::after {
-  border-color: var(--line);
+@media (width < 72rem) {
+  :root {
+    --sl-mobile-toc-height: 3.25rem; /* a 2.75rem control, plus the air below */
+  }
 }
 
-/* The brand system asks for a hairline that divides and never a box that
-   encloses, so the sidebar and the on this page list get one rule each
-   and nothing else. */
-.sidebar-content {
-  border-inline-end: 1px solid var(--line);
+/* ===========================================================================
+   THE TOP BAR
+   Owner of the line under the bar: the site's own header, in Nav.astro, on
+   every page including the marketing ones. Starlight's `.header` is a fixed,
+   full-width box of exactly `--sl-nav-height` that the site's header is
+   rendered inside, and it also draws a rule under itself, which put two
+   hairlines 13px apart across the top of every documentation page. So its
+   rule goes and its padding goes with it: the bar is now exactly as tall as
+   the header inside it, and the header's own `max-w-6xl` gutter is the
+   documentation's gutter.
+   ========================================================================= */
+.header {
+  border-bottom: 0;
+  padding: 0;
 }
 
-.right-sidebar-panel {
-  border-inline-start: 1px solid var(--line);
+/* ===========================================================================
+   THE SIDEBAR
+   Owner of the vertical rule on the left: Starlight, which draws a
+   `border-inline-start` on every `li` here from `--sl-color-hairline-shade`.
+   That rule is gone; see "ONE RAIL, THREE EDGES, NO RULES" below for what
+   removed it and why nothing took its place. The previous version of this
+   file also drew a second rule on `.sidebar-content` a pixel away; that one
+   was already gone and still is.
+
+   What is left is the item treatment, because Starlight's is an inversion:
+   the current page was a filled block of the accent, which is the ink here,
+   so it was the ink on the ink. A sidebar marks where you are with a
+   background step, the same language the site's own navigation uses, and
+   leaves the ink to the text.
+   ========================================================================= */
+.sidebar-pane {
+  /* A little air above the first label, so the first line sits level with
+     the page title. The comment here used to say "so the hairline runs into
+     empty space"; there is no hairline on this rail any more. */
+  padding-top: 0.75rem;
+  /* This pane draws one on its right edge as well, and it is the only rule
+     between the sidebar and the text. Sixteen of them were measured across
+     the page before this block went in: twelve on the items and this one. */
+  border-inline-end: 0;
 }
 
-.content-panel {
-  border: 0;
-  box-shadow: none;
-  background: transparent;
+.sidebar-content a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink-2);
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
-/* Code, both fences and inline, follows the site's own treatment. */
-.star pre,
-.sl-markdown-content pre {
-  background-color: var(--sunken) !important;
-  border: 0;
-  border-radius: var(--radius-lg);
-}
-
-.sl-markdown-content :is(code):not(:where([class~="not-content"] *)) {
-  background-color: var(--sunken);
-  border-radius: 4px;
-  padding: 0.1em 0.35em;
-  font-size: 0.85em;
-}
-
-.sl-markdown-content :is(code):not(:where([class~="not-content"] *))::before,
-.sl-markdown-content :is(code):not(:where([class~="not-content"] *))::after {
-  content: none;
-}
-
-/* A link is ink with an underline, on this site and in the docs. */
-.sl-markdown-content :is(a):not(:where([class~="not-content"] *)) {
+.sidebar-content a:hover,
+.sidebar-content a:focus-visible {
+  background-color: var(--surface-2);
   color: var(--ink);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-  text-decoration-color: var(--line-2);
 }
 
-.sl-markdown-content :is(a):not(:where([class~="not-content"] *)):hover {
-  text-decoration-color: var(--ink);
-}
-
-/* Code blocks keep the Shiki dual palette, which the site stylesheet
-   already switches on the .dark class. */
-.star .shiki,
-.star .shiki span {
-  color: var(--shiki-light) !important;
-  font-style: var(--shiki-light-font-style) !important;
-  font-weight: var(--shiki-light-font-weight) !important;
-}
-
-.dark .star .shiki,
-.dark .star .shiki span {
-  color: var(--shiki-dark) !important;
-  font-style: var(--shiki-dark-font-style) !important;
-  font-weight: var(--shiki-dark-font-weight) !important;
-}
-
-/* Starlight marks the current page with aria-current and paints it with
-   the accent, which here is ink. Ink on ink made the active item a black
-   block with invisible text, so the active state is a surface step like
-   everywhere else on the site. */
-.sidebar-content a[aria-current="page"] {
-  background-color: var(--surface-2) !important;
-  color: var(--ink) !important;
-  font-weight: 500;
+/* The current page. `aria-current="page"` is Starlight's own attribute and it
+   is what carries the state to a screen reader; the background step and the
+   weight are what carry it to the eye. Not an inversion: the contract calls
+   a solid block "deafening" for exactly this much information. */
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+  background-color: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .sidebar-content a[aria-current="page"] .large {
-  color: var(--ink) !important;
+  color: var(--ink);
 }
 
-/* Uppercase, no tracking, same as the marketing pages. */
+.sidebar-content summary {
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding-inline: 0.75rem;
+}
+
+.sidebar-content summary:hover {
+  background-color: var(--surface-2);
+}
+
+.sidebar-content .large {
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+/* ===========================================================================
+   THE RAIL: "ON THIS PAGE"
+   Owner of the vertical rule on the right: Starlight, on `.right-sidebar`,
+   from `--sl-color-hairline`. That rule is gone, with the sidebar's and the
+   one under the page title; see "ONE RAIL, THREE EDGES, NO RULES" below.
+   The previous version drew a second one on `.right-sidebar-panel` as well,
+   and that one is gone too.
+
+   The rail is a contents table, so it is set in the face that carries labels
+   and numbers, at the smallest step, in the metadata ink. It is the quietest
+   thing on the page and it has to behave like it: real hover and focus
+   states, a background step for the entry you are reading, and a title bar
+   label in the same face as its entries.
+   ========================================================================= */
+.right-sidebar-panel {
+  padding-top: 1.5rem;
+}
+
+/* The label and its entries were BOTH --ink-3, so "ON THIS PAGE" was
+   painted exactly like the line under it and read as the first entry of
+   a list that starts one line too high. The label keeps the quiet ink
+   and now has the air of a label; the entries move a step darker, which
+   is what makes them a list the label is heading. Three levels: the
+   label quiet, an entry readable, the entry you are reading at full ink
+   and 600. */
+.right-sidebar-panel h2 {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 1rem;
+}
+
+.right-sidebar-panel a,
+.right-sidebar-panel a:hover {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  margin-inline: -0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1.5;
+  text-decoration: none;
+  /* one step darker than the label above it, so the label reads as a
+     label and this reads as what it labels */
+  color: var(--ink-2);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.right-sidebar-panel a:hover,
+.right-sidebar-panel a:focus-visible {
+  background-color: var(--surface-2);
+  color: var(--ink);
+}
+
+.right-sidebar-panel a[aria-current="true"] {
+  background-color: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* The mobile list inside the contents bar is the same table, so it gets the
+   same ink; its row rules are hairlines with air, which they already are. */
+mobile-starlight-toc a {
+  color: var(--ink-2);
+  border-radius: var(--radius-sm);
+}
+
+mobile-starlight-toc a[aria-current="true"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ===========================================================================
+   ONE RAIL, THREE EDGES, NO RULES
+   The top bar lost its rule in Nav.astro: a sticky opaque bar that slices
+   the text passing under it reads as a broken render unless something marks
+   the edge, and a 20px fade marks it better than a line does. The two
+   vertical rails and the rule under the page title were still carrying that
+   same mark, which left the documentation describing itself three different
+   ways — a bar with no edge, a sidebar with one, a title with one — on a
+   page the reader is meant to read as one document.
+
+   So the two rails lose theirs as well, and nothing replaces them. The rails
+   were never load-bearing: a sidebar and a contents table are separated from
+   the text by `--sl-sidebar-width` of gutter, which is a wider gap than any
+   hairline, and what marks "you are here" in both is the background step on
+   the item, not the line beside it. That is the navbar's own language, which
+   is the point: one rule for where you are, used three times.
+
+   Measured rather than assumed. The left rule was not one element but twelve
+   — Starlight draws `border-inline-start` on every `li` in the sidebar, so it
+   was a dashed-looking rail a pixel apart down the outer edge, which is worse
+   than the single line it was meant to be. `.content-panel`'s top rule is the
+   fourth, and it sat 13px under the header's old keyline, which is where the
+   "two hairlines 13px apart" note above came from.
+
+   What is left is the footer's rule, and it stays: that one divides two
+   sections of a page rather than separating a rail from text, and
+   `--line` is documented as dividing and never enclosing.
+   ========================================================================= */
+.sidebar-content li {
+  border-inline-start: 0;
+}
+
+.right-sidebar {
+  border-inline-start: 0;
+}
+
+.content-panel {
+  border-top: 0;
+}
+
+/* ===========================================================================
+   THE TWO MOBILE CONTROLS
+   Both of these were the previous version's worst visual defects, and neither
+   needed a new colour to fix it.
+
+   The sidebar button cannot live in the site's bar. That bar already carries
+   the theme toggle and the site's own mobile menu at its right edge, and a
+   third control at that offset lands exactly on top of them: the button was
+   invisible and unusable on every phone-width screen, because the two
+   controls occupy the same 44 pixels. It is moved to the end of the contents
+   bar below, which is a bar whose whole job is to hold controls, and given
+   the air the contract asks a rule to have rather than the pixel Starlight
+   puts it on.
+
+   The contents bar itself is moved half a step down. Starlight positions it
+   at `--sl-nav-height - 1px` so that its own top rule lands on top of the
+   header's keyline, which is two rules occupying one pixel; below the
+   header's keyline there is nothing between the two bars but air, which is
+   the point. `--sl-mobile-toc-height` above already counts that half step,
+   so the content still clears the bar.
+
+   The button itself is a bare icon control, like the two it sits beside: no
+   background, no rule, no shadow, and the same 2.75rem box the site uses
+   everywhere. It used to be a 2rem circle painted `--sl-color-white`, which
+   is the ink here, so it was a solid ink disc with an ink icon on it.
+   ========================================================================= */
+.sl-menu-button {
+  top: calc(
+    var(--sl-nav-height) + 0.5rem + (var(--sl-mobile-toc-height) - var(--sl-menu-button-size)) / 2
+  );
+  inset-inline-end: var(--sl-nav-pad-x);
+  width: var(--sl-menu-button-size);
+  height: var(--sl-menu-button-size);
+  padding: 0.625rem;
+  background-color: transparent;
+  color: var(--ink);
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.sl-menu-button:hover,
+.sl-menu-button:has(~ :popover-open):hover {
+  background-color: var(--surface-2);
+}
+
+/* Open, the button is the close affordance. Starlight repaints it with gray-2
+   and drops the shadow; both are cancelled here. */
+.sl-menu-button:has(~ :popover-open),
+[data-theme="light"] .sl-menu-button,
+[data-theme="light"] .sl-menu-button:has(~ :popover-open) {
+  background-color: transparent;
+  color: var(--ink);
+  box-shadow: none;
+}
+
+/* A page with no table of contents has no contents bar to sit in, so the
+   button falls back to floating under the header's own edge, where it is a
+   raised control rather than an icon in a bar. No documentation page is in
+   this state today; every one of them has a contents table. */
+html:not([data-has-toc]) .sl-menu-button {
+  top: calc(var(--sl-nav-height) + 0.5rem);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+mobile-starlight-toc nav {
+  top: calc(var(--sl-nav-height) + 0.5rem);
+  background-color: var(--paper);
+  border-top: 0;
+}
+
+/* A control with no background of its own, so it is the one visible
+   boundary. Not a filled block, which is what it was: the toggle was
+   `--sl-color-black`, the ink, with its own label in the ink on it. */
+mobile-starlight-toc .toggle,
+mobile-starlight-toc .toggle:hover,
+mobile-starlight-toc details[open] .toggle {
+  background-color: transparent;
+  color: var(--ink-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  padding-inline: 0.75rem 0.5rem;
+  min-height: 2.25rem;
+}
+
+mobile-starlight-toc .toggle:hover,
+mobile-starlight-toc details[open] .toggle {
+  color: var(--ink);
+  background-color: var(--surface-2);
+}
+
+mobile-starlight-toc .display-current {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  /* Room for the sidebar button, which now shares this bar. */
+  padding-inline-end: calc(var(--sl-menu-button-size) + var(--sl-nav-pad-x));
+}
+
+/* ===========================================================================
+   PROSE
+   Starlight's own markdown stylesheet is good and stays. What follows is the
+   five things it and the marketing half disagree about, plus the spacing the
+   contract asks for: a section heading needs a section's worth of air above
+   it, not one and a half lines.
+   ========================================================================= */
+.sl-markdown-content {
+  color: var(--ink-2);
+}
+
+/* Headings: the display face, the primary ink, and the marketing rhythm. */
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display);
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
 .sl-markdown-content h2 {
-  letter-spacing: -0.012em;
+  margin-top: 3rem;
 }
 
-.sidebar-pill {
+.sl-markdown-content h3 {
+  margin-top: 2rem;
+}
+
+.sl-markdown-content h4,
+.sl-markdown-content h5,
+.sl-markdown-content h6 {
+  margin-top: 1.5rem;
+}
+
+/* The first heading of a page is the title, not a section, so it does not
+   get the section's air. Starlight's PageTitle is the only h1. */
+.sl-markdown-content > h1:first-child {
+  margin-top: 0;
+}
+
+/* A link is the ink with an underline, on this site and in the
+   documentation. The anchor link that Starlight hangs off every heading is
+   not a link in that sense, so it is excluded. */
+.sl-markdown-content :is(a):not(:where(.not-content *)):not(.sl-anchor-link) {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-style 150ms ease;
+}
+
+.sl-markdown-content :is(a):not(:where(.not-content *)):not(.sl-anchor-link):hover {
+  text-decoration-style: solid;
+}
+
+.sl-markdown-content strong {
+  font-weight: 600;
+}
+
+.sl-markdown-content :is(ul, ol) {
+  padding-inline-start: 1.25rem;
+}
+
+.sl-markdown-content li {
+  color: var(--ink-2);
+}
+
+.sl-markdown-content li::marker {
+  color: var(--ink-3);
+}
+
+/* Inline code. A background step and a radius, and no rule: the marketing
+   half draws a hairline round it, but in running prose that is a line
+   touching the text, and here the step is enough. */
+.sl-markdown-content code:not(:where(.not-content *)) {
+  background-color: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.3em;
+}
+
+/* A quote is set off by a rule with air, not by a bar against the text. */
+.sl-markdown-content blockquote {
+  border-inline-start: 1px solid var(--line);
+  padding-inline-start: 1.25rem;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+}
+
+.sl-markdown-content details {
+  --sl-details-border-color: var(--line);
+  --sl-details-border-color--hover: var(--line-2);
+  border-inline-start: 1px solid var(--line);
+  padding-inline-start: 1.25rem;
+}
+
+.sl-markdown-content summary {
+  color: var(--ink);
+}
+
+.sl-markdown-content hr {
+  border-bottom: 1px solid var(--line);
+  margin-block: 2.5rem;
+}
+
+/* Tables. Row rules only: a hairline under each row, with the section rhythm
+   above and below it, and no box around the table. The header is the ink at
+   600 because a column head is a label and the body copy is the second ink. */
+.sl-markdown-content :is(th, td) {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.sl-markdown-content :is(th, td):first-child {
+  padding-inline-start: 0;
+}
+
+.sl-markdown-content :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.sl-markdown-content th {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.sl-markdown-content td {
+  color: var(--ink-2);
+}
+
+/* ===========================================================================
+   CODE
+   The code window is the one place colour is allowed, and it is its own
+   surface: `--sunken`, a hairline around it, the radius scale, and inside it
+   the measured syntax palette from src/lib/code-theme.mjs, which nothing in
+   this file overrides.
+
+   Expressive Code brings fourteen colour properties of its own and injects
+   them at `:root` and on `.expressive-code[data-theme='dark']`, which is why
+   the code window used to render blue-grey on cream while the rest of the
+   page was black on white. All of them are repointed here, and because every
+   value is a contract token -- which flips with the theme on its own -- one
+   block covers both dark markers and neither theme needs a second copy of
+   any of it. That is also why this section has no `.frame`, no `figcaption`
+   and no `pre` rules: the previous version had rules for all three, fighting
+   rules that were already doing the right thing.
+   ========================================================================= */
+.expressive-code {
+  /* The frame. */
+  --ec-brdWd: 1px;
+  --ec-brdCol: var(--line);
+  --ec-brdRad: var(--radius);
+  --ec-focusBrd: var(--focus);
+  --ec-frm-shdCol: var(--ink);
+
+  /* The code surface and the text in it. `--ec-codeBg` is the one value here
+     that is deliberately not the page: the window is a window. */
+  --ec-codeBg: var(--sunken);
+  --ec-codeFg: var(--ink);
+  --ec-frm-trmBg: var(--sunken); /* the terminal frame's own copy of it */
+  --ec-frm-edBg: var(--sunken); /* and the editor frame's */
+  --ec-codePadBlk: 1rem;
+  --ec-codePadInl: 1.25rem;
+  --ec-codeFontFml: var(--font-mono);
+  --ec-codeFontSize: var(--text-small);
+  --ec-codeFontWg: 400;
+  --ec-codeLineHt: 1.7;
+
+  /* A selection is the one gesture that marks a region, and it is the ink. */
+  --ec-codeSelBg: var(--ink);
+  --ec-uiSelBg: var(--ink);
+  --ec-uiSelFg: var(--paper);
+
+  /* The gutter: metadata ink, with a hairline for the marked-line rule. */
+  --ec-gtrFg: var(--ink-3);
+  --ec-gtrHlFg: var(--ink-2);
+  --ec-gtrBrdCol: var(--line);
+  --ec-gtrBrdWd: 1px;
+  --ec-sbThumbCol: var(--ink);
+  --ec-sbThumbHoverCol: var(--ink);
+
+  /* The title bar. This is the one tinted band in the documentation, and
+     `--surface-2` is what a tinted region is for. Its label is the second
+     ink and its three dots are the third, which is the whole of a window's
+     title bar on this site. */
+  --ec-frm-trmTtbBg: var(--surface-2);
+  --ec-frm-trmTtbFg: var(--ink-2);
+  --ec-frm-trmTtbDotsFg: var(--ink-3);
+  --ec-frm-trmTtbDotsOpa: 1;
+  --ec-frm-trmTtbBrdBtmCol: var(--line);
+
+  /* The tab bar, for the frames that have tabs rather than a title. */
+  --ec-frm-edTabBarBg: var(--surface-2);
+  --ec-frm-edTabBarBrdCol: var(--line);
+  --ec-frm-edTabBarBrdBtmCol: var(--line);
+  --ec-frm-edTabBrdRad: var(--radius-sm);
+  --ec-frm-edActTabBg: var(--surface-2);
+  --ec-frm-edActTabFg: var(--ink);
+  --ec-frm-edActTabBrdCol: var(--line);
+  --ec-frm-edActTabIndTopCol: var(--line);
+  --ec-frm-edActTabIndBtmCol: transparent;
+
+  /* The copy button: a quiet chip that fills on hover. Idle opacity is zero,
+     so the background is the hover state rather than a second colour. */
+  --ec-frm-inlBtnFg: var(--ink-2);
+  --ec-frm-inlBtnBg: var(--surface-2);
+  --ec-frm-inlBtnBgIdleOpa: 0;
+  --ec-frm-inlBtnBgHoverOrFocusOpa: 1;
+  --ec-frm-inlBtnBgActOpa: 1;
+  --ec-frm-inlBtnBrd: var(--line-2);
+  --ec-frm-inlBtnBrdOpa: 0;
+
+  /* "Copied!" is a state, so it is the state tint. */
+  --ec-frm-tooltipSuccessBg: var(--signal-bg);
+  --ec-frm-tooltipSuccessFg: var(--signal-ink);
+
+  /* Text markers: a marked, an inserted and a deleted line are three states
+     and this system has one tint, so all three are it. They stay
+     distinguishable because Expressive Code renders the sign in the gutter
+     as a character, which is the label the contract asks for. */
+  --ec-tm-markBg: var(--signal-bg);
+  --ec-tm-markBrdCol: transparent;
+  --ec-tm-insBg: var(--signal-bg);
+  --ec-tm-insBrdCol: transparent;
+  --ec-tm-insDiffIndCol: var(--signal-ink);
+  --ec-tm-delBg: var(--signal-bg);
+  --ec-tm-delBrdCol: transparent;
+  --ec-tm-delDiffIndCol: var(--signal-ink);
+  --ec-tm-lineMarkerLabelCol: var(--signal-ink);
+  --ec-tm-lineMarkerAccentWd: 0.15rem;
+  --ec-tm-inlMarkerBrdRad: var(--radius-sm);
+  --ec-tm-inlMarkerBrdWd: 1px;
+  --ec-tm-inlMarkerPad: 0.15rem;
+
+  /* The frame's own chrome: the mono face, the small step, the rhythm. */
+  --ec-uiFontFml: var(--font-mono);
+  --ec-uiFontSize: var(--text-micro);
+  --ec-uiFontWg: 400;
+  --ec-uiLineHt: 1.5;
+  --ec-uiPadBlk: 0.25rem;
+  --ec-uiPadInl: 1rem;
+}
+
+/* The one place a browser default reaches the page. Expressive Code's own
+   reset sets `color: revert` on everything inside a code block, and for a
+   button `revert` is the user agent's `buttontext`, which is pure black --
+   the one colour the contract has no token for. The copy button has no text
+   in it, so nothing is painted in that colour today, but the icon and the
+   "copied" tooltip are painted out of the tokens above, and this keeps the
+   last link in the chain one of ours as well. */
+.expressive-code .copy button {
+  color: var(--ink-2);
+}
+
+/* WORKAROUND, remove when @expressive-code/core stops discarding tokenColors.
+   Read this before touching it: what it guards has changed twice.
+
+   Expressive Code paints each syntax token through a numbered custom
+   property. The span carries `style="--0:<light>;--1:<dark>"` and its
+   stylesheet says `color: var(--0, inherit)`, switching to `--1` in dark
+   mode. Its theme normaliser, ExpressiveCodeTheme.fromJSONString, reads a
+   Shiki 4 theme object and returns one whose `tokenColors` is `undefined`,
+   so on 0.44.2 all 45 entries are discarded without an error and every
+   token is written in Expressive Code's "unknown token" grey, #BBBBBB, which
+   is 1.67:1 on the code surface. That is a serious axe violation on every
+   documentation page with code in it, and it is not fixable from this
+   repository: 0.44.2 is the latest release and it is what discards them.
+
+   The fix so far has been in src/lib/code-theme.mjs, which re-attaches the
+   token colours after normalising. That works, and the build output proves
+   it: the spans in dist now carry measured values such as `--0:#023B95` and
+   `--1:#91CBFF`, and every one of them clears 4.5:1 on `--sunken`.
+
+   So the flat override that used to sit here -- forcing every token to
+   `var(--ink)` so that nothing could be an unreadable grey -- is gone. It was
+   doing its job by flattening the palette, which the contract forbids in as
+   many words ("every code block keeps the measured syntax palette"), and it
+   was flattening the light theme only: the dark theme renders from `--1`,
+   which the override never touched. Measured on the current build, light
+   mode was drawing all of a code block in one colour and dark mode was
+   drawing the real one.
+
+   What is left is the part that is still load-bearing, and it is the part
+   that was never here: the choice of theme. Expressive Code switches on
+   `data-theme` and on `prefers-color-scheme`, so on a documentation page
+   where the site's own toggle set a class instead, the light tokens rendered
+   on the dark surface. Both markers are answered explicitly below.
+
+   The other half of the guard is `--ec-codeFg` above, and it is the reason
+   the failure can no longer be a contrast failure: a token Expressive Code
+   cannot colour has no `--0` at all, falls back to `inherit`, and inherits
+   the code ink rather than a grey of its own. tests/code-themes.spec.ts
+   measures the rendered result in both themes and is what proves it.
+   ------------------------------------------------------------------------ */
+.expressive-code .ec-line :where(span[style^="--"]:not([class])) {
+  color: var(--0, inherit);
+}
+
+:is([data-theme="dark"], .dark) .expressive-code .ec-line :where(span[style^="--"]:not([class])) {
+  color: var(--1, inherit);
+}
+
+/* ===========================================================================
+   CHROME THIS SITE DOES NOT RENDER
+   Starlight's footer is replaced by the site's own (src/components/
+   DocsFooter.astro), so the pagination, the edit link and the "last updated"
+   line are not in the built documentation at all. They are styled anyway,
+   because turning `pagination: true` back on should not put Starlight's
+   card and its 0.5rem radius back with it, and because a rule that is only
+   correct while nothing uses it is not a rule.
+
+   Pagination is a pair of raised cards: a surface step and a low shadow, no
+   rule around the container, and a second shadow on hover. The edit link and
+   the date sit in the row above it, which is the same kind of row as the
+   site's own footer: a section's worth of air, then metadata in the third
+   ink at the small step.
+
+   The footer's own top rule is gone with every other section boundary. It
+   was not drawn by the `rule` class this site used — Starlight draws it
+   here, on `.content-panel footer`, so removing the class left the line
+   behind and the footer kept a separator after the site had decided it
+   had none. Its padding is kept: without a rule, the air is the divider.
+   ========================================================================= */
+.content-panel footer {
+  padding-top: 1.5rem;
+}
+
+.content-panel footer .meta {
+  margin-top: 0;
+  color: var(--ink-3);
+  font-size: var(--text-micro);
+}
+
+.content-panel footer .meta a {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.2em;
+}
+
+.content-panel footer .meta a:hover {
+  color: var(--ink);
+  text-decoration-style: solid;
+}
+
+.pagination-links a {
+  background-color: var(--surface);
+  border: 0;
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.25rem;
+  color: var(--ink-3);
+  transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.pagination-links a:hover {
+  background-color: var(--surface-2);
+  box-shadow: var(--shadow-md);
+  color: var(--ink-2);
+}
+
+.pagination-links .link-title {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--text-lead);
+  font-weight: 600;
+}
+
+.pagination-links a[rel="prev"],
+.pagination-links a[rel="next"] {
+  color: var(--ink-2);
+}
+
+/* A badge is a chip: the tinted fill and the ink. Starlight's default badge
+   is a solid accent with `#fff` on it, and its plain variant sets
+   `border-color: currentColor`, which is a rule at the full contrast the
+   contract calls a bug. None of this is used in the documentation today. */
+.sl-badge {
+  background-color: var(--surface-2);
+  color: var(--ink);
+  border-color: transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  padding: 0.125rem 0.375rem;
+}
+
+/* A card is a raised panel: a surface step, the large radius, and a low
+   shadow. Starlight's card is the black on a coloured wash, which is a
+   different design language rather than a different colour. */
+.card {
+  background-color: var(--surface);
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+}
+
+.card .title {
+  color: var(--ink);
+  font-family: var(--font-display);
+}
+
+.card .icon {
+  border: 0;
+  background-color: var(--surface-2);
+  border-radius: var(--radius-sm);
 }

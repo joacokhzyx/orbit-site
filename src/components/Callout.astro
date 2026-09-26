@@ -1,8 +1,14 @@
 ---
-// Three kinds of aside, all of them things the brand system asks to be
-// loud about: a plain note, a stated limit, and a useful tip. The system
-// has no emoji and no "!" styling, so the distinction is carried by the
-// label and a single hairline, and nothing reads as alarm.
+// Four kinds of aside: a plain note, a stated limit, a useful tip, and
+// something still being measured.
+//
+// Every one of them is a card on a tinted surface, and none of them is a
+// filled rectangle. The measuring aside is the loudest thing in the set
+// and it is still a tint: a solid black slab to say "this number is not
+// finished" spends the loudest mark in the system on the least important
+// information on the page. What separates the four is the icon and the
+// word, and both of them are always rendered, so the density of the box is
+// never carrying the message on its own.
 type Variant = "note" | "limit" | "tip" | "measuring";
 
 interface Props {
@@ -20,45 +26,73 @@ const defaults: Record<Variant, string> = {
   measuring: "Still measuring",
 };
 
-const styles: Record<Variant, { box: string; icon: string; path: string }> = {
+/*
+  The icon takes currentColor, so it follows the card rather than being
+  told a colour, and the label is the loud element on every variant. The
+  three ordinary asides share one surface, because a note, a limit and a
+  tip are the same kind of thing said three ways; the measuring aside gets
+  the state tint, which is the only place the system has one.
+*/
+const styles: Record<Variant, { box: string; label: string; icon: string; path: string }> = {
   note: {
-    box: "bg-surface",
-    icon: "text-ink-3",
+    box: "bg-[var(--surface-2)]",
+    label: "text-[var(--ink)]",
+    icon: "text-[var(--ink-2)]",
     path: "M12 16v-5M12 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
   },
   limit: {
-    box: "bg-surface-2",
-    icon: "text-ink-2",
+    box: "bg-[var(--surface-2)]",
+    label: "text-[var(--ink)]",
+    icon: "text-[var(--ink-2)]",
     path:
       "M12 9v4M12 17h.01M10.3 3.9 2.4 17.5A1.9 1.9 0 0 0 4 20.4h16a1.9 1.9 0 0 0 1.6-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z",
   },
   tip: {
-    box: "bg-surface",
-    icon: "text-ink-2",
+    box: "bg-[var(--surface-2)]",
+    label: "text-[var(--ink)]",
+    icon: "text-[var(--ink-2)]",
     path:
       "M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .9 1.6l.1.6h5.2l.1-.6c.1-.6.4-1.2.9-1.6A6 6 0 0 0 12 3Z",
   },
   measuring: {
-    box: "bg-signal",
-    icon: "text-signal-ink",
+    box: "bg-[var(--signal-bg)]",
+    label: "text-[var(--signal-ink)]",
+    icon: "text-[var(--signal-ink)]",
     path: "M12 8v4l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
   },
 };
 
-const { box, icon, path } = styles[variant];
+const { box, label: labelClass, icon: iconClass, path } = styles[variant];
+
+/**
+ * A callout is a complementary landmark, and /foundation carries two of
+ * them. Two landmarks with the same implicit role and no name are
+ * indistinguishable in a landmark list, so the aside points at its own
+ * visible label. The id is derived from the label so two callouts with
+ * different labels on one page never collide, and a repeated label on one
+ * page is a content bug the duplicate-id check in check-a11y will catch.
+ */
+const labelId = `callout-${(label ?? defaults[variant])
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "")}`;
+
+const body =
+  "[&>p+p]:mt-3 [&_a]:text-[var(--ink)] [&_a]:underline [&_a]:decoration-2 [&_a]:decoration-[var(--line-2)] [&_a]:underline-offset-4 hover:[&_a]:decoration-[var(--ink)] [&_code]:rounded-[var(--radius-sm)] [&_code]:border-0 [&_code]:bg-[var(--sunken)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em]";
 ---
 
 <aside
   class:list={[
     // self-start so an aside in a two column grid hugs its own text
     // instead of stretching and leaving dead space.
-    "flex self-start gap-3.5 rounded-[var(--radius-lg)] p-5",
+    "flex self-start gap-3.5 rounded-[var(--radius)] p-5",
     box,
     className,
   ]}
+  aria-labelledby={labelId}
 >
   <svg
-    class:list={["mt-0.5 h-5 w-5 shrink-0", icon]}
+    class:list={["mt-0.5 h-5 w-5 shrink-0", iconClass]}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -69,11 +103,9 @@ const { box, icon, path } = styles[variant];
   >
     <path d={path}></path>
   </svg>
-  <div class="min-w-0 text-small [&>*+*]:mt-2">
-    <p class="font-semibold text-ink">{label ?? defaults[variant]}</p>
-    <div
-      class="text-ink-2 [&_a]:text-ink [&_a]:underline [&_a]:decoration-line-2 [&_a]:underline-offset-4 hover:[&_a]:decoration-ink [&_code]:rounded [&_code]:border [&_code]:border-line [&_code]:bg-sunken [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:code-inline"
-    >
+  <div class="min-w-0 text-small">
+    <p id={labelId} class:list={["font-display", labelClass]}>{label ?? defaults[variant]}</p>
+    <div class:list={["mt-2 text-[var(--ink-2)]", body]}>
       <slot />
     </div>
   </div>

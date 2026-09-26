@@ -5,38 +5,50 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && node scripts/check-contrast.mjs --file src/styles/global.css --scheme site && node scripts/check-links.mjs",
     "preview": "astro preview",
-    "check": "astro check",
-    "check:contrast": "node scripts/check-contrast.mjs --file src/styles/global.css --scheme site",
+    "build": "astro build && node scripts/fix-expressive-code-asset.mjs && npm run gates",
+    "gates": "npm run typecheck && npm run check:contrast && npm run check:code-contrast && npm run check:links && npm run check:downloads && npm run check:seo",
+    "typecheck": "astro check",
+    "check:contrast": "node scripts/check-contrast.mjs --self-test && node scripts/check-contrast.mjs --file src/styles/global.css --scheme site",
+    "check:code-contrast": "node scripts/check-code-contrast.mjs",
     "check:links": "node scripts/check-links.mjs",
+    "check:downloads": "node scripts/check-downloads.mjs",
+    "check:seo": "node scripts/check-seo.mjs",
     "icons": "node scripts/generate-icons.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "test:a11y": "playwright test",
+    "test:a11y:update": "playwright test --update-snapshots"
   },
   "keywords": [
     "orbit",
     "programming-language",
     "energy-efficiency"
   ],
-  "author": "Orbit Foundation",
+  "author": "Orbit Software Foundation",
   "license": "MIT",
   "dependencies": {
+    "@astrojs/react": "^7.0.0",
     "@astrojs/starlight": "^0.42.4",
+    "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",
-    "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@fontsource-variable/newsreader": "^5.3.0",
-    "@fontsource-variable/outfit": "^5.3.0",
-    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@lucide/astro": "^1.48.0",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.3.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@astrojs/sitemap": "^3.7.4",
+    "@axe-core/playwright": "^4.13.0",
+    "@expressive-code/core": "0.44.2",
+    "@playwright/test": "^1.63.0",
+    "@shikijs/themes": "4.4.3",
     "sharp": "0.35.4",
     "shiki": "4.4.3"
-  }
+  },
+  "packageManager": "pnpm@12.3.4"
 }

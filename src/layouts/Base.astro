@@ -26,9 +26,42 @@ const {
 // A backslash, as chosen for the site: Orbit \ Do more with less. It is
 // the character a reader already associates with a command prompt, and
 // the product is a compiler.
-const pageTitle = title ? `${SITE.name} \\ ${title}` : `${SITE.name} \\ ${SITE.headline}`;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
-const ogImage = new URL("/og.png", Astro.site ?? SITE.url).href;
+//
+// The homepage is the exception and does not use the backslash. It is the
+// only page whose <title> is read by a stranger in a search result rather
+// than by someone who has already navigated here, and "Orbit \ The Orbit
+// Programming Language" says the word Orbit twice while the half that
+// would have carried the keywords is decoration. So the homepage takes
+// SITE.seoTitle whole, which leads with what Orbit is and spends the rest
+// on the two facts that make someone click.
+const pageTitle = title ? `${SITE.name} \\ ${title}` : SITE.seoTitle;
+
+// A page that asks not to be indexed gets no canonical either. A
+// self-referencing canonical on an error page is a request to index it,
+// which is the opposite of what noindex means.
+//
+// The one thing this does NOT do is echo back whatever was asked for.
+// Astro serves /learn and /learn/ both with a 200 — `trailingSlash:
+// "ignore"` draws no redirect — so a canonical built from the request path
+// would tell a crawler that two different URLs are each the real one, and
+// the one that settles nothing. Every internal link on the site is written
+// with the trailing slash, so that is the form a canonical names, and a
+// request without it is pointed at the form with it. The canonical is the
+// site's answer about which address is canonical, not a mirror of the
+// question.
+const canonical = noindex
+  ? null
+  : new URL(
+      Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`,
+      Astro.site ?? SITE.url,
+    ).href;
+const ogImage = new URL("/og.jpg", Astro.site ?? SITE.url).href;
+
+// The alt describes this page, not the homepage. It used to be the
+// headline on every page, so /learn, /foundation and /changelog all
+// shipped a social image labelled "Orbit \ Do more with less."
+const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.seoTitle;
+
 ---
 
 <!doctype html>
@@ -40,18 +73,19 @@ const ogImage = new URL("/og.png", Astro.site ?? SITE.url).href;
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {canonical && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${SITE.name} \\ ${SITE.headline}`} />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:locale" content="en_US" />
 
     <meta name="twitter:card" content="summary_large_image" />
@@ -59,10 +93,15 @@ const ogImage = new URL("/og.png", Astro.site ?? SITE.url).href;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)" />
+    {/* One declaration, not two media-scoped ones. `prefers-color-scheme`
+        cannot see the toggle in the header, so a reader who chose dark on a
+        light system got a light browser chrome to match a dark page. The
+        value is the two paper tokens, and the script below keeps it in step
+        with the class. */}
+    <meta name="theme-color" content="#faf9f7" data-theme-color />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
     <link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -72,21 +111,53 @@ const ogImage = new URL("/og.png", Astro.site ?? SITE.url).href;
         on <html>. Without this the page shows light, then snaps to dark. */}
     <script is:inline>
       (function () {
+        var root = document.documentElement;
+        var meta = document.querySelector("meta[data-theme-color]");
+        // The two values of --paper, one per theme. The browser chrome is
+        // the only thing outside the page that can be themed, so it is
+        // written from the same two tokens rather than a third palette.
+        var paper = { light: "#faf9f7", dark: "#131316" };
+        var system = window.matchMedia("(prefers-color-scheme: dark)");
+        var chosen = false;
+
+        function paint() {
+          if (!meta) return;
+          meta.setAttribute("content", paper[root.classList.contains("dark") ? "dark" : "light"]);
+        }
+
         try {
           var saved = localStorage.getItem("orbit-theme");
-          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          var theme = saved || (prefersDark ? "dark" : "light");
-          document.documentElement.classList.toggle("dark", theme === "dark");
+          chosen = saved === "light" || saved === "dark";
+          root.classList.toggle("dark", chosen ? saved === "dark" : system.matches);
+          /* A reader who has never chosen a theme follows the system, which
+             is what the media-scoped meta used to do for them. */
+          system.addEventListener("change", function (event) {
+            if (!chosen) {
+              root.classList.toggle("dark", event.matches);
+            }
+          });
         } catch (error) {
           /* Storage can be unavailable. The light default stands. */
         }
+
+        paint();
+        /* The toggle only changes the class on <html>, so that class is what
+           the meta has to watch. */
+        new MutationObserver(paint).observe(root, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
       })();
     </script>
   </head>
   <body class="min-h-dvh bg-paper text-ink">
+    {/* Still the first focusable node on the page, and still off screen
+        until a keyboard asks for it. When it does appear it is a pill on
+        the ink, the one treatment that has to be findable over anything it
+        lands on. */}
     <a
       href="#main"
-      class="sr-only rounded-md bg-ink px-4 py-2 text-small font-medium text-paper focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60]"
+      class="sr-only rounded-[var(--radius-pill)] bg-ink px-4 py-2 text-small font-normal text-paper focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60]"
     >
       Skip to content
     </a>

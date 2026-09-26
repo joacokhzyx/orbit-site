@@ -1,0 +1,40 @@
+---
+/**
+ * The social tags Starlight does not emit, and nothing else.
+ *
+ * Starlight's head already carries the canonical link, the description,
+ * and og:type, og:url, og:title, og:description, og:site_name, og:locale
+ * and twitter:card. Emitting those a second time would put two og:title
+ * elements in the document, and a crawler reads the first one, so the
+ * duplicate would silently win over whichever was correct.
+ *
+ * What is genuinely missing is the image. All eleven documentation pages
+ * shipped with no og:image, so sharing a link to /docs/start/getting-started
+ * rendered with no picture at all, and that is the one URL the homepage
+ * sends people to.
+ */
+import { SITE } from "../data/site";
+
+// Overriding this component replaces Starlight's own head rather than
+// adding to it, so its tags are rendered here first. Only the ones
+// Starlight does not emit follow.
+const { head = [], entry } = Astro.locals.starlightRoute ?? {};
+// The bare page title, to match the og:title Starlight already emitted.
+// Appending the site name here put "| Orbit" in the alt and not in the
+// title, which is the mismatch check-seo exists to catch.
+const pageTitle = entry?.data?.title ?? SITE.name;
+const description = entry?.data?.description ?? SITE.description;
+const ogImage = new URL("/og.jpg", Astro.site ?? SITE.url).href;
+---
+
+{head.map(({ tag: Tag, attrs, content }: any) => <Tag {...attrs} set:html={content} />)}
+
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={pageTitle} />
+
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />

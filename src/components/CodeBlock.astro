@@ -3,6 +3,7 @@
 // browser except the finished markup and a few hundred bytes for the
 // copy button.
 import { getHighlighter } from "../lib/highlighter.mjs";
+import { CODE_THEMES_BY_ROLE } from "../lib/code-theme.mjs";
 import type { ShikiTransformer } from "shiki";
 
 interface Props {
@@ -26,20 +27,20 @@ const LANG_NAMES: Record<string, string> = {
 };
 const langName = LANG_NAMES[lang] ?? lang;
 
+const caption = label ?? langName;
+const captionId = `code-caption-${caption.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
 const highlighter = await getHighlighter();
 
 const html = highlighter.codeToHtml(trimmed, {
   lang,
-  themes: { light: "github-light", dark: "github-dark" },
+  themes: CODE_THEMES_BY_ROLE,
   defaultColor: false,
   transformers: [
     {
       name: "orbit-block",
       pre(node) {
         node.properties.class = `${node.properties.class ?? ""} code-surface`.trim();
-        if (label) {
-          node.properties["aria-label"] = label;
-        }
         return node;
       },
     },
@@ -47,49 +48,80 @@ const html = highlighter.codeToHtml(trimmed, {
 });
 ---
 
+{ /*
+  A window, which is the one place on the site a frame is right: the code
+  surface is a different colour from the page, and the title bar has to be
+  a bar and not another run of code. The frame is a hairline and a radius,
+  the copy control is a real control with its own hover and focus, and both
+  hairlines sit on padding rather than touching the text they separate.
+*/}
 <figure
   class:list={[
-    // No border. A background step is enough, and a radius is the only
-    // shape on the page.
-    "group/code relative overflow-hidden rounded-[var(--radius-lg)] bg-sunken",
+    "group/code relative overflow-hidden rounded-[var(--radius-lg)] border border-line bg-[var(--sunken)]",
     className,
   ]}
+  aria-labelledby={captionId}
 >
   {
     (label || lang !== "orbit") && (
-      <figcaption class="flex items-center justify-between gap-3 bg-code-bg px-4 pt-3 pb-1">
-        <span class="truncate font-mono text-micro text-ink-3">{label ?? langName}</span>
-        {label && <span class="text-micro text-ink-3">{langName}</span>}
+      <figcaption class="flex min-h-11 items-center justify-between gap-3 border-b border-line pl-4 pr-1.5">
+        <span id={captionId} class="truncate font-mono text-micro text-[var(--ink-2)]">
+          {caption}
+        </span>
+        <button
+          type="button"
+          data-copy
+          data-code={trimmed}
+          data-idle-label="Copy"
+          class="h-11 min-w-11 shrink-0 rounded-[var(--radius-sm)] bg-[var(--surface)] px-3 text-micro text-ink transition-colors hover:bg-[var(--surface-2)]"
+        >
+          Copy
+        </button>
       </figcaption>
     )
   }
   <div data-code-host set:html={html} />
-  <button
-    type="button"
-    data-copy
-    data-code={trimmed}
-    class="absolute top-2.5 right-2.5 rounded-[var(--radius)] bg-paper/90 px-2.5 py-1.5 text-micro text-ink-2 opacity-0 backdrop-blur transition-opacity group-hover/code:opacity-100 focus-visible:opacity-100 hover:text-ink"
-    aria-label="Copy code to clipboard"
-  >
-    Copy
-  </button>
+  {
+    // The button label changes on click, which a screen reader only
+    // announces if the change lands in a live region. The button is not
+    // one, so the result is announced from here instead.
+  }
+  <span data-copy-status role="status" class="sr-only" />
 </figure>
 
 <script>
-  const labels = { idle: "Copy", done: "Copied", failed: "Press Ctrl+C" };
+  const COPY_LABEL = "Copy";
 
   for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    // The status element is a sibling, so the button does not carry the
+    // announcement itself.
+    const status = button.closest("figure")?.querySelector<HTMLElement>("[data-copy-status]");
+    let resetTimer: number | undefined;
+
+    function announce(message: string): void {
+      if (!status) return;
+      // Clearing first makes a repeated copy of the same code announce
+      // again instead of being swallowed as an unchanged region.
+      status.textContent = "";
+      status.textContent = message;
+    }
+
     button.addEventListener("click", async () => {
       const code = button.dataset.code ?? "";
-      const previous = button.textContent ?? labels.idle;
+      window.clearTimeout(resetTimer);
       try {
         await navigator.clipboard.writeText(code);
-        button.textContent = labels.done;
+        button.textContent = "Copied";
+        announce("Code copied to the clipboard.");
       } catch {
-        button.textContent = labels.failed;
+        button.textContent = "Press Ctrl+C";
+        announce("Copying failed. Select the code and press Ctrl+C.");
       }
-      window.setTimeout(() => {
-        button.textContent = previous;
+      // Reset to the idle label rather than to whatever the button said,
+      // which used to read "Copied" on a second click and then never
+      // returned to "Copy".
+      resetTimer = window.setTimeout(() => {
+        button.textContent = button.dataset.idleLabel ?? COPY_LABEL;
       }, 2000);
     });
   }

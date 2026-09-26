@@ -1,11 +1,24 @@
 ---
 // Buttons follow the CTA order in section 28 of the brand system:
 // read the docs first, try Orbit second, GitHub third. Weight follows the
-// same order, and every variant shares one radius and one height.
+// same order, and every variant shares one height.
+//
+// The fills are the three the system actually has: an ink pill, a padded
+// button with no rule around it, and text with an underline. The secondary
+// earns its place from the surface step on hover rather than from a box, so
+// a row of them stays a row of words instead of a row of frames. Nothing
+// here is a solid slab for small information, because a filled rectangle is
+// the loudest thing a page can say and a button is not that important.
 interface Props {
   href: string;
   variant?: "primary" | "secondary" | "tertiary";
   external?: boolean;
+  /**
+   * A right-pointing chevron, for a link that goes deeper into the site.
+   * Not for external links: the arrow already says "leaves this site", and
+   * two directional glyphs on one button say the same thing twice.
+   */
+  chevron?: boolean;
   class?: string;
 }
 
@@ -13,17 +26,25 @@ const {
   href,
   variant = "secondary",
   external = href.startsWith("http"),
+  chevron = false,
   class: className = "",
 } = Astro.props;
 
-const base =
-  "text-small inline-flex items-center justify-center gap-1.5 font-medium transition-colors";
+const base = "text-small inline-flex items-center justify-center gap-1.5 font-normal";
 
+/*
+  The primary button is the one legitimate inversion on the site, so its
+  hover is a step in opacity rather than a new fill: a hover colour that
+  drops the paper-on-ink ratio below 4.5:1 would trade the button's whole
+  reason for existing for a little extra emphasis.
+*/
 const variants = {
-  primary: "h-11 rounded-[var(--radius-pill)] bg-ink px-6 text-paper hover:bg-ink-2",
+  primary:
+    "h-11 rounded-[var(--radius-pill)] bg-ink px-6 text-paper transition-opacity hover:opacity-90",
   secondary:
-    "h-11 rounded-[var(--radius-pill)] border border-line-2 px-6 text-ink hover:border-ink hover:bg-surface-2",
-  tertiary: "h-11 rounded-[var(--radius)] px-1 text-ink underline decoration-line-2 underline-offset-4 hover:decoration-ink",
+    "h-11 rounded-[var(--radius)] px-6 text-ink transition-colors hover:bg-[var(--surface-2)]",
+  tertiary:
+    "h-11 rounded-[var(--radius-sm)] px-1 text-ink underline decoration-2 decoration-[var(--line-2)] underline-offset-4 transition-[text-decoration-color] hover:decoration-[var(--ink)]",
 } as const;
 ---
 
@@ -35,7 +56,7 @@ const variants = {
 >
   <slot />
   {
-    external && (
+    external ? (
       <svg
         class="h-3 w-3 opacity-55"
         viewBox="0 0 12 12"
@@ -47,6 +68,21 @@ const variants = {
       >
         <path d="M4.5 2.5h5v5M9.5 2.5 4 8M7.5 9.5h-5v-5" />
       </svg>
+    ) : (
+      chevron && (
+        <svg
+          class="h-3 w-3 opacity-55"
+          viewBox="0 0 12 12"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4.5 2.5 8 6l-3.5 3.5" />
+        </svg>
+      )
     )
   }
 </a>

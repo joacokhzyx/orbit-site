@@ -78,7 +78,7 @@ file, read the file. Errors go to stderr, not stdout.
 
 ## Where to go next
 
-- The [language tour](/docs/start/tour) walks through the syntax with runnable
+- The [language tour](/docs/start/tour/) walks through the syntax with runnable
   snippets and their verified output.
-- [Language reference](/docs/language/reference) is the contract: bindings,
+- [Language reference](/docs/language/reference/) is the contract: bindings,
   control flow, routes, models, and the limits that apply today.

@@ -61,4 +61,4 @@ in the repository and runs as written.
 One limit is worth stating here rather than in a footnote: there is no rate
 limiting on the auth path itself. If you need it, the HTTP layer's admission
 gate is a separate concern, described in
-[Kynx](/docs/services/kynx).
+[Kynx](/docs/services/kynx/).

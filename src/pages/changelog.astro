@@ -6,10 +6,12 @@ import Footer from "../components/Footer.astro";
 import PageHero from "../components/PageHero.astro";
 import Callout from "../components/Callout.astro";
 import LinkButton from "../components/LinkButton.astro";
-import { REPO, docLink } from "../data/site";
-import { RELEASES } from "../data/releases";
+import { REPO } from "../data/site";
+import { docHref } from "../data/docs";
+import { CHANGELOG_RELEASES } from "../data/releases";
+import { LATEST } from "../lib/releases.mjs";
 
-const ordered = [...RELEASES].sort((a, b) => b.date.localeCompare(a.date));
+const ordered = [...CHANGELOG_RELEASES].sort((a, b) => b.date.localeCompare(a.date));
 const formatted = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
     year: "numeric",
@@ -36,56 +38,68 @@ const formatted = (iso: string) =>
       </div>
     </PageHero>
 
-    <Callout variant="note" class="mt-12" label="This page is a reading">
+    <Callout variant="note" class="mt-10 sm:mt-12" label="This page is a reading">
       <p>
-        The authoritative record is <a href={docLink("CHANGELOG.md")}>docs/CHANGELOG.md</a> in the
+        The authoritative record is <a href={docHref("CHANGELOG.md")}>docs/CHANGELOG.md</a> in the
         repository, written from the commit history. This page selects the entries worth showing to
         someone who hasn't read it, so it can be behind. If the two disagree, the repository wins.
       </p>
     </Callout>
 
-    <ol class="mt-14 flex flex-col gap-10 pb-4">
+    <ol class="mt-16 flex flex-col gap-12 sm:mt-24">
       {
         ordered.map((release) => (
-          <li class="rule pt-5">
+          <li class="pt-8 sm:pt-12">
             <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-              <h2 class="mono text-body font-semibold text-ink">{release.version}</h2>
-              <p class="text-body text-ink-2">{release.period}</p>
+              <h2 class="font-mono text-heading font-normal text-ink">{release.version}</h2>
+              <p class="text-body text-[var(--ink-2)]">{release.period}</p>
               {release.unreleased ? (
-                <span class="chip ml-auto">In progress</span>
-              ) : (
-                <time class="text-micro ml-auto text-ink-3" datetime={release.date}>
+                <span class="ml-auto inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--signal-bg)] px-2 py-1 font-mono text-micro leading-normal text-[var(--signal-ink)]">
+                  In progress
+                </span>
+              ) : release.published ? (
+                <time class="text-micro ml-auto text-[var(--ink-3)]" datetime={release.date}>
                   {formatted(release.date)}
                 </time>
+              ) : (
+                <span class="text-micro ml-auto text-[var(--ink-3)]">Not published as a release</span>
               )}
             </div>
             <ul class="mt-5 flex flex-col gap-3">
               {release.highlights.map((item) => (
                 <li class="flex gap-3">
                   <span
-                    class="mt-2.5 h-1 w-1 flex-none rounded-full bg-ink-3"
+                    class="mt-2.5 h-1.5 w-1.5 flex-none rounded-[var(--radius-pill)] bg-[var(--ink-2)]"
                     aria-hidden="true"
                   />
-                  <span class="text-body max-w-prose text-ink-2">{item}</span>
+                  <span class="text-body max-w-[66ch] text-[var(--ink-2)]">{item}</span>
                 </li>
               ))}
             </ul>
+            {release.published && release.downloadCount > 0 && (
+              <p class="mt-5 text-small">
+                <a
+                  class="link"
+                  href={REPO.releases}
+                >
+                  {release.downloadCount} download{release.downloadCount === 1 ? "" : "s"} in this
+                  release
+                </a>
+              </p>
+            )}
           </li>
         ))
       }
     </ol>
 
-    <section class="rule mt-16 py-10">
+    <section class="mt-16 pt-16 sm:mt-24 sm:pt-24">
       <h2 class="text-heading">Versioning</h2>
-      <p class="prose-measure text-body mt-4 text-ink-2">
-        <code class="code-inline">orbit --version</code>
-        prints <code class="code-inline"
-          >orbit 0.1.0</code
-        >, and services still report
-        <code class="code-inline">0.1.0-rc.2</code> in
-        <code class="code-inline">/health</code>. The rules
-        for what counts as a breaking change are in
-        <a class="link" href={docLink("VERSIONING.md")}>versioning and compatibility</a>.
+      <p class="max-w-[66ch] text-body mt-6 text-[var(--ink-2)]">
+        <code class="code-inline">orbit --version</code> prints the version the build reports, which
+        for the newest release is <code class="code-inline">orbit {LATEST.version}</code>. Services
+        report the same string from <code class="code-inline">/health</code>. The rules for what
+        counts as a breaking change are in
+        <a class="link" href={docHref("VERSIONING.md")}>versioning and compatibility</a>.
       </p>
     </section>
   </main>

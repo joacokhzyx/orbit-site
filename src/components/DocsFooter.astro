@@ -1,39 +1,91 @@
 ---
-// Starlight's footer, replaced with the site's own. The documentation is
-// the authority, so the line at the bottom says so.
+// Starlight's footer, replaced with the site's own.
+//
+// The rule at the top of this one is gone, along with every other section
+// boundary on the site, so the separation is air and the air is now the
+// only thing doing that job. The spacing below is therefore not decorative:
+// it is the divider.
+//
+// The row was also cramped, and in a way worth recording. Every link here
+// is a 44px touch target — the height the whole site uses — and the row
+// between them was 4px. So each label had 8px of padding inside it and 4px
+// of air outside, which reads as a dense strip of tall thin boxes rather
+// than a list of links. A 44px target needs about 8px of gap before it
+// stops looking like a box, and the row is now given that.
 import Logo from "./Logo.astro";
-import { SITE, REPO } from "../data/site";
+import { REPO } from "../data/site";
 
 const year = new Date().getFullYear();
+
+const linkClass =
+  "text-small inline-flex min-h-11 items-center gap-1.5 rounded-[var(--radius-sm)] px-2 text-[var(--ink-2)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)]";
 ---
 
-<footer class="rule">
-  <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-8">
-    <div>
-      <a href="/" class="inline-flex items-center gap-2.5" aria-label="Orbit, home">
-        <Logo class="h-6 w-6 text-ink" />
-        <span class="font-logo text-lead leading-none font-semibold tracking-tight">Orbit</span>
+<footer class="mt-16 pt-12 sm:mt-24 sm:pt-16">
+  {/* The description paragraph is gone, and it is the reason this footer
+      used to look cramped. It repeated SITE.headline and SITE.subheadline —
+      the marketing footer already says them, and a reader who is four
+      screens into the documentation has read them twice. In the marketing
+      footer the sentence has room; here the footer sits in the content
+      column beside a sidebar, so the same text was wrapping to six words a
+      line next to a nav that had nowhere to go. A footer with less in it
+      is a footer that fits. */}
+  <div
+    class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 sm:flex-row sm:items-center sm:justify-between sm:gap-10 sm:px-8"
+  >
+    <a href="/" class="inline-flex items-center gap-2.5" aria-label="Orbit, home">
+      <Logo class="h-6 w-6 text-ink" />
+      <span class="font-display text-lead leading-none font-normal tracking-tight">Orbit</span>
+    </a>
+    <nav aria-label="Footer" class="flex flex-wrap gap-x-2 gap-y-1">
+      <a class={linkClass} href="/learn/">Learn</a>
+      <a class={linkClass} href="/foundation/">Foundation</a>
+      <a class={linkClass} href="/changelog/">Changelog</a>
+      <a class={linkClass} href={REPO.url} target="_blank" rel="noopener noreferrer">
+        GitHub
+        <svg
+          class="h-3 w-3 opacity-55"
+          viewBox="0 0 12 12"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M4.5 2.5h5v5M9.5 2.5 4 8M7.5 9.5h-5v-5"></path>
+        </svg>
+        <span class="sr-only">(opens in a new tab)</span>
       </a>
-      <p class="text-small mt-3 text-ink-2">
-        {SITE.headline} A statically typed language for APIs and microservices.
-      </p>
-    </div>
-    <nav aria-label="Footer" class="flex flex-wrap gap-x-6 gap-y-2">
-      <a class="text-small text-ink-2 transition-colors hover:text-ink" href="/learn">Learn</a>
-      <a class="text-small text-ink-2 transition-colors hover:text-ink" href="/foundation">Foundation</a>
-      <a class="text-small text-ink-2 transition-colors hover:text-ink" href="/changelog">Changelog</a>
-      <a
-        class="text-small text-ink-2 transition-colors hover:text-ink"
-        href={REPO.url}
-        target="_blank"
-        rel="noopener noreferrer">GitHub ↗</a
-      >
     </nav>
   </div>
   <div
-    class="text-micro mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 pb-10 text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-8"
+    class="text-micro mx-auto mt-10 flex w-full max-w-6xl flex-col gap-2 px-6 pb-12 text-[var(--ink-3)] sm:flex-row sm:items-center sm:justify-between sm:px-8"
   >
-    <p>MIT licensed. Orbit {year}.</p>
-    <p>The repository is the source of the documentation.</p>
+    {/* The holder is Orbit Software Foundation, which is what LICENSE and
+        package.json both say. The right-hand sentence that used to be here
+        was not a link and not a claim, so it went; the licence file is
+        linked instead, which is what a reader who reached this line
+        wanted. */}
+    <p>MIT licensed. &copy; {year} Orbit Software Foundation.</p>
+    {/* 24px minimum, not decoration. These two were inline text links in a
+        micro row and measured about 15px, which fails the 24px target-size
+        floor axe enforces — and correctly: they are the last thing on the
+        page and someone tapping at them is aiming at a phone. The padding
+        is what buys the size, so the row carries it rather than the text. */}
+    <p class="flex flex-wrap items-center gap-x-1">
+      <a
+        class="link inline-flex min-h-6 items-center px-1"
+        href={REPO.url}
+        target="_blank"
+        rel="noopener noreferrer">Source</a
+      >
+      <span aria-hidden="true">&middot;</span>
+      <a
+        class="link inline-flex min-h-6 items-center px-1"
+        href={`${REPO.url}/blob/main/LICENSE`}
+        target="_blank"
+        rel="noopener noreferrer">licence</a
+      >
+    </p>
   </div>
 </footer>

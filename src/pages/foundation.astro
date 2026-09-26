@@ -8,7 +8,8 @@ import Section from "../components/Section.astro";
 import Callout from "../components/Callout.astro";
 import Prose from "../components/Prose.astro";
 import LinkButton from "../components/LinkButton.astro";
-import { REPO, docLink } from "../data/site";
+import { REPO } from "../data/site";
+import { docHref } from "../data/docs";
 
 // Quoted with its source. It belongs here and not in the hero: it explains
 // why the project exists, it isn't a claim about Orbit, and a statistic
@@ -73,7 +74,7 @@ const method = [
     />
 
     <Section number="01" heading="Why this exists">
-      <div style="display: grid; gap: 2.5rem; grid-template-columns: 1fr" class="lg:grid-cols-[1.2fr_1fr]">
+      <div class="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-12">
         <Prose>
           <p>
             {context.headline} {context.growth} That growth is the reason a language that compiles
@@ -90,30 +91,29 @@ const method = [
             first, or the rest is decoration.
           </p>
         </Prose>
-        <div class="rounded-[var(--radius-lg)] bg-surface p-6 sm:p-7">
-          <p class="label">Source</p>
-          <p class="text-lead mt-3 font-semibold text-balance">{context.headline}</p>
-          <p class="text-small mt-2 text-ink-2">{context.growth}</p>
-          <p class="text-micro mt-5 text-ink-3">
+        <Callout label="Source">
+          <p class="text-lead text-balance font-normal">{context.headline}</p>
+          <p class="text-small">{context.growth}</p>
+          <p class="text-micro">
             {context.source}. A third party figure, quoted with its source rather than measured by
             me.
           </p>
-        </div>
+        </Callout>
       </div>
     </Section>
 
     <Section number="02" heading="What I think is clumsy">
-      <div class="grid gap-8 sm:grid-cols-2 sm:gap-x-12">
+      <div class="grid gap-8 sm:grid-cols-2 sm:gap-x-12 sm:gap-y-12">
         {
           beliefs.map((belief) => (
-            <div class="rule pt-4">
+            <div class="pt-8 sm:pt-12">
               <h3 class="text-lead text-balance">{belief.title}</h3>
-              <p class="text-body mt-2 text-ink-2">{belief.body}</p>
+              <p class="text-body mt-2 text-[var(--ink-2)]">{belief.body}</p>
             </div>
           ))
         }
       </div>
-      <Prose class="mt-9">
+      <Prose class="mt-10 sm:mt-12">
         <p>
           I have no interest in claiming Orbit beats a named language. Plenty of languages optimise
           for peak benchmark power, and that often needs more memory and energy to stay fast.
@@ -126,17 +126,17 @@ const method = [
       heading="How I measure"
       lead="The method is written down before the numbers, so I can't quietly change one to suit the other."
     >
-      <div style="display: grid; gap: 2.5rem; grid-template-columns: 1fr" class="lg:grid-cols-[1fr_1.05fr]">
-        <ol class="flex flex-col gap-5">
+      <div class="grid gap-8 lg:grid-cols-[1fr_1.05fr] lg:gap-12">
+        <ol class="flex flex-col gap-6">
           {
             method.map((step, index) => (
               <li class="flex gap-4">
-                <span class="mono text-small shrink-0 text-ink-3">
+                <span class="font-mono text-small shrink-0 text-[var(--ink-3)]">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <h3 class="text-small font-semibold text-ink">{step.title}</h3>
-                  <p class="text-small mt-1.5 leading-relaxed text-ink-2">{step.body}</p>
+                  <h3 class="text-small font-normal text-ink">{step.title}</h3>
+                  <p class="text-small mt-1.5 leading-relaxed text-[var(--ink-2)]">{step.body}</p>
                 </div>
               </li>
             ))
@@ -145,9 +145,10 @@ const method = [
         <div class="flex flex-col gap-4">
           <Callout variant="note" label="Where the method lives">
             <p>
-              The full procedure, including the run counts, the discarded runs, and the rule about
-              proxies, is in <a href={docLink("guides/benchmark-methodology.md")}>benchmark
-              methodology</a> and <a href={docLink("ENERGY.md")}>energy measurement</a>.
+              The proxies, and the rule that CPU time is never converted into joules, are in{" "}
+              <a href={docHref("ENERGY.md")}>energy measurement</a>. What the runtime keeps is in{" "}
+              <a href={docHref("PERF.md")}>performance</a>. The full run-by-run procedure is not
+              written up as its own document yet.
             </p>
           </Callout>
           <Callout variant="measuring" label="What I don't know yet">
@@ -165,7 +166,7 @@ const method = [
       </div>
     </Section>
 
-    <Section number="04" heading="How it's built" class="pb-4">
+    <Section number="04" heading="How it's built">
       <Prose>
         <p>
           The compiler is written in Orbit and compiles itself. That wasn't chosen for the logo.
@@ -182,17 +183,17 @@ const method = [
         </p>
       </Prose>
       <div class="mt-8 flex flex-wrap gap-3">
-        <LinkButton href={docLink("architecture/SELF_HOSTING.md")} variant="secondary">
+        <LinkButton href={docHref("architecture/SELF_HOSTING.md")} variant="secondary">
           How the bootstrap works
         </LinkButton>
-        <LinkButton href={docLink("architecture/SOVEREIGNTY.md")} variant="tertiary">
+        <LinkButton href={docHref("architecture/SOVEREIGNTY.md")} variant="tertiary">
           Trust and reproducibility
         </LinkButton>
         <LinkButton href={REPO.url} variant="tertiary">The repository</LinkButton>
       </div>
     </Section>
 
-    <section class="rule mt-20 py-10">
+    <section class="mt-16 pt-16 sm:mt-24 sm:pt-24">
       <Prose>
         <h2>What I'm testing next</h2>
         <p>
@@ -201,8 +202,8 @@ const method = [
           continuing at all. If the answer is no, I'll say so here and in the repository.
         </p>
         <p>
-          To follow that, the <a href={docLink("ROADMAP.md")}>roadmap</a> and{" "}
-          <a href={docLink("STATUS.md")}>dated status</a> pages are the two places I update
+          To follow that, the <a href={docHref("ROADMAP.md")}>roadmap</a> and{" "}
+          <a href={docHref("STATUS.md")}>dated status</a> pages are the two places I update
           honestly, including the parts that didn't work.
         </p>
       </Prose>

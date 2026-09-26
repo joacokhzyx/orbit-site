@@ -1,5 +1,5 @@
 import { defineCollection } from "astro:content";
-import { docsLoader } from "@astrojs/starlight/loaders";
+import { docsLoader, i18nLoader } from "@astrojs/starlight/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 
 // Two things have to be declared here that Starlight 0.42 does not do for
@@ -26,4 +26,10 @@ export const collections = {
     loader: docsLoader({ generateId: ({ entry }) => toSlug(entry) }),
     schema: docsSchema(),
   }),
+  // Starlight reads a collection called "i18n" for its UI strings on every
+  // build. Declaring it is what stops the build logging "the collection
+  // i18n does not exist or is empty" and returning nothing, which is a
+  // warning about a collection that is supposed to be empty on an
+  // English-only site.
+  i18n: defineCollection({ loader: i18nLoader() }),
 };

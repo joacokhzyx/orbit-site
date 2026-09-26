@@ -1,7 +1,6 @@
-@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/archivo/wght.css";
 @import "@fontsource-variable/ibm-plex-sans";
 @import "@fontsource-variable/jetbrains-mono";
-@import "@fontsource-variable/outfit";
 @import "tailwindcss";
 
 /* Two things mark the theme as dark and both have to work. The site sets a
@@ -15,48 +14,77 @@
 
 /* ===========================================================================
    TOKENS
-   Direction A: nine greys and no accent. The only colour on the page is
-   the amber that marks a state.
 
-   The two blocks below are parsed by scripts/check-contrast.mjs, which
-   fails the build when a pair misses WCAG AA. Every value must therefore
-   stay a single hex on a single line. The previous palette shipped seven
-   failing pairs, the most used at 3.54:1, because nothing was
-   measuring.
+   Twelve values, measured. Every pairing the interface is allowed to make is
+   listed in scripts/check-contrast.mjs, which fails the build when one
+   misses WCAG AA, and the gate reads both blocks below, so every value must
+   stay a single hex on a single line.
+
+   This replaced a two-value one-bit palette: a pixel, a ground, and a stipple
+   pattern standing in for every tone between them. Twelve named greys is not
+   a regression, it is the difference between a constraint and a design. The
+   one-bit version had turned its own rule into the answer, so everything was
+   a box outlined at full contrast, the stipple read as noise, and the
+   corner radius carried no information because everything was square. Space
+   and a background step separate things now, and a border is the last resort.
+
+   Measured, and the numbers are the reason for the values:
+     ink on paper          16.56:1 light   16.13:1 dark
+     ink-2 on paper         7.11:1 light    8.75:1 dark
+     ink-3 on surface-2     4.93:1 light    4.65:1 dark
+     signal-ink on signal   7.07:1 light    8.90:1 dark
+     line-2 on paper        3.36:1 light    3.68:1 dark
+     focus on paper         6.37:1 light    8.60:1 dark
    =========================================================================== */
 :root {
-  --paper: #faf9f6;
+  /* Surfaces. Four steps, warm, none of them pure white. The page is a warm
+     off-white so that a raised card is a step up rather than a hole. */
+  --paper: #faf9f7;
   --surface: #ffffff;
-  --surface-2: #f4f2ec;
-  --sunken: #f1efe9;
-  --code-bg: #f1efe9;
-  --ink: #16150f;
-  --ink-2: #4a4841;
+  --surface-2: #f2f1ee;
+  --sunken: #f6f5f2;
+
+  /* Ink. Three real levels of information, not three decorative shades. */
+  --ink: #1a1a18;
+  --ink-2: #56554f;
   --ink-3: #6b6860;
-  --link: #16150f;
-  --line: #dedad0;
-  --line-2: #8d8a80;
-  --focus: #16150f;
-  --signal-bg: #f7ecd2;
-  --signal-ink: #6b4a05;
+
+  /* Boundaries, in two roles. --line divides content and is a hairline you
+     should not notice until you look for it. --line-2 is the only value a
+     control may be outlined with, and it clears 3:1 so the boundary is
+     findable. Nothing in the system is drawn at full contrast. */
+  --line: #e4e2dd;
+  --line-2: #8b8880;
+
+  /* A focus ring in its own colour, because a ring the same colour as the
+     text it surrounds is a ring nobody finds. This is the one place the
+     system reaches for a hue. */
+  --focus: #1d4ed8;
+
+  /* The state tint. A tint with dark text on it, never an inversion: a solid
+     black rectangle to say "prerelease" is shouting about nothing. */
+  --signal-bg: #fbf3e2;
+  --signal-ink: #6b4d09;
 }
 
 .dark,
 :root[data-theme="dark"] {
-  --paper: #0b0b0c;
-  --surface: #141416;
-  --surface-2: #1d1d20;
-  --sunken: #191a1c;
-  --code-bg: #191a1c;
-  --ink: #f4f2ed;
-  --ink-2: #b4b0a7;
-  --ink-3: #8b877e;
-  --link: #f4f2ed;
-  --line: #27272b;
-  --line-2: #64605b;
-  --focus: #f4f2ed;
-  --signal-bg: #2c2511;
-  --signal-ink: #e0bd6d;
+  --paper: #131316;
+  --surface: #1b1b1f;
+  --surface-2: #232327;
+  --sunken: #101013;
+
+  --ink: #f0efec;
+  --ink-2: #b4b2ac;
+  --ink-3: #8e8c84;
+
+  --line: #2b2b30;
+  --line-2: #6e6e79;
+
+  --focus: #8ab0ff;
+
+  --signal-bg: #2e2617;
+  --signal-ink: #e8c37a;
 }
 
 @theme inline {
@@ -64,44 +92,36 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-sunken: var(--sunken);
-  --color-code-bg: var(--code-bg);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
-  --color-link: var(--link);
   --color-line: var(--line);
   --color-line-2: var(--line-2);
   --color-focus: var(--focus);
   --color-signal: var(--signal-bg);
   --color-signal-ink: var(--signal-ink);
 
-  --font-display: "Space Grotesk Variable", "IBM Plex Sans Variable", "Segoe UI", system-ui, sans-serif;
+  /* Archivo carries display, headings and the wordmark. It has a weight axis,
+     so 600 is available for the two steps that hold a page's structure. IBM
+     Plex Sans carries prose, JetBrains Mono anything a machine would print. */
+  --font-display: "Archivo Variable", "Archivo", "IBM Plex Sans Variable", "Segoe UI", system-ui, sans-serif;
   --font-sans: "IBM Plex Sans Variable", "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", monospace;
-  --font-logo: "Outfit Variable", "IBM Plex Sans Variable", system-ui, sans-serif;
 
-  /* Seven sizes and nothing outside them, and they are not tight. The
-     first pass of this design ran at 16px on a 1.7 line height with
-     56px between sections, and a reader lost the thread. Body is 17px,
-     the measure is wider, and the sections are two and a half times
-     further apart.
-     The old build carried sixteen declarations, four of them ad hoc at
-     0.7em, 0.85em, 75% and 80%. What is left besides the seven is
-     .code-inline below, the ordered list marker, and Tailwind's own
-     preflight for small and sub. */
-  --text-display: clamp(2.5rem, 1.5rem + 4.2vw, 4.5rem);
-  --text-display--line-height: 1.04;
-  --text-display--letter-spacing: -0.025em;
-  --text-title: clamp(2rem, 1.4rem + 2.8vw, 3rem);
-  --text-title--line-height: 1.1;
-  --text-title--letter-spacing: -0.02em;
-  --text-heading: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
-  --text-heading--line-height: 1.25;
-  --text-heading--letter-spacing: -0.012em;
-  --text-lead: clamp(1.125rem, 1.05rem + 0.5vw, 1.375rem);
-  --text-lead--line-height: 1.55;
+  /* Seven sizes and nothing outside them. */
+  --text-display: clamp(2.25rem, 1.5rem + 3.75vw, 4rem);
+  --text-display--line-height: 1.12;
+  --text-display--letter-spacing: -0.02em;
+  --text-title: clamp(1.625rem, 1.25rem + 1.875vw, 2.5rem);
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.015em;
+  --text-heading: clamp(1.25rem, 1.0625rem + 0.9375vw, 1.5rem);
+  --text-heading--line-height: 1.3;
+  --text-heading--letter-spacing: -0.01em;
+  --text-lead: clamp(1.0625rem, 1rem + 0.3125vw, 1.1875rem);
+  --text-lead--line-height: 1.6;
   --text-body: 1.0625rem;
-  --text-body--line-height: 1.75;
+  --text-body--line-height: 1.7;
   --text-small: 0.9375rem;
   --text-small--line-height: 1.65;
   --text-micro: 0.8125rem;
@@ -110,27 +130,27 @@
   /* One spacing rhythm on a 4px base. */
   --spacing: 0.25rem;
 
-  /* One radius, plus a pill. The old build mixed 0.375, 0.625, 1 and
-     1.5rem across the same page. */
+  /* Four radii, used consistently. The one-bit version set all three to zero,
+     which meant every element was the same shape and the shape said nothing. */
+  --radius-sm: 0.375rem;
   --radius: 0.625rem;
-  --radius-lg: 0.875rem;
+  --radius-lg: 1rem;
   --radius-pill: 999px;
 
-  /* The measure was 66ch, which forced a line break in the middle of a
-     thought. It is wider now, and the two tiers moved apart. */
-  --container-measure: 72ch;
-  --container-prose: 48rem;
+  /* Two levels of elevation, low and higher. Depth is a shadow or a
+     background step. It was never a full-contrast outline. */
+  --shadow-sm: 0 1px 2px rgb(26 26 24 / 0.06), 0 1px 3px rgb(26 26 24 / 0.04);
+  --shadow-md: 0 4px 12px rgb(26 26 24 / 0.08), 0 2px 4px rgb(26 26 24 / 0.04);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--focus) 35%, transparent);
 
-  /* Space between sections. This is the number that decides whether a
-     page feels calm or dense, and it was less than half of what it
-     should have been. */
-  --space-section: 6rem;
-  --space-section-lg: 8rem;
+  /* The measure, in the two places it is used. */
+  --container-measure: 66ch;
+  --container-prose: 44rem;
 }
 
 /* ===========================================================================
    BASE
-=========================================================================== */
+   =========================================================================== */
 @layer base {
   html {
     background-color: var(--paper);
@@ -147,37 +167,44 @@
 
   body {
     font-size: var(--text-body);
-    line-height: 1.7;
+    line-height: var(--text-body--line-height);
   }
 
   h1,
   h2,
   h3,
   h4 {
+    font-family: var(--font-display);
     text-wrap: balance;
-    /* Three weights only. Reaching for 700 everywhere is most of why the
-       old site read heavy. */
+    /* 400 in the previous direction left nothing to emphasise with, because a
+       bitmap face has no weight axis. Two weights, and 600 is reserved for
+       the two steps that carry a page's structure. */
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
+    color: var(--ink);
   }
 
   h1 {
-    font-family: var(--font-display);
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
   }
 
   p {
     text-wrap: pretty;
+    color: var(--ink-2);
   }
 
+  /* A focus ring with a halo, so it is findable on a card, a code window and
+     the page alike rather than only on the page. */
   :focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
   }
 
   ::selection {
     background-color: var(--focus);
-    color: var(--paper);
+    color: #ffffff;
   }
 
   ::-webkit-scrollbar {
@@ -192,7 +219,7 @@
   ::-webkit-scrollbar-thumb {
     background-color: var(--line-2);
     border: 2px solid var(--paper);
-    border-radius: 8px;
+    border-radius: var(--radius-pill);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -211,7 +238,7 @@
 }
 
 @layer components {
-  /* The one measure every block of prose uses. */
+  /* The measure a block of prose uses. */
   .measure {
     max-width: var(--container-measure);
   }
@@ -220,11 +247,9 @@
     max-width: var(--container-prose);
   }
 
-  /* A link is ink with an underline, and the underline is the affordance.
-     The old palette gave links a colour that never appeared anywhere
-     else, so it carried no meaning. */
+  /* A link is ink with an underline, and the underline is the affordance. */
   .link {
-    color: var(--link);
+    color: var(--ink);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
@@ -233,58 +258,66 @@
   }
 
   .link:hover {
-    text-decoration-color: var(--link);
+    text-decoration-color: var(--ink);
   }
 
-  /* A hairline divides a section. It never encloses a box. */
-  .rule {
-    border-top: 1px solid var(--line);
+  /* A hairline divides a section. It never encloses a box, and it never sits
+     closer to the text than the section rhythm. */
+  /* A raised block: a background step and a shadow, in that order. A border
+     is what a block falls back to when it has no background of its own. */
+  .block {
+    background-color: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
   }
 
-  /* Uppercase, but not shouted. The first pass tracked the letters at
-     0.08em, which turned a label into a banner and made the whole page
-     feel like a spreadsheet. No tracking, less weight, and it recedes. */
+  /* Uppercase mono, no tracking, for labels, numbers and file names. */
   .label {
     font-family: var(--font-mono);
     font-size: var(--text-micro);
     letter-spacing: 0;
     text-transform: uppercase;
     color: var(--ink-3);
-    font-weight: 500;
+    font-weight: 400;
   }
 
+  /* A chip is a tint, not an inversion. The one-bit version painted this
+     solid black, which made "Prerelease" the loudest thing on the page. */
   .chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.375rem;
     background-color: var(--signal-bg);
     color: var(--signal-ink);
     border-radius: var(--radius-pill);
-    padding: 0.3rem 0.75rem;
+    padding: 0.2rem 0.625rem;
+    font-family: var(--font-mono);
     font-size: var(--text-micro);
-    font-weight: 500;
-    line-height: 1.2;
+    font-weight: 400;
+    line-height: 1.4;
   }
 
-  /* The one relative size on the site. Inline code has to track whatever
-     it sits inside, so a fixed step would be wrong inside a lead sentence
-     and inside a footnote. */
+  /* The one relative size on the site. Inline code has to track whatever it
+     sits inside, so a fixed step would be wrong inside a lead sentence and
+     inside a footnote. A background step, not a framed box: a border around
+     every piece of inline code is the boxed-everything problem in miniature. */
   .code-inline {
     font-family: var(--font-mono);
     font-size: 0.85em;
     background-color: var(--sunken);
-    border-radius: 4px;
-    padding: 0.1em 0.35em;
+    border-radius: var(--radius-sm);
+    padding: 0.1em 0.3em;
     color: var(--ink);
   }
 
-  /* Code blocks arrive from CodeBlock, which is shared with the
-     prototypes, so their surface styling lives here too. */
+  /* The code window is the one place colour is allowed, because syntax colour
+     is meaning rather than decoration. It is a raised surface with a frame,
+     and the tokens come from src/lib/code-theme.mjs. */
   .code-surface {
     margin: 0;
     padding: 1rem 1.125rem;
     overflow-x: auto;
-    background-color: var(--code-bg) !important;
+    background-color: var(--sunken) !important;
     font-family: var(--font-mono);
     font-size: var(--text-small);
     line-height: 1.7;
@@ -306,4 +339,486 @@
     font-style: var(--shiki-dark-font-style) !important;
     font-weight: var(--shiki-dark-font-weight) !important;
   }
+}
+
+/* ══ Seek ═══════════════════════════════════════════════════
+   A search icon that becomes a search field, as one object.
+   Component: src/components/Seek.tsx. From Bencho, MIT,
+   bencho.dev/licence.
+
+   ── THE TOKENS, AND WHERE THEY COME FROM ─────────────────
+   Upstream this block reads eleven custom properties that
+   belong to the author's own bench: --bg, --font-ui, --g-blur,
+   --g-sat, --ink through --ink-5, --ink-rgb, --pane and
+   --pane-edge. Rather than redefine them as new globals, each
+   one is mapped below to whatever this project already uses for
+   the same job, and the whole set is declared on the
+   COMPONENT'S OWN ROOT. Nothing leaks out, and the component
+   would still work if it were dropped into a page that had
+   never seen this file.
+
+   The one that needed a decision rather than a rename is the
+   frost. Upstream, --pane is a glass material and --g-blur and
+   --g-sat turn it on. This project has no glass anywhere: a
+   surface here is a flat fill, and the documented recipe for a
+   raised thing is "a background step and a shadow". So the
+   blur is set to zero and the pane to --surface-2, which is
+   what a glass pane resolves to when the Glass dial is at
+   zero anyway. The component then follows a flat material
+   honestly instead of shipping a frosted pill into a design
+   system that has no such thing.
+
+   --g-bright is the exception that proves it: brightness()
+   works on an opaque fill, so the hover still answers, and it
+   did so in both themes without this file naming a colour. */
+.sek {
+  --bg: var(--paper);
+  --pane: var(--surface-2);
+  --pane-edge: var(--line);
+  --font-ui: var(--font-sans);
+  /* no glass in this system: the frost is off, not absent */
+  --g-blur: 0px;
+  --g-sat: 100%;
+
+  /* --ink, --ink-2 and --ink-3 are NOT redeclared here, and that is
+     the interesting part of this mapping.
+
+     They already exist, globally, with these exact names and these
+     exact jobs, so the mapping for them is the identity and needs no
+     declaration. The first version of this block wrote
+     `--ink: var(--ink)` anyway, on the theory that restating the
+     mapping made it explicit. It does not: a custom property that
+     refers to itself is a cycle, CSS invalidates it at computed-value
+     time, and everything reading it falls back to its initial value.
+     `stroke: var(--ink-3)` on the lens resolved to `none`, so the
+     magnifier was not drawn at all — in either theme, at any state,
+     and with no error anywhere to say so. Three lines that looked
+     like documentation and were a broken stylesheet.
+
+     Bencho's --ink-4 and --ink-5 are also not here, and this is a
+     second lesson rather than a repeat of the first. They were mapped
+     to color-mix() steps toward --paper, on the reasoning that a
+     system with three ink steps needs two more and deriving them was
+     cheaper than inventing them. The contract on this site allows
+     twelve named tokens and nothing else: every colour the browser
+     paints has to be one of them, and the gate that says so caught
+     both on the first run. A derived value is still a value the
+     contract does not name.
+
+     So the two states they were carrying are carried by tokens that
+     exist. The lens at rest is the metadata ink, which is already the
+     quietest thing on the surface; the acknowledgement on hover is
+     --ink and the one on typing is --ink-2, both of which are
+     contract values and were already in this file. The open field
+     does not get its own step, and does not need one: the busy beat
+     is the state that says "I heard you", and it is the state a
+     reader is actually looking at while the field is open. */
+  /* The CSS builds rgba() from this one, so it wants three bare
+     numbers and not a colour. There is no rgb-triplet token in
+     this system, so it is derived from --ink here and restated
+     for the dark theme below: a colour-mix cannot produce the
+     comma-separated form these need. */
+  --ink-rgb: 26 26 24;
+
+  /* the frame is the composition. It never moves, which is
+     what gives the magnet a stable home to measure from and
+     keeps the object centred at every width. */
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* ── THE FRAME IS `--frame`, and it was not ──────────────
+     Seek.tsx computes `--frame` and `--frameh` from the width
+     that is actually set — its note explains why at length: a
+     frame sized for the widest the knob goes makes every
+     smaller setting reserve room it is not using, and that room
+     is paid for in the one part of the object you are looking
+     at. */
+  width: var(--frame, 380px);
+  height: var(--frameh, 96px);
+  font-family: var(--font-ui);
+}
+
+/* the dark half of the one token that cannot be derived */
+.dark .sek,
+:root[data-theme="dark"] .sek {
+  --ink-rgb: 240 239 236;
+}
+
+/* ══ stroke ═════════════════════════════════════════════════
+   Whether a component draws a hairline round itself. OFF by
+   default, which is the change: a grey line round everything
+   makes a group of components look like a group of boxes rather
+   than a group of things.
+
+   The line is not load-bearing. A flat pane is a fill against
+   a different fill and reads on its own; the ring was there to
+   sharpen an edge that was already there.
+
+   Upstream this rule also lists .lab, .gcard, .gpane, .gnav,
+   .gdock, .esc-btn and .slo-track, because the bench has those
+   components. This project has exactly one, so the list is
+   scoped to it rather than shipping selectors for markup that
+   does not exist here. */
+[data-stroke="on"] .sek-skin::before {
+  border-color: var(--pane-edge);
+}
+
+/* ── the object ─────────────────────────────────────────────
+   Width is the state. Height is fixed, so the radius can be
+   derived from the width rather than animated beside it —
+   at 64 the corner is 32 and the shape IS a circle, and there
+   is no frame where the two disagree. */
+.sek-skin {
+  position: relative;
+  width: var(--w);
+  /* --shut, NOT a number. The component sets the closed width
+     and the height from one constant precisely so they cannot
+     drift, and its own comment says so: "the skin's height and
+     the closed width are the same number by definition, and
+     two places holding it are two places to get it wrong." */
+  height: var(--shut);
+  /* ── ONE SHAPE RULE ─────────────────────────────────────
+     Fully round, at every width. At --shut wide it is a circle
+     and at 320 a pill, and those are the same rule rather than
+     two ends of a tween. Height is fixed, so it cannot be
+     anything else. */
+  border-radius: var(--sek-r, 999px);
+  background: var(--pane);
+  -webkit-backdrop-filter:
+    blur(var(--g-blur, 2px)) saturate(var(--g-sat, 150%)) brightness(var(--g-bright, 100%));
+  backdrop-filter:
+    blur(var(--g-blur, 2px)) saturate(var(--g-sat, 150%)) brightness(var(--g-bright, 100%));
+  isolation: isolate;
+  /* the magnet, and the press, on one transform — two
+     transforms on one element is one of them winning */
+  transform: translate(var(--lx), var(--ly)) scale(var(--sk, 1));
+  transition:
+    transform 260ms cubic-bezier(0.22, 0.9, 0.28, 1),
+    background 220ms ease;
+  /* the field is inside from the first frame; this is what
+     keeps it from spilling out of a 64px circle */
+  overflow: hidden;
+}
+
+/* the edge, and NOTHING until Stroke asks for it. A hairline
+   nobody switched on is a hairline the control cannot remove,
+   which is the same bug the background had. */
+.sek-skin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Hover: it comes up a hair and lifts off the ground. Both
+   are small enough to be felt rather than seen, which is the
+   point — a hover state you notice is a hover state that has
+   said too much. */
+.sek:not([data-open="true"]) .sek-skin:hover {
+  --sk: 1.045;
+  /* the surface answers, without drawing an edge it was not
+     given — brightness rather than an outline */
+  --g-bright: 104%;
+}
+
+/* pressed: it yields before it moves. A thing that gives
+   under a click reads as having been pushed; a thing that
+   only expands reads as having been triggered. */
+.sek[data-press="true"] .sek-skin {
+  --sk: 0.93;
+  transition: transform 90ms cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* the field is a text target, and the object is a button */
+.sek[data-open="true"] .sek-skin { cursor: text; }
+
+/* ── the lens ───────────────────────────────────────────────
+   Fixed to the box's left inset and never animated. At the
+   shut width that inset centres it; at the open width it is
+   the field's padding. The lens crossing the page is the box
+   growing around a mark that stayed still. */
+.sek-lens {
+  position: absolute;
+  left: var(--inset);
+  top: 50%;
+  width: var(--lens);
+  height: var(--lens);
+  margin-top: calc(var(--lens) / -2);
+  fill: none;
+  stroke: var(--ink-3);
+  /* 1.5, AND THE NUMBER CANNOT BE COMPARED TO LUCIDE'S.
+     Every lucide glyph is drawn on a 24-unit grid; this one is
+     drawn on 18. A stroke-width of u paints at u/viewBox of
+     the icon's size, so lucide's 2-on-24 is 0.0833 and a 2
+     here would be 0.1111 — the same number, a third heavier.
+     1.5/18 is 0.0833 exactly, which is the weight the rest of
+     this bar's icons use. */
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  pointer-events: none;
+  transition: stroke 200ms ease, stroke-width 200ms ease;
+}
+
+.sek-skin:hover .sek-lens { stroke: var(--ink); }
+
+/* open, not typing: the same quiet metadata ink as at rest. Bencho
+   recedes the lens here with --ink-4; this contract has no fourth ink, and
+   the beat that matters while the field is open is the busy one below. */
+.sek[data-open="true"] .sek-lens { stroke: var(--ink-3); }
+
+/* typing: the lens thickens a hair and darkens. One beat per
+   burst, not one per keystroke — a mark that flickers at the
+   rate of your typing is noise wearing the costume of
+   feedback. */
+/* still "a hair", and still the same proportion of the base it
+   always was — 1.8 is to 1.5 as the original 1.9 was to 1.6 */
+.sek[data-busy="true"] .sek-lens { stroke: var(--ink-2); stroke-width: 1.8; }
+
+/* ── the field ──────────────────────────────────────────────
+   Present from the first frame and revealed by --say, which
+   is the last third of the width's own progress. It slides a
+   few pixels as it arrives, from the left, so it reads as
+   having come out of the lens rather than as having faded up
+   where it stood. */
+.sek-field {
+  position: absolute;
+  left: calc(var(--inset) + var(--lens) + 11px);
+  right: 14px;
+  top: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  /* 18 is a CONTROL carrying its own text, and on the 64 it was drawn
+     at it is a content size rather than a caption. The component
+     publishes the number it wants as --say-fs, because it depends on
+     the shut size: 18 on a 64 object, 14 in a 44 bar, which is the
+     navigation size the rest of that bar already uses. */
+  font-size: var(--say-fs, 18px);
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  outline: none;
+  opacity: var(--say);
+  transform: translateX(calc((1 - var(--say)) * -6px));
+  /* until it is most of the way open it is not a target, and
+     a caret that can be placed in a 64px circle is a caret in
+     the wrong place */
+  pointer-events: var(--say-hit, none);
+}
+
+.sek[data-open="true"] .sek-field { --say-hit: auto; }
+
+/* the placeholder is metadata, so it is the metadata ink */
+.sek-field::placeholder { color: var(--ink-3); }
+
+/* the way in, while there is one */
+.sek-hit {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  cursor: pointer;
+}
+
+.sek-hit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(var(--ink-rgb), 0.4);
+}
+
+/* ── the results ────────────────────────────────────────────
+   Not upstream: there is nothing behind this field upstream.
+   They sit BELOW the object rather than inside it, because
+   inside they would be clipped by the overflow that keeps the
+   field from spilling out of the shut circle, and the box's
+   width is the state — it cannot also be the height of a list.
+
+   They are the same material as everything else on the site:
+   --surface with --shadow-md, which is the documented recipe
+   for a raised thing, and no hairline. */
+.sek-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: var(--frame);
+  max-height: 60vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 0.375rem;
+  list-style: none;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.sek-result a {
+  display: block;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background 120ms ease;
+}
+
+.sek-result[data-cursor] a,
+.sek-result a:hover {
+  background: var(--surface-2);
+}
+
+.sek-result-title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--text-small);
+  line-height: var(--text-small--line-height);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.sek-result-excerpt {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  color: var(--ink-3);
+  /* two lines is what makes this a preview of a page rather
+     than a second copy of its first paragraph */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pagefind's own <mark>, recoloured to this palette. Its
+   default is a yellow that belongs to no theme here. */
+.sek-result-excerpt mark {
+  background: var(--signal-bg);
+  color: var(--signal-ink);
+  border-radius: 2px;
+  padding: 0 0.1em;
+}
+
+.sek-empty {
+  padding: 0.625rem;
+  font-size: var(--text-micro);
+  color: var(--ink-3);
+}
+
+/* ══ CARDS THAT INVERT ═════════════════════════════════════
+   Three cards, each with the icon of the thing it measures,
+   which turn together while the other two stay. Component:
+   src/components/DecisionCards.astro. After Bencho's "Cards
+   that invert", MIT, bencho.dev/licence.
+
+   The card carries five roles and the hover swaps all five, so
+   what arrives is one object printed in the other ink rather
+   than a card that became a different card. A card that only
+   changed its fill would read as a highlight.
+
+   `:focus-visible` is in the same selector list as `:hover`
+   and on purpose. They are the same state, and the first
+   version of this file wrote them as two rules; an edit landed
+   in one, and on hover in the dark scheme the card's number
+   kept the resting colour and measured 1.18:1 against the
+   ground it had just turned to. One list cannot drift. */
+.inv-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (width >= 40rem) {
+  .inv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.5rem; }
+}
+
+@media (width >= 64rem) {
+  .inv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
+}
+
+.inv {
+  --card-ground: var(--surface);
+  --card-fg: var(--ink);
+  --card-body: var(--ink-2);
+  --card-dim: var(--ink-3);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--card-ground);
+  /* the properties, not the properties they feed: five declarations
+     swapping at once is five chances to arrive at the wrong time
+     relative to each other */
+  transition: --card-ground 300ms ease, --card-fg 300ms ease,
+              --card-body 300ms ease, --card-dim 300ms ease,
+              
+}
+
+@media (hover: hover) {
+  .inv:hover,
+}
+
+.inv:hover,
+.inv:focus-visible {
+  --card-ground: var(--ink);
+  --card-fg: var(--paper);
+  --card-body: var(--surface-2);
+  --card-dim: var(--line-2);
+}
+
+.inv-t {
+  font-family: var(--font-display);
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--card-fg);
+  /* two lines of reservation, so the icons below line up across the row
+     however long the longest title is */
+  min-height: calc(2 * var(--text-lead--line-height) * 1em);
+  text-wrap: balance;
+  transition: color 300ms ease;
+}
+
+/* The icon. Stroke is inherited from the class, and the weight is
+   Lucide's own 2-on-24, which is the same 0.0833 of the glyph's size as
+   the 1.5-on-18 the rest of the site's line work uses — so it matches at
+   any size without being told. */
+.inv-fig {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-block: 1.5rem 1.25rem;
+  color: var(--card-fg);
+  flex: none;
+  transition: color 300ms ease;
+}
+
+.inv-b {
+  margin-top: auto;
+  font-size: var(--text-small);
+  line-height: var(--text-small--line-height);
+  color: var(--card-body);
+  transition: color 300ms ease;
+}
+
+.inv-l {
+  margin-top: 1rem;
+  font-size: var(--text-small);
+  color: var(--card-fg);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--card-dim);
+  transition: color 300ms ease, text-decoration-color 300ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv,
+  .inv-t,
+  .inv-fig,
+  .inv-b,
+  .inv-l { transition: none; }
 }

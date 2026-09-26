@@ -1,12 +1,40 @@
 ---
-// No border on the header. The old one had a hairline under the bar, and
-// with a rule under every section as well, the page read as a stack of
-// bands. The bar now separates itself with space and a blurred paper
-// background, and the active link is a background step rather than an
-// underline, which is the same language the sections use.
+// The bar at the top of every page. It carries no rule under it: a hairline
+// here drew a line across the full width of every page for the sake of one
+// boundary. Instead it lifts, with the low shadow, which is the honest signal
+// for a bar that sits on top of the content: something is passing underneath.
+// Without either, the opaque bar sliced the text behind it at its own edge and
+// left half a line of glyphs showing, which reads as a broken render.
+//
+// It is opaque, because a sticky bar that blurs whatever scrolls under it
+// turns the page behind it into a moving texture on the one element a reader
+// meets first.
+//
+// The links are a background step, not an underline, so "where am I" and
+// "where can I go" are answered by the same mechanism.
 import Logo from "./Logo.astro";
 import ThemeToggle from "./ThemeToggle.astro";
+import Search from "./Search.astro";
 import { NAV } from "../data/site";
+
+interface Props {
+  /**
+   * The element this renders as. A <header> is a banner landmark, which is
+   * right on a marketing page and wrong inside Starlight: there the slot
+   * already sits in Starlight's own banner, so a second one gives the
+   * document two unnamed banners and one nested inside the other.
+   */
+  as?: "header" | "div";
+  /**
+   * Mount the search control. It is opt-in rather than automatic because
+   * Pagefind only indexes the documentation: on a marketing page the field
+   * would open, accept a query, and return nothing, which is worse than no
+   * field at all. The index and the control travel together.
+   */
+  search?: boolean;
+}
+
+const { as: Tag = "header", search = false } = Astro.props;
 
 const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 
@@ -19,32 +47,31 @@ function isCurrent(href: string): boolean {
 const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
 ---
 
-<header class="sticky top-0 z-50 bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/70">
-  <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4 sm:px-8">
+<Tag class="sticky top-0 z-50 bg-paper">
+  <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-2.5 sm:px-8 sm:py-3">
     <a
       href="/"
-      class="group -ml-2 flex items-center gap-2.5 rounded-[var(--radius)] px-2 py-1"
+      class="group -ml-2 flex min-h-11 items-center gap-2.5 rounded-[var(--radius-sm)] px-2 py-1"
       aria-label="Orbit, home"
       aria-current={path === "/" ? "page" : undefined}
     >
       <Logo
         class="h-6 w-6 text-ink transition-transform duration-300 group-hover:rotate-[8deg]"
       />
-      <span class="font-logo text-lead leading-none font-semibold tracking-tight text-ink">
+      <span class="font-display text-lead leading-none font-normal tracking-tight text-ink">
         Orbit
       </span>
     </a>
 
-    <div class="flex items-center gap-2 sm:gap-3">
-      <nav class="hidden items-center gap-1 sm:flex" aria-label="Primary">
-        {
+    <div class="flex items-center gap-1 sm:gap-2">
+      <nav class="hidden items-center gap-1 sm:flex" aria-label="Primary">        {
           links.map((link) =>
             link.external ? (
               <a
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-small flex h-10 items-center gap-1.5 rounded-[var(--radius)] px-3 text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+                class="text-small flex min-h-11 items-center gap-1.5 rounded-[var(--radius-sm)] px-3 text-ink transition-colors hover:bg-[var(--surface-2)]"
               >
                 {link.label}
                 <svg
@@ -64,8 +91,10 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
                 href={link.href}
                 aria-current={link.current ? "page" : undefined}
                 class:list={[
-                  "text-small flex h-10 items-center rounded-[var(--radius)] px-3 transition-colors",
-                  link.current ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
+                  "text-small flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 transition-colors",
+                  link.current
+                    ? "bg-[var(--surface-2)] text-[var(--ink)]"
+                    : "text-ink hover:bg-[var(--surface-2)] hover:text-ink",
                 ]}
               >
                 {link.label}
@@ -75,12 +104,19 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
         }
       </nav>
 
+      {search && <Search />}
+
       <ThemeToggle />
 
-      {/* A disclosure rather than a component, so nothing ships for it. */}
-      <details class="group/menu relative sm:hidden">
+      {/* A disclosure rather than a component, so nothing ships for it,
+          apart from the four behaviours <details> does not have: Escape
+          to close, a click outside to close, closing when focus leaves,
+          and focus returning to the summary. Without them the panel stayed
+          open over the page while a keyboard user tabbed through links
+          that were no longer visible. */}
+      <details class="group/menu relative sm:hidden" data-menu>
         <summary
-          class="text-small flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-[var(--radius)] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink [&::-webkit-details-marker]:hidden"
+          class="text-small flex h-11 w-11 shrink-0 cursor-pointer list-none items-center justify-center rounded-[var(--radius)] text-ink transition-colors hover:bg-[var(--surface-2)] [&::-webkit-details-marker]:hidden"
           aria-label="Menu"
         >
           <svg
@@ -107,8 +143,12 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
           </svg>
         </summary>
 
+        {/* A lifted card, not a boxed panel: a surface, a real radius and a
+            shadow. A menu that is a box reads as a page region, and the
+            one thing it has to read as is a short list floating over the
+            content. */}
         <nav
-          class="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-[var(--radius-lg)] bg-surface p-1.5 shadow-[0_8px_30px_rgb(0_0_0/0.12)]"
+          class="absolute right-0 z-50 mt-2 w-56 rounded-[var(--radius-lg)] bg-[var(--surface)] p-1.5 shadow-[var(--shadow-md)]"
           aria-label="Primary, mobile"
         >
           <ul class="flex flex-col">
@@ -121,13 +161,15 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
                     rel={link.external ? "noopener noreferrer" : undefined}
                     aria-current={link.current ? "page" : undefined}
                     class:list={[
-                      "text-small flex min-h-11 items-center justify-between rounded-[var(--radius)] px-3 py-2.5 transition-colors",
-                      link.current ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
+                      "text-small flex min-h-11 items-center justify-between rounded-[var(--radius-sm)] px-3 py-2.5 transition-colors",
+                      link.current
+                        ? "bg-[var(--surface-2)] text-[var(--ink)]"
+                        : "text-ink hover:bg-[var(--surface-2)] hover:text-ink",
                     ]}
                   >
                     {link.label}
                     {link.external && (
-                      <span class="text-micro text-ink-3" aria-hidden="true">
+                      <span class="text-micro text-[var(--ink-3)]" aria-hidden="true">
                         ↗
                       </span>
                     )}
@@ -140,4 +182,53 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
       </details>
     </div>
   </div>
-</header>
+
+  {/* The bar is opaque and it sits on top of the content, so whatever line of
+      text happens to be at its edge is cut in half. A rule under it made that
+      cut read as an edge; without one it reads as a broken render. A short
+      fade below the bar is what actually settles it, because it works on the
+      content rather than on the background: the bar and the page are the same
+      colour here, which is also why a shadow cannot do this job. It takes the
+      cut from a slice to a fade, and it is 20px of gradient instead of a line
+      drawn across every page. */}
+  <div
+    class="pointer-events-none absolute inset-x-0 -bottom-5 h-5 bg-gradient-to-b from-paper to-transparent"
+    aria-hidden="true"
+  >
+  </div>
+</Tag>
+
+<script>
+  // <details> has no built-in dismissal. A disclosure that a keyboard user
+  // can open but cannot close with Escape is a menu they are stuck inside,
+  // so the three missing behaviours are added here.
+  for (const menu of document.querySelectorAll<HTMLDetailsElement>("[data-menu]")) {
+    const summary = menu.querySelector<HTMLElement>("summary");
+    if (!summary) continue;
+
+    function close(): void {
+      menu.open = false;
+    }
+
+    menu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.open) {
+        event.stopPropagation();
+        close();
+        // Focus has to go back where it came from, or it lands on the body
+        // and the next Tab starts the page from the top.
+        summary.focus();
+      }
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (menu.open && !menu.contains(event.target as Node)) close();
+    });
+
+    // Focus leaving the panel entirely closes it, so tabbing past the last
+    // item does not leave an open menu floating over unrelated content.
+    menu.addEventListener("focusout", (event) => {
+      const next = event.relatedTarget;
+      if (menu.open && next instanceof Node && !menu.contains(next)) close();
+    });
+  }
+</script>

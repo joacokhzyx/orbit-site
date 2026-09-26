@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-26T00:00:00.000Z",
+  "title": "Design System: Orbit",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Primary ink",
+        "canonical": "#1a1a18",
+        "tonalRamp": [
+          "#0e0e0d",
+          "#1a1a18",
+          "#3a3934",
+          "#56554f",
+          "#6b6860",
+          "#8e8c84",
+          "#b4b2ac",
+          "#f0efec"
+        ],
+        "note": "Three levels are used: ink for primary text and the primary button fill, ink-2 for body copy, ink-3 for labels and metadata. The full ramp is recorded here for tooling; only the three are used."
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Page",
+        "canonical": "#faf9f7",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#131316",
+          "#1b1b1f",
+          "#232327",
+          "#f2f1ee",
+          "#f6f5f2",
+          "#faf9f7",
+          "#ffffff"
+        ],
+        "note": "Four surfaces: paper is the page, surface is a raised card, surface-2 a tinted block, sunken code. Warm throughout, never pure white for the page."
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#e4e2dd",
+        "tonalRamp": [],
+        "note": "A divider that divides content. Exempt from the 3:1 boundary rule, which is why --line-2 exists."
+      },
+      "line-2": {
+        "role": "neutral",
+        "displayName": "Control boundary",
+        "canonical": "#8b8880",
+        "tonalRamp": [],
+        "note": "3.36:1 light, 3.68:1 dark on the page. The only value a control may be outlined with."
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Focus ring",
+        "canonical": "#1d4ed8",
+        "tonalRamp": [],
+        "note": "The one hue in the system, because a ring the same colour as the text it surrounds is a ring nobody finds."
+      },
+      "signal-bg": {
+        "role": "neutral",
+        "displayName": "State tint",
+        "canonical": "#fbf3e2",
+        "tonalRamp": [],
+        "note": "A state is a tint with dark text on it. The one-bit version painted state solid black, which made 'Prerelease' the loudest thing on the page."
+      }
+    },
+    "shadow": {
+      "sm": "0 1px 2px rgb(26 26 24 / 0.06), 0 1px 3px rgb(26 26 24 / 0.04)",
+      "md": "0 4px 12px rgb(26 26 24 / 0.08), 0 2px 4px rgb(26 26 24 / 0.04)",
+      "note": "Two levels. Depth is a surface step first, a shadow second, and a border only when the element has no background of its own."
+    },
+    "motion": {
+      "duration": {
+        "instant": "0ms",
+        "quick": "150ms",
+        "settled": "200ms"
+      },
+      "easing": "steps(1, end)",
+      "note": "One timing token and a stepped easing, because a one-bit machine's output did not tween. Anything that moves here is a discrete state change, and the only continuous motion on the site is the underline switching from dotted to solid, which is a decoration style change rather than an animation."
+    },
+    "breakpoints": {
+      "sm": "640px",
+      "lg": "1024px",
+      "note": "Two breakpoints, so the layout has three states rather than a continuous ramp. Continuity between them comes from the clamp() on the type scale, not from layout steps."
+    },
+    "components": {
+      "window": {
+        "html": "<section class=\"block rounded-[var(--radius-lg)] p-6\"><h2>Title</h2></section>",
+        "css": "background-color: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);",
+        "note": "A raised block is a background step and a shadow, in that order. The two-value version drew a 1px full-contrast outline around six of these."
+      },
+      "control-filled": {
+        "html": "<a class=\"inline-flex h-11 items-center rounded-none bg-ink px-6 text-paper hover:stipple hover:text-ink\">Getting started</a>",
+        "css": "background-color: var(--ink); color: var(--paper); height: 44px; border-radius: 0;",
+        "note": "The one legitimate inversion on the site. Hover is a 10% opacity step, not a colour, so it cannot fail contrast."
+      },
+      "control-outlined": {
+        "html": "<a class=\"inline-flex h-11 items-center rounded-none border border-line px-6 text-ink hover:stipple\">Read the docs</a>",
+        "css": "background-color: var(--paper); border: 1px solid var(--line); color: var(--ink); height: 44px; border-radius: 0;"
+      },
+      "chip": {
+        "html": "<span class=\"chip\"><span>Prerelease</span></span>",
+        "css": "background-color: var(--ink); color: var(--paper); font-family: var(--font-mono); border-radius: 0;",
+        "note": "A tint, not an inversion. The one-bit version painted this solid black."
+      },
+      "link": {
+        "html": "<a class=\"link\" href=\"/docs/\">known limitations</a>",
+        "css": "color: var(--ink); text-decoration: underline; text-decoration-style: dotted; text-decoration-thickness: 2px; text-underline-offset: 0.2em;",
+        "note": "The underline is the affordance. It goes solid on hover in 150ms, which is the only continuous motion in the system."
+      },
+      "code-window": {
+        "html": "<figure class=\"rounded-none border border-line bg-code-bg\"><figcaption class=\"border-b border-line\">file.orb</figcaption><pre class=\"code-surface\"><code>route GET \"/health\" { }</code></pre></figure>",
+        "css": "background-color: var(--code-bg); border: 1px solid var(--line); border-radius: 0;",
+        "note": "The one place colour is allowed. Syntax colour is meaning rather than decoration, so the phosphor terminal keeps the measured palette from src/lib/code-theme.mjs."
+      },
+      "card-inset": {
+        "html": "<div class=\"rounded-[var(--radius)] bg-[var(--surface-2)] p-4\">Body</div>",
+        "css": "background-color: var(--surface-2); border-radius: var(--radius);",
+        "note": "A tinted block with no border. Used for a platform row, a note, a callout."
+      }
+    },
+    "narrative": {
+      "northStar": "Space and a background step separate things. A border is the last resort.",
+      "overview": "A warm neutral system: twelve measured values, four surfaces, three inks, two boundary weights, one focus hue, one state tint. This replaced a two-value one-bit palette with a 2px stipple standing in for every tone, and the replacement is not a regression but the difference between a constraint and a design. The two-value version turned its own rule into the answer: seven full-contrast borders and six outlined surfaces so nothing was distinguished, twenty-one uses of a stipple that read as noise, square corners everywhere so shape carried nothing, solid black rectangles to say 'Prerelease', and rules touching the text they divided.",
+      "keyCharacteristics": [
+        "Warm, not cold: the page is #faf9f7, so a raised card reads as a card and not as a hole.",
+        "Two boundary weights and only two: a hairline that divides content, and one that clears 3:1 for a control. Nothing at full contrast.",
+        "Three inks for three real levels of information, not three decorative shades.",
+        "One focus hue, because a ring the same colour as the text it surrounds is a ring nobody finds.",
+        "A state is a tint with dark text on it, never a solid fill.",
+        "The code window is the one place colour is allowed, because syntax colour is meaning rather than decoration."
+      ],
+      "do": [
+        "Separate with space or a surface step first; reach for a border last.",
+        "Give every rule air on both sides, written as a pair with the previous section's bottom.",
+        "Repoint a third-party colour at one of the twelve tokens the moment it appears.",
+        "Mark a state with a label as well as a tint.",
+        "Keep the code window's syntax palette measured rather than chosen by eye."
+      ],
+      "dont": [
+        "Draw anything at full contrast. A 100% black or white border is a bug.",
+        "Use a solid fill for small information; the primary button is the only inversion.",
+        "Bring back the stipple, the dither, or a square corner.",
+        "Set a typeface at a size it cannot carry. No automated check can catch this: three pixel metrics were measured against four faces and the failing face scored higher on all three.",
+        "Remap --sl-color-white to a surface; Starlight sets every heading's colour from it, and pointing it at the ground made all eleven documentation titles invisible. That passed both the palette check and axe.",
+        "Trust that a palette implies legible text."
+      ]
+    },
+    "typography": {
+      "faces": {
+        "display": {
+          "family": "Archivo Variable",
+          "weightsUsed": [
+            400,
+            600
+          ],
+          "replaced": "Workbench, a bitmap face drawn for 8-12px and illegible at the 64px display size"
+        },
+        "body": {
+          "family": "IBM Plex Sans Variable",
+          "weightsUsed": [
+            400
+          ]
+        },
+        "mono": {
+          "family": "JetBrains Mono Variable",
+          "weightsUsed": [
+            400
+          ]
+        }
+      },
+      "automatedLegibilityCheck": "None, deliberately. Three pixel metrics were written and measured against four faces at 64px; the bitmap face scored higher on all three, because its blocks touch and its band is taller and denser than a real face's. A statistic cannot tell a reader that a word does not spell anything. tests/typography.spec.ts keeps the two checks that are true: the declared face is the loaded face, and no line has its ink cut by its own line box."
+    }
+  },
+  "description": "A warm neutral system where space and a background step separate things, and a border is the last resort."
+}

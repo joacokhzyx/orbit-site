@@ -1,0 +1,97 @@
+---
+/* ══ CARDS THAT INVERT ═════════════════════════════════════
+   Three cards, each with the icon of the thing it measures.
+   Point at one and it turns — ground, marks, icon, title,
+   number and body together — while the other two stay.
+   After Bencho's "Cards that invert", MIT, bencho.dev/licence.
+
+   ── WHY THE ICONS ARE LUCIDE AND NOT DRAWN ──────────────
+   The first version drew its own figures: a bootstrap cycle, a
+   three-stage pipeline, a dependency tree, as inline SVG with
+   letters in them. They were bad. Hand-drawn marks inherit
+   every mistake — a wrong proportion, a label colliding with a
+   line, a stroke weight that does not match the 1.5 the rest
+   of the bar uses — and none of those show up until the
+   drawing is on screen at every size in both themes.
+
+   So the marks come from Lucide, which is the set Bencho's own
+   components are drawn against, and which is 1855 glyphs that
+   already share one grid, one stroke weight and one set of
+   terminals. The three here are the actual subject and not a
+   neighbour of it: `orbit` for a program that is written in
+   itself, `square-terminal` for the thing it compiles to, and
+   `package-minus` for a dependency count that is the claim.
+
+   The weight matters and is set explicitly. Lucide draws 2 on
+   a 24-unit box, which is 0.0833 of the glyph's own size, and
+   the site's line work is 1.5 on 18 — also 0.0833. The two
+   agree, so `absoluteStrokeWidth` is left off and the icon
+   keeps its own proportion at whatever size the card sets.
+
+   ── WHY THE GROUND IS NOT INVERTED ANYMORE ───────────────
+   This section was a full-bleed band of ink, and that was a
+   mistake. A page that is warm paper everywhere else arriving
+   at a black rectangle is not a considered section, it is a
+   hole, and no amount of restraint inside it fixes the edge.
+   The reference gets away with a dark ground because its page
+   IS dark. Borrowing the cards without the page bought the
+   contrast and left the calm behind.
+
+   So the band is gone and the section stands on the site's own
+   ground. The inversion is now the card's own and stays inside
+   the card: a surface at rest, ink on hover, with the marks,
+   the icon and every piece of text moving together. A reader
+   who never points at anything sees three quiet cards on
+   paper, which is what the rest of the page looks like. */
+import Orbit from "@lucide/astro/icons/orbit";
+import SquareTerminal from "@lucide/astro/icons/square-terminal";
+import PackageMinus from "@lucide/astro/icons/package-minus";
+
+interface Decision {
+  title: string;
+  body: string;
+  link: { label: string; href: string };
+  icon: "selfhost" | "toc" | "deps";
+}
+
+const { decisions } = Astro.props as { decisions: Decision[] };
+
+const ICONS = { selfhost: Orbit, toc: SquareTerminal, deps: PackageMinus } as const;
+---
+
+<div class="inv-grid">
+  {
+    decisions.map((item) => {
+      const Icon = ICONS[item.icon];
+      return (
+        <article class="inv" tabindex="0">
+          {/* No crop marks and no number, both of which this had.
+
+              The marks were carrying the card's outline, since there is no
+              border — which meant a decorative SVG was load-bearing for the
+              shape of every card on the page, and the thing you look at first
+              was a set of corner brackets. They are gone; the card is a
+              surface, and a surface does not need to be drawn.
+
+              The number was worse. 001, 002, 003 is a catalogue, and this is
+              not a catalogue: it is three arguments, and numbering them makes
+              them a list the reader can finish rather than three things worth
+              weighing. It also had to be dim, which on a card that inverts is
+              a second thing to keep in step with the first, and the first
+              version of that pairing is what left the number invisible on
+              hover in the dark scheme. */}
+          <h3 class="inv-t">{item.title}</h3>
+
+          {/* The icon is decorative: the title beside it already names the
+              thing, so announcing it would say the same word twice. */}
+          <Icon class="inv-fig" aria-hidden="true" />
+
+          <p class="inv-b">{item.body}</p>
+          <a class="inv-l" href={item.link.href}>
+            {item.link.label}
+          </a>
+        </article>
+      );
+    })
+  }
+</div>

@@ -1,5 +1,5 @@
 ---
-title: Kynx, the HTTP layer
+title: Kynx
 description: Rate limiting, identity admission, and why the Bloom filter is never authority.
 ---
 
@@ -29,7 +29,7 @@ against the real table before it means anything.
 Kynx does not terminate TLS, does not parse multipart bodies, and does not
 proxy. Those are the three things people expect from an HTTP layer and none of
 them are in 0.1.0. A file upload saves nothing; see
-[known limitations](/docs/reference/limitations).
+[known limitations](/docs/reference/limitations/).
 
 ## The protections that were fixed
 

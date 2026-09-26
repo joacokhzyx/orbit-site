@@ -1,0 +1,15 @@
+{
+  "pageTitle": "{{title}} | {{site}}",
+  "tableOfContents.onThisPage": "On this page",
+  "sidebar.secondaryMenu": "More",
+  "search.placeholder": "Search",
+  "search.label": "Search the documentation",
+  "page.editLink": "Edit this page on GitHub",
+  "page.lastUpdated": "Last updated",
+  "page.previousLink": "Previous",
+  "page.nextLink": "Next",
+  "themeSelect.accessibleLabel": "Theme",
+  "copyButton.copied": "Copied",
+  "copyButton.copy": "Copy",
+  "builtWithStarlight.label": "Built with Starlight"
+}

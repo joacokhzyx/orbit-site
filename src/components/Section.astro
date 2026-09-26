@@ -1,31 +1,92 @@
 ---
 // A numbered section with one hairline above it. The number is the
-// identity of this direction: every section on the site is numbered in
-// mono, the way a standards document numbers its clauses.
+// identity of the section: every one on the site is numbered in mono, the
+// way a standards document numbers its clauses.
 //
-// The padding below is the point. The first pass used pt-12, which put
-// the next heading 48px under the last paragraph, and a page of six
-// sections read as a wall. It is now a full section's worth of air.
+// The padding is the whole point of this component, in both directions. A
+// rule is drawn on the top edge of the section, so the space above it
+// belongs to the section that came before and the space below it to this
+// one, and a divider with air on only one side is a divider that reads as
+// attached to the text under it. So the rhythm is one value, applied
+// symmetrically: the same gap above the rule as below it, on the same
+// 4px scale as everything else on the site.
 interface Props {
   id?: string;
   number?: string;
   heading?: string;
   lead?: string;
   class?: string;
+  /**
+   * "dark" puts the section on a band of --ink, where the heading is
+   * --paper and the metadata is --ink-3. It also drops the hairline above:
+   * a section that begins by inverting the whole ground does not need a rule
+   * to announce the change, and --line on --ink is a bright line rather than
+   * a quiet one. The band itself is the boundary.
+   */
+  tone?: "light" | "dark";
 }
 
-const { id, number, heading, lead, class: className = "" } = Astro.props;
+const {
+  id,
+  number,
+  heading,
+  lead,
+  class: className = "",
+  tone = "light",
+} = Astro.props;
+const dark = tone === "dark";
 ---
 
-<section id={id} class:list={["rule scroll-mt-24 pt-16 sm:pt-24 lg:pt-28", className]}>
+<section
+  id={id}
+  class:list={[
+    "scroll-mt-24",
+    dark ? "mt-16 pt-16 sm:mt-24 sm:pt-24" : "mt-16 pt-16 sm:mt-24 sm:pt-24",
+    className,
+  ]}
+>
   {
     heading && (
-      <header class="mb-10 sm:mb-14">
+      <header class="mb-8 sm:mb-12">
         <div class="flex flex-wrap items-baseline gap-x-5 gap-y-2">
-          {number && <span class="mono text-small text-ink-3">{number}</span>}
-          <h2 class="text-title text-balance">{heading}</h2>
+          {number && (
+            /* --band-body, not --band-dim. The number is text, and the dim
+               token is the mid grey that reads on ink: 4.92:1 on the light
+               band but 4.38:1 on the dark one, which is under the 4.5:1 that
+               a number owes. There is no contract token that is both quieter
+               than the band and legible on it in both schemes, so the number
+               is one step under the heading instead, and the mono face and
+               the size carry the rest of the hierarchy. */
+            <span
+              class:list={[
+                "font-mono text-small",
+                dark ? "text-[var(--band-body)]" : "text-[var(--ink-3)]",
+              ]}
+            >
+              {number}
+            </span>
+          )}
+          <h2
+            class:list={[
+              "text-title text-balance",
+              dark && "text-[var(--band-fg)]",
+            ]}
+          >
+            {heading}
+          </h2>
         </div>
-        {lead && <p class="measure text-lead mt-6 text-ink-2">{lead}</p>}
+        {
+          lead && (
+            <p
+              class:list={[
+                "max-w-[66ch] text-lead mt-6",
+                dark ? "text-[var(--band-body)]" : "text-ink",
+              ]}
+            >
+              {lead}
+            </p>
+          )
+        }
       </header>
     )
   }

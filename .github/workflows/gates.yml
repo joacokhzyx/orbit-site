@@ -1,0 +1,62 @@
+name: gates
+
+# The gates in this repository are the only thing that knows whether the
+# site is publishable. Until this file existed they ran on whoever's
+# machine happened to build it, and several of them had been reporting
+# success without checking anything: the contrast gate parsed the light
+# palette twice and never read the dark one, and the link gate skipped every
+# repository path and still exited zero when no checkout was present.
+#
+# So they run here, on every push, where nobody can quietly skip them.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: gates-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # The release resolver and the download gate read the public GitHub
+      # API. A token raises the rate limit from 60 requests an hour, which
+      # a few consecutive builds can reach. It is not required: without one
+      # the resolver falls back to the committed snapshot.
+      - name: Release and download gates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Accessibility and rendering
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm test:a11y
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: review-screenshots
+          path: .impeccable/review/
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          if-no-files-found: ignore

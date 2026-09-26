@@ -108,7 +108,7 @@ when a row was actually removed.
 ## Telemetry
 
 `system.*` reads live counters, not constants. There is no p50 or p99 yet,
-which is stated plainly in [known limitations](/docs/reference/limitations).
+which is stated plainly in [known limitations](/docs/reference/limitations/).
 
 ```orbit
 route GET "/metrics" {

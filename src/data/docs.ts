@@ -1,219 +1,97 @@
-// The documentation map for /docs. Every entry points into the repository,
-// which is authoritative: the site never copies a document, so a page here
-// can't quietly disagree with the thing it links to.
+// Where a reader should be sent for each document.
+//
+// The site started with every documentation link pointing into the
+// repository, on the reasoning that a mirror can drift. That stopped being
+// true when the documentation moved onto this site: eleven pages under
+// /docs are hosted here now, and the marketing pages were still sending
+// readers to a raw markdown view on github.com for eight of them. The
+// repository stayed the place for anything the site does not host, which
+// is the policy this file records.
+//
+// One map, one resolver, and a gate that fails the build if a page links
+// to the repository for a document listed here. Adding a page under
+// /docs means adding a line here, which is what keeps the two in step.
 
-import { docLink } from "./site";
+import { REPO } from "./site";
 
-export type DocEntry = {
-  question: string;
-  doc: string;
-  /** One line saying what the reader will get. */
-  blurb: string;
+export type DocRoute = {
+  /** The path inside the orbit-lang repository, without the docs/ prefix. */
+  repo: string;
+  /** The route on this site, or null when the site does not host it. */
+  site: string | null;
+  /** One line saying what the reader gets, for the places that show it. */
+  blurb?: string;
 };
 
-export type DocGroup = {
-  title: string;
-  note?: string;
-  entries: DocEntry[];
-};
+/**
+ * The documents the site hosts, keyed by the repository path. Anything not
+ * listed here is repository-only and is linked there on purpose.
+ */
+export const DOC_ROUTES: readonly DocRoute[] = [
+  { repo: "README.md", site: "/docs/", blurb: "Start with the question you are trying to answer." },
+  { repo: "GETTING_STARTED.md", site: "/docs/start/getting-started/", blurb: "Install it and run a first service." },
+  { repo: "TOUR.md", site: "/docs/start/tour/", blurb: "What the language looks like, end to end." },
+  { repo: "LANGUAGE_REFERENCE.md", site: "/docs/language/reference/", blurb: "The user-visible contract." },
+  { repo: "KYNX.md", site: "/docs/services/kynx/", blurb: "Rate limiting, identity admission, and the Bloom filter." },
+  { repo: "COMMANDS.md", site: "/docs/reference/commands/", blurb: "Every command, its flags, and where output goes." },
+  { repo: "KNOWN_LIMITATIONS.md", site: "/docs/reference/limitations/", blurb: "What happens today, and how to work around it." },
+  { repo: "FAQ.md", site: "/docs/reference/faq/", blurb: "The uncomfortable questions, answered plainly." },
 
-export const DOC_GROUPS: readonly DocGroup[] = [
-  {
-    title: "Starting out",
-    note: "If you've never written Orbit, this order works.",
-    entries: [
-      {
-        question: "How do I install it and run my first program?",
-        doc: "GETTING_STARTED.md",
-        blurb: "Builds the compiler and runs a service, without giant dependencies.",
-      },
-      {
-        question: "What does the language look like?",
-        doc: "TOUR.md",
-        blurb: "Functions, models, routes, SQLite, telemetry. Every snippet runnable, every output verified.",
-      },
-      {
-        question: "Which syntax rules will trip me up?",
-        doc: "SYNTAX_GUIDE.md",
-        blurb: "A short pointer to the maintained reference.",
-      },
-      {
-        question: "How do I write Orbit programs?",
-        doc: "LANGUAGE_REFERENCE.md",
-        blurb: "The user-visible contract: bindings, control flow, routes, models, modules, limits.",
-      },
-    ],
-  },
-  {
-    title: "Building a service",
-    entries: [
-      {
-        question: "How do I build a blog API with auth?",
-        doc: "tutorials/blog-api.md",
-        blurb: "Runnable example plus the expected outputs at each step.",
-      },
-      {
-        question: "How do I serve files and accept uploads?",
-        doc: "tutorials/file-server.md",
-        blurb: "The same tutorial style, with the upload limitation stated up front.",
-      },
-      {
-        question: "How do I ship one binary?",
-        doc: "tutorials/deploy-single-binary.md",
-        blurb: "Windows and Linux, plus one-box clustering.",
-      },
-      {
-        question: "What are the HTTP protections?",
-        doc: "KYNX.md",
-        blurb: "Rate limiting, identity admission, and why the Bloom filter is never authority.",
-      },
-      {
-        question: "How does memory work?",
-        doc: "ARENA.md",
-        blurb: "Arena allocation, the pool fast path, and what telemetry the runtime keeps.",
-      },
-    ],
-  },
-  {
-    title: "When it doesn't work",
-    note: "Written to be found before midnight, not after.",
-    entries: [
-      {
-        question: "What can't Orbit do yet?",
-        doc: "KNOWN_LIMITATIONS.md",
-        blurb: "The honest list: what happens today, how to work around it, what would change it.",
-      },
-      {
-        question: "Something broke. What now?",
-        doc: "tutorials/troubleshooting.md",
-        blurb: "Silent exits, ports already in use, slow first boots.",
-      },
-      {
-        question: "What do people ask?",
-        doc: "FAQ.md",
-        blurb: "Twenty questions answered plainly, including the uncomfortable ones.",
-      },
-      {
-        question: "Which platforms are supported?",
-        doc: "SUPPORT.md",
-        blurb: "What's verified where, and which paths are marked untested.",
-      },
-      {
-        question: "Will this change break my code?",
-        doc: "VERSIONING.md",
-        blurb: "What counts as a breaking change before 0.1.0.",
-      },
-    ],
-  },
-  {
-    title: "Commands and tooling",
-    entries: [
-      {
-        question: "Which commands are available?",
-        doc: "COMMANDS.md",
-        blurb: "Every command, its flags, and where output goes.",
-      },
-      {
-        question: "How do I format code?",
-        doc: "FMT.md",
-        blurb: "Token-based formatting, and the check mode the CI gate runs.",
-      },
-      {
-        question: "What does orbit doctor check?",
-        doc: "DOCTOR.md",
-        blurb: "Read-only project checks, their codes, and the optional whitespace fixes.",
-      },
-    ],
-  },
-  {
-    title: "Understanding the system",
-    entries: [
-      {
-        question: "How does the compiler work?",
-        doc: "ARCHITECTURE.md",
-        blurb: "The pipeline from source to C, and where the boundaries are.",
-      },
-      {
-        question: "How does the compiler compile itself?",
-        doc: "architecture/SELF_HOSTING.md",
-        blurb: "Fixed-point convergence, the trust root, and how a build is verified.",
-      },
-      {
-        question: "What is the trust model?",
-        doc: "architecture/SOVEREIGNTY.md",
-        blurb: "Reproducibility, and what the committed C file does and doesn't guarantee.",
-      },
-      {
-        question: "What is implemented today?",
-        doc: "STATUS.md",
-        blurb: "A dated snapshot of capabilities, risks, and active workstreams.",
-      },
-      {
-        question: "What is planned next?",
-        doc: "ROADMAP.md",
-        blurb: "Sequencing and priorities. It does not replace the engineering contract.",
-      },
-    ],
-  },
-  {
-    title: "Measuring honestly",
-    entries: [
-      {
-        question: "How should energy be measured?",
-        doc: "ENERGY.md",
-        blurb: "The definitions, and why CPU time is never converted to joules.",
-      },
-      {
-        question: "What did the performance work find?",
-        doc: "PERF.md",
-        blurb: "Numbers with machine and method, including what was tried and left alone.",
-      },
-      {
-        question: "How do I benchmark it?",
-        doc: "guides/benchmark-methodology.md",
-        blurb: "Run counts, medians, discarded runs, and the proxy rules.",
-      },
-      {
-        question: "What is the Superluminal research?",
-        doc: "SUPERLUMINAL.md",
-        blurb: "What was measured, what was falsified, and what stays aspiration.",
-      },
-    ],
-  },
-  {
-    title: "The project itself",
-    entries: [
-      {
-        question: "What changed?",
-        doc: "CHANGELOG.md",
-        blurb: "Every entry, condensed from the git history.",
-      },
-      {
-        question: "What is in this release?",
-        doc: "RELEASE_NOTES_0_1_0.md",
-        blurb: "The 0.1.0 release notes.",
-      },
-      {
-        question: "How are releases packaged?",
-        doc: "RELEASES.md",
-        blurb: "Artifacts and how they're verified.",
-      },
-      {
-        question: "What are the quality gates?",
-        doc: "../ENGINEERING.md",
-        blurb: "The implementation contract and its executable gates.",
-      },
-    ],
-  },
+  // Repository-only. The site does not carry these, so the link is honest
+  // and the repository is authoritative for them.
+  { repo: "ARCHITECTURE.md", site: null },
+  { repo: "ARENA.md", site: null },
+  { repo: "CHANGELOG.md", site: null },
+  { repo: "CLUSTER.md", site: null },
+  { repo: "DOCTOR.md", site: null },
+  { repo: "ENERGY.md", site: null },
+  { repo: "FMT.md", site: null },
+  { repo: "PERF.md", site: null },
+  { repo: "RELEASES.md", site: null },
+  { repo: "RELEASE_NOTES_0_1_0.md", site: null },
+  { repo: "ROADMAP.md", site: null },
+  { repo: "STATUS.md", site: null },
+  { repo: "SUPERLUMINAL.md", site: null },
+  { repo: "SUPPORT.md", site: null },
+  { repo: "SYNTAX_GUIDE.md", site: null },
+  { repo: "VERSIONING.md", site: null },
+  { repo: "architecture/BOOTSTRAP_STAGES.md", site: null },
+  { repo: "architecture/ORBIT_ARENA.md", site: null },
+  { repo: "architecture/SELF_HOSTING.md", site: null },
+  { repo: "architecture/SOVEREIGNTY.md", site: null },
+  { repo: "architecture/TYPED_IR.md", site: null },
+  { repo: "guides/migrations.md", site: null },
+  { repo: "tutorials/blog-api.md", site: null },
+  { repo: "tutorials/deploy-single-binary.md", site: null },
+  { repo: "tutorials/file-server.md", site: null },
+  { repo: "tutorials/troubleshooting.md", site: null },
 ];
 
-/** Resolves a docs-relative path, including the one entry outside docs/. */
-export const hrefFor = (doc: string): string => {
-  if (doc.startsWith("../")) {
-    return `https://github.com/joacokhzyx/orbit-lang/blob/main/${doc.slice(3)}`;
-  }
-  return docLink(doc);
-};
+const BY_REPO_PATH = new Map(DOC_ROUTES.map((route) => [route.repo, route]));
 
-/** Last path segment, used as the label on each row. */
-export const labelFor = (doc: string): string => doc.split("/").pop() ?? doc;
+/** The repository path for a document, for pages that must send readers there. */
+export function repoHref(file: string): string {
+  return `${REPO.docsBase}/${file}`;
+}
+
+/**
+ * Where to send a reader for a document: this site when the site hosts it,
+ * the repository when it does not.
+ */
+export function docHref(file: string): string {
+  const route = BY_REPO_PATH.get(file);
+  if (!route) {
+    throw new Error(
+      `unknown document "${file}". Add it to DOC_ROUTES so the site and the repository cannot disagree.`,
+    );
+  }
+  return route.site ?? repoHref(file);
+}
+
+/** True when a document the site hosts was linked into the repository. */
+export function isHostedOnSite(file: string): boolean {
+  return BY_REPO_PATH.get(file)?.site != null;
+}
+
+/** A link into the source tree, for the files that are not documentation. */
+export const sourceLink = (file: string): string => `${REPO.sourceBase}/${file}`;

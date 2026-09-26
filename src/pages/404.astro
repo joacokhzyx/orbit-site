@@ -1,0 +1,65 @@
+---
+import "../styles/global.css";
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import LinkButton from "../components/LinkButton.astro";
+import { REPO } from "../data/site";
+import { docHref } from "../data/docs";
+
+/**
+ * noindex, and no canonical.
+ *
+ * The 404 that shipped before this one was Starlight's, which declared a
+ * canonical address of /404/ and carried no robots directive. That asks a
+ * search engine to treat an error page as a real document and to index it.
+ * Base.astro only emits a canonical when a page asks for one, and this page
+ * does not, so there is nothing to point at.
+ */
+const startingPoints = [
+  { label: "Getting started", href: docHref("GETTING_STARTED.md"), note: "Install it and run a first service." },
+  { label: "Language tour", href: docHref("TOUR.md"), note: "The syntax, end to end." },
+  { label: "Documentation", href: "/docs/", note: "Everything the site hosts." },
+  { label: "What 0.1 can't do", href: docHref("KNOWN_LIMITATIONS.md"), note: "Known limits, with workarounds." },
+];
+---
+
+<Base
+  title="Page not found"
+  description="That address does not exist on this site. Here is where the documentation actually is."
+  noindex
+>
+  <Nav />
+
+  <main id="main" class="mx-auto w-full max-w-6xl px-6 pt-12 pb-16 sm:px-8 sm:pt-16 lg:pt-20">
+    <p class="label">Error 404</p>
+    <h1 class="text-display mt-5 max-w-3xl text-balance">This page is not here.</h1>
+    <p class="max-w-[66ch] text-lead mt-6 text-[var(--ink-2)]">
+      Nothing is broken on your side. The address you asked for does not exist, which usually means a
+      document moved from the repository onto this site.
+    </p>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <LinkButton href="/" variant="primary">Home</LinkButton>
+      <LinkButton href={REPO.issues} variant="secondary">Report a broken link</LinkButton>
+    </div>
+
+    <section class="mt-16 pt-16 sm:mt-24 sm:pt-24" aria-labelledby="starting-points">
+      <h2 id="starting-points" class="text-heading">Where things are</h2>
+      <ul class="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+        {
+          startingPoints.map((point) => (
+            <li>
+              <a class="link text-body" href={point.href}>
+                {point.label}
+              </a>
+              <p class="text-small mt-1.5 text-[var(--ink-2)]">{point.note}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+
+  <Footer />
+</Base>

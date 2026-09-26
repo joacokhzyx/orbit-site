@@ -1,0 +1,22 @@
+---
+// The React island. Astro's client directives only work on framework
+// components from a .astro file, so this wrapper exists to give Seek one.
+//
+// client:idle, not client:load. The control has a spring and a magnet and
+// is nicer for being present on the first frame, but it is not the reason
+// anyone came to this page, and the documentation header is the first
+// thing every reader's browser parses here. Idle hydration keeps that off
+// the critical path; the Pagefind index itself is a further step out
+// still, imported on the first keystroke rather than with the component.
+//
+// size={44} is the whole reason this wrapper passes anything. The control
+// defaults to the 64 it was drawn at, which is half again as tall as every
+// other control in this bar — and the bar is a fixed-height box, so the
+// overflow painted the bar's own background across the top of the page
+// title. 44 is the height of the theme toggle beside it, and at 44 the
+// component's lens lands at 0.44 of the circle, the same band the rest of
+// the bar's round buttons sit in.
+import { Seek } from "./Seek";
+---
+
+<Seek client:idle size={44} framePad={0} />

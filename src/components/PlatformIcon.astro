@@ -1,0 +1,69 @@
+---
+// The platform mark on a download row.
+//
+// Drawn, not imported. A brand mark fetched from a CDN is a third-party
+// dependency on the most important card on the site, and these two are
+// simple enough to own.
+//
+// Both are drawn on a 24-unit grid and fill with currentColor, so they
+// inherit the row's state without a second rule. The penguin needs its face
+// and belly cut back out of the silhouette, and those cut-outs are painted in
+// --surface-2 and --ink, which are the two colours the tile behind it is
+// already made of. That is why it reads correctly in both themes without a
+// per-theme rule: the cut-outs are whatever the tile is.
+//
+// Version B of the penguin, with an orange beak in Tux's own colour, was
+// rendered and rejected. At 96 pixels the beak reads as a duck's bill, and at
+// 16 it is a coloured dot, and in both cases it is the one thing on the card
+// carrying a colour that means nothing.
+//
+// The mark is decorative. The platform name is always next to it in text, so
+// the shape adds nothing a screen reader needs, and an icon that also carries
+// a role and a title would be announced twice: once as "Linux" from the
+// visible text and once as "Linux, graphic" from the title. It therefore
+// carries aria-hidden and no role at all.
+
+interface Props {
+  platform: string;
+  class?: string;
+}
+
+const { platform, class: className = "" } = Astro.props;
+
+---
+
+<svg class={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  {
+    platform === "Windows" ? (
+      // The four panes. The only unambiguously Windows mark that is also
+      // four rectangles, so it stays a mark and does not become an icon of
+      // something else.
+      <path d="M2.6 5.1 10.4 3.9v7.3H2.6zM11.6 3.7 21.4 2.5v8.7h-9.8zM2.6 12.4h7.8v7.3l-7.8-1.2zM11.6 12.4h9.8v8.7l-9.8-1.2z" />
+    ) : platform === "Linux" ? (
+      <g>
+        {/* Head and body in one path. Drawn as two shapes it reads as a
+            snowman; the pear is what makes it a penguin. */}
+        <path
+          d="M12 2.1c1.95 0 3.3 1.35 3.35 3.2 0 .62-.13 1.12-.05 1.55 1.5.72 2.6 2.3 2.6 4.3 0 .5-.06.97-.17 1.4 1.02.92 1.6 2.2 1.6 3.6 0 3.3-3.2 5.75-7.33 5.75S4.34 19.45 4.34 16.15c0-1.4.58-2.68 1.6-3.6-.11-.43-.17-.9-.17-1.4 0-2 1.1-3.58 2.6-4.3.08-.43-.05-.93-.05-1.55 0-1.85 1.35-3.2 3.35-3.2z"
+        />
+        <ellipse cx="12" cy="7.1" rx="2.55" ry="2.5" fill="var(--platform-ground, var(--surface-2))" />
+        <ellipse cx="12" cy="16" rx="3.5" ry="4.05" fill="var(--platform-ground, var(--surface-2))" />
+        <circle cx="10.7" cy="6.6" r=".72" fill="var(--platform-ink, var(--ink))" />
+        <circle cx="13.3" cy="6.6" r=".72" fill="var(--platform-ink, var(--ink))" />
+        <path
+          d="M12 8.3c.8 0 1.5.42 1.5.95s-.7.95-1.5.95-1.5-.42-1.5-.95.7-.95 1.5-.95z"
+          fill="var(--platform-ink, var(--ink))"
+        />
+        {/* The feet, which is what stops it being a penguin-shaped egg. */}
+        <path
+          d="M9.6 20.3c.62.9.5 1.72-.32 1.86-.82.14-1.62-.4-1.99-1.3-.37-.9-.25-1.72.32-1.86.57-.14 1.37.4 1.99 1.3zM14.4 20.3c-.62.9-.5 1.72.32 1.86.82.14 1.62-.4 1.99-1.3.37-.9.25-1.72-.32-1.86-.57-.14-1.37.4-1.99 1.3z"
+        />
+      </g>
+    ) : (
+      // Anything else gets the file mark rather than a wrong brand. The
+      // release resolver only returns platforms in its own table, so this
+      // branch is unreachable today and says so by being visibly generic.
+      <path d="M6 2.8h8l4 4v14.4H6z" opacity=".35" />
+    )
+  }
+</svg>

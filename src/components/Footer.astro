@@ -1,6 +1,7 @@
 ---
 import Logo from "./Logo.astro";
-import { SITE, REPO, docLink } from "../data/site";
+import { SITE, REPO } from "../data/site";
+import { docHref } from "../data/docs";
 
 const year = new Date().getFullYear();
 
@@ -8,19 +9,19 @@ const columns = [
   {
     heading: "Learn",
     links: [
-      { label: "What Orbit is", href: "/learn" },
-      { label: "Documentation", href: "/docs" },
-      { label: "Language tour", href: docLink("TOUR.md") },
-      { label: "Getting started", href: docLink("GETTING_STARTED.md") },
+      { label: "What Orbit is", href: "/learn/" },
+      { label: "Documentation", href: "/docs/" },
+      { label: "Language tour", href: docHref("TOUR.md") },
+      { label: "Getting started", href: docHref("GETTING_STARTED.md") },
     ],
   },
   {
     heading: "Honest limits",
     links: [
-      { label: "What 0.1 can't do", href: docLink("KNOWN_LIMITATIONS.md") },
-      { label: "Project status", href: docLink("STATUS.md") },
-      { label: "Roadmap", href: docLink("ROADMAP.md") },
-      { label: "Frequently asked", href: docLink("FAQ.md") },
+      { label: "What 0.1 can't do", href: docHref("KNOWN_LIMITATIONS.md") },
+      { label: "Project status", href: docHref("STATUS.md") },
+      { label: "Roadmap", href: docHref("ROADMAP.md") },
+      { label: "Frequently asked", href: docHref("FAQ.md") },
     ],
   },
   {
@@ -28,22 +29,34 @@ const columns = [
     links: [
       { label: "GitHub", href: REPO.url, external: true },
       { label: "Releases", href: REPO.releases, external: true },
-      { label: "Changelog", href: "/changelog" },
+      { label: "Changelog", href: "/changelog/" },
       { label: "Report an issue", href: REPO.issues, external: true },
     ],
   },
 ];
+
+/*
+  One hairline, at the top, with the section rhythm above it and the
+  footer's own padding below it. The columns are not boxes and nothing
+  inside them is framed: a footer is the quietest part of a page, and four
+  outlined columns at the bottom of a long scroll undo that. The links sit
+  one weight below the headings, and every one of them is a 44px row, which
+  is a bigger change than it looks: a 20px-tall link at the end of a page
+  is the hardest target on the site.
+*/
+const linkClass =
+  "text-small inline-flex min-h-11 items-center gap-1 text-[var(--ink-2)] transition-colors hover:text-[var(--ink)]";
 ---
 
-<footer class="rule mt-24">
+<footer class="mt-24">
   <div class="mx-auto w-full max-w-6xl px-6 py-14 sm:px-8 sm:py-16">
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-8">
       <div>
         <a href="/" class="inline-flex items-center gap-2.5" aria-label="Orbit, home">
           <Logo class="h-6 w-6 text-ink" />
-          <span class="font-logo text-lead leading-none font-semibold tracking-tight">Orbit</span>
+          <span class="font-display text-lead leading-none font-normal tracking-tight">Orbit</span>
         </a>
-        <p class="measure text-small mt-4 text-ink-2">
+        <p class="max-w-[66ch] text-small mt-4 text-[var(--ink-2)]">
           {SITE.headline} A statically typed language for APIs and microservices, with a compiler
           written in itself.
         </p>
@@ -53,14 +66,14 @@ const columns = [
         columns.map((column) => (
           <nav aria-label={column.heading}>
             <h2 class="label">{column.heading}</h2>
-            <ul class="mt-4 flex flex-col gap-1">
+            <ul class="mt-2 flex flex-col">
               {column.links.map((link) => (
                 <li>
                   <a
                     href={link.href}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
-                    class="text-small inline-flex min-h-9 items-center gap-1 text-ink-2 transition-colors hover:text-ink"
+                    class={linkClass}
                   >
                     {link.label}
                     {link.external && (
@@ -77,10 +90,20 @@ const columns = [
       }
     </div>
 
-    <div
-      class="text-micro mt-14 flex flex-col gap-2 border-t border-line pt-6 text-ink-3 sm:flex-row sm:items-center sm:justify-between"
-    >
-      <p>MIT licensed. Orbit {year}.</p>
-      <p>The repository is the source of the documentation.</p>
-    </div>  </div>
+    <div class="text-micro mt-16 text-[var(--ink-3)]">
+      {/* The holder is Orbit Software Foundation, which is what LICENSE
+          and package.json both say, so the footer now says it too. It read
+          "Orbit 2026" and quietly contradicted the only two places the
+          project's legal name is written down.
+
+          The second line went rather than being reworded. "The repository
+          is the source of the documentation" told a reader something they
+          had no way to act on and no reason to doubt: it is not a link, it
+          is not a claim anyone would doubt, and the footer is the last
+          thing on a page and should not spend a line on it. The left slot
+          is the licence and the holder, which is the thing a footer is
+          actually for. */}
+      <p>MIT licensed. &copy; {year} Orbit Software Foundation.</p>
+    </div>
+  </div>
 </footer>

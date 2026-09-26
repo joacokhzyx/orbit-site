@@ -17,3 +17,22 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# pnpm is the only package manager here; a stray npm lockfile is not tracked
+package-lock.json
+
+# Link-gate HTTP cache
+.cache/
+
+# Playwright
+test-results/
+playwright-report/
+.vercel
+.env*
+
+# Impeccable's visual-review output: screenshots taken while judging a change,
+# and the scratch pages built to compare two of them. The design CONTRACT is
+# tracked (.impeccable/design.json and the surface briefs) because it is a
+# decision; the pictures of what a decision looked like on one afternoon are
+# not, and there were 3.3MB of them across 21 files.
+.impeccable/review/

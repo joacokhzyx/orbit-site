@@ -1,6 +1,6 @@
 ---
 title: Documentation
-description: Start with the question you are trying to answer.
+description: Orbit compiles to C, so what you write is what a C compiler sees. Start here for the install, the syntax, and the reference.
 ---
 
 Orbit compiles to C, so what you write is what a C compiler sees. There is no
@@ -11,11 +11,11 @@ and everything below is the detail behind it.
 
 **New to Orbit.** Get to a running service in one page: build the compiler,
 start a server, and read a real response.
-[Getting started →](/docs/start/getting-started)
+[Getting started →](/docs/start/getting-started/)
 
 **Want to see the language.** Functions, bindings, models, routes, and
 telemetry. Every snippet runnable, every output verified.
-[Language tour →](/docs/start/tour)
+[Language tour →](/docs/start/tour/)
 
 ## The contract, and the limits
 
@@ -28,7 +28,7 @@ because finding that out at midnight is a bad way to learn a language.
 - **One host per cluster.** No shared state, no proxying, no failover.
 
 The full list, with workarounds, is in
-[known limitations](/docs/reference/limitations).
+[known limitations](/docs/reference/limitations/).
 
 ## If a number matters to you
 

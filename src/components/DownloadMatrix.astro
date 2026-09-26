@@ -1,0 +1,156 @@
+---
+// The primary action for anyone who came to install the language.
+//
+// Every number on this component is read from the release the repository
+// actually has, resolved in src/lib/releases.mjs. Nothing here is a
+// hardcoded version, a guessed file size, or a URL built from a template:
+// the asset names in the repository are not consistent between releases,
+// and a template would produce 404s.
+//
+// A platform with no asset in the newest release is not rendered at all
+// rather than rendered as a button that fails, which is why macOS does not
+// appear while the newest release ships only Linux and Windows. The
+// sentence underneath says which platforms are supported, so a reader on
+// another platform is told a fact instead of left to infer one.
+import { LATEST, DOWNLOADS, IS_PRERELEASE } from "../lib/releases.mjs";
+import { REPO } from "../data/site";
+import { docHref } from "../data/docs";
+import PlatformIcon from "./PlatformIcon.astro";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+
+const supported = DOWNLOADS.map((download) => download.platform);
+const platformSentence =
+  supported.length > 1
+    ? `${supported.slice(0, -1).join(", ")} and ${supported[supported.length - 1]}`
+    : supported[0] ?? "no platform yet";
+
+const published = new Date(LATEST.publishedAt).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/*
+  The prerelease marker is the one piece of state on this card, and it is a
+  tint with dark text on it. It used to be an inverted block: a solid black
+  rectangle, at the size of a word, to say something the sentence directly
+  underneath already says in full.
+*/
+const prereleaseChip =
+  "inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-[var(--signal-bg)] px-2 py-1 font-mono text-micro leading-normal text-[var(--signal-ink)]";
+---
+
+<section
+  class:list={[
+    "rounded-[var(--radius-lg)] bg-[var(--surface)] p-6 shadow-[var(--shadow-sm)] sm:p-8",
+    className,
+  ]}
+  aria-labelledby="download-heading"
+>
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+    <h2 id="download-heading" class="text-heading">
+      Download <span class="font-mono text-ink">{LATEST.version}</span>
+    </h2>
+    <p class="flex flex-wrap items-center gap-2">
+      {
+        IS_PRERELEASE && (
+          <span class={prereleaseChip}>
+            <span>Prerelease</span>
+          </span>
+        )
+      }
+      <span class="text-micro text-[var(--ink-3)]">
+        Published <time datetime={LATEST.date}>{published}</time>
+      </span>
+    </p>
+  </div>
+
+  {
+    IS_PRERELEASE && (
+      <p class="mt-3 text-small text-[var(--ink-2)]">
+        This is a release candidate, not a stable release. It is the newest build the project
+        publishes, and it is what the version below reports.
+      </p>
+    )
+  }
+
+  {/* Each platform is a row on a tinted tile, not a bordered box. A download
+      is a control, so the only thing here that gets a visible boundary is
+      the boundary it reveals when you point at it.
+
+      The icon is what makes the row scannable at a glance: without it, two
+      rows differing only by a word are two rows you have to read. It is also
+      why the row is 44 pixels tall rather than 40: a 38 pixel tile inside a
+      40 pixel row leaves the target smaller than the mark on it. */}
+  <ul class="mt-6 grid gap-2.5 sm:grid-cols-2">
+    {
+      DOWNLOADS.map((download) => (
+        // min-w-0 on both the grid item and the flex row. A grid item and a
+        // flex item both default to min-width:auto, so without it the row
+        // refuses to go below the width of "x86_64 - Windows executable" and
+        // the card scrolls sideways at 320px.
+        <li class="min-w-0">
+          <a
+            href={download.url}
+            class="group/dl flex min-h-11 min-w-0 items-center gap-3.5 rounded-[var(--radius)] bg-[var(--surface-2)] px-3 py-2.5 transition-colors hover:bg-[var(--surface)] hover:ring-1 hover:ring-[var(--line-2)]"
+          >
+            {/* The tile hands the icon its own two colours, so the penguin's
+                face and belly are cut in the tile rather than in whatever
+                the icon guessed was behind it. */}
+            <span
+              class="grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--surface)] [--platform-ground:var(--surface)] [--platform-ink:var(--ink)]"
+            >
+              <PlatformIcon platform={download.platform} class="size-[22px] text-ink" />
+            </span>
+            <span class="flex min-w-0 flex-1 flex-col">
+              <span class="text-body text-ink">{download.platform}</span>
+              <span class="text-micro truncate text-[var(--ink-3)]">
+                {download.arch} &middot; {download.formatLabel}
+              </span>
+            </span>
+            <span class="flex shrink-0 items-center gap-3">
+              <span class="text-micro font-mono text-[var(--ink-3)]">{download.sizeLabel}</span>
+              <svg
+                class="size-4 shrink-0 text-ink-2 transition-transform group-hover/dl:translate-y-0.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 4v12m0 0 5-5m-5 5-5-5M5 20h14" />
+              </svg>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-small">
+    <p class="text-[var(--ink-2)]">
+      Built binaries for <span class="text-[var(--ink)]">{platformSentence}</span>, x86-64.
+    </p>
+    <a class="link" href={docHref("GETTING_STARTED.md")}>Build from source</a>
+    <a class="link" href={REPO.releases}>All releases</a>
+  </div>
+
+  <p class="mt-5 text-micro text-[var(--ink-2)]">
+    There is no macOS build for this release. There was one in 0.1.0-rc.1 and it
+    is not carried forward yet. There is no arm64 build for any release. Both are
+    wanted and both are behind, and this page will offer them the day they exist.
+  </p>
+
+  <p class="mt-3 text-micro text-[var(--ink-2)]">
+    No package manager install yet, and no checksum is published with the release. Verify the
+    file size above against what your download reports before you run it.
+  </p>
+</section>

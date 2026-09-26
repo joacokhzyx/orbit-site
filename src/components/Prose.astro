@@ -2,24 +2,43 @@
 // Long-form copy written directly in a page. The brand asks for 15 to 22
 // word sentences, one idea each, and no exclamation stacks, so the
 // styling stays quiet enough not to fight it.
+//
+// Three weights of one ink, and each of them has a job: `--ink` for the
+// words, `--ink-2` for the body, `--ink-3` for the machinery around them.
+// What used to come from shade now comes from the heading scale, from the
+// list marker and from the tinted quote, because a paragraph of prose is
+// the one place on the site where a background step is quieter than a rule.
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
 ---
 
-<div class="prose-measure text-ink [&>*+*]:mt-5">
+<div class:list={["prose-measure text-ink [&>*+*]:mt-6", className]}>
   <slot />
 </div>
 
 <style>
+  /* 66ch, the measure the site is set to. It is written here rather than
+     reaching for a utility, because the token it came from was never a
+     class: `measure` matched nothing in the built CSS, so every paragraph
+     on the site was running full width. */
+  .prose-measure {
+    max-width: var(--container-measure, 66ch);
+  }
+
   .prose-measure :global(h2) {
     font-size: var(--text-heading);
     line-height: 1.28;
-    margin-top: 2.5rem;
+    margin-top: 3rem;
     text-wrap: balance;
   }
 
   .prose-measure :global(h3) {
     font-size: var(--text-lead);
     line-height: 1.4;
-    margin-top: 2rem;
+    margin-top: 2.25rem;
     text-wrap: balance;
   }
 
@@ -28,22 +47,30 @@
     color: var(--ink-2);
   }
 
+  /* One weight, so strong is marked the only way prose can mark it: with
+     the display face, which is a different tool rather than a heavier
+     one. It is the same trick the callout labels use. */
   .prose-measure :global(strong) {
+    font-family: var(--font-display);
+    font-weight: 400;
     color: var(--ink);
-    font-weight: 600;
   }
 
+  /* The site's one link: the ink with an underline that is a visible
+     boundary rather than a full-contrast rule, and that darkens to the
+     ink itself on hover. The same treatment the tertiary button uses, so
+     a link in a paragraph and a link that looks like a button agree. */
   .prose-measure :global(a) {
-    color: var(--link);
+    color: var(--ink);
     text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
     text-decoration-color: var(--line-2);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
     transition: text-decoration-color 150ms ease;
   }
 
   .prose-measure :global(a:hover) {
-    text-decoration-color: var(--link);
+    text-decoration-color: var(--ink);
   }
 
   .prose-measure :global(ul),
@@ -60,8 +87,10 @@
     list-style: decimal;
   }
 
-  /* A list marker is a small dot, not a bullet glyph, so the page keeps
-     one shape language. */
+  /* A list marker is a small round dot in the secondary ink: the system's
+     information about structure, one weight below the words it marks. It
+     used to be a two-pixel square, because the old direction had no
+     curves to draw one with. */
   .prose-measure :global(li) {
     position: relative;
     padding-left: 1.25rem;
@@ -70,12 +99,12 @@
   .prose-measure :global(ul li)::before {
     content: "";
     position: absolute;
-    top: 0.7em;
-    left: 0.25rem;
+    top: 0.68em;
+    left: 0.3rem;
     width: 5px;
     height: 5px;
-    border-radius: 999px;
-    background-color: var(--ink-3);
+    border-radius: var(--radius-pill);
+    background-color: var(--ink-2);
   }
 
   .prose-measure :global(li + li) {
@@ -83,14 +112,43 @@
   }
 
   .prose-measure :global(ol li)::marker {
-    color: var(--ink-3);
+    color: var(--ink-2);
     font-family: var(--font-mono);
     font-size: 0.9em;
   }
 
+  /* Inline code is a chip on the page: a sunken surface with a small
+     radius and no frame. A hairline around every `orbit` in a paragraph
+     is the boxed-everything problem in miniature. */
+  .prose-measure :global(:not(pre) > code) {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.1em 0.3em;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background-color: var(--sunken);
+    color: var(--ink);
+  }
+
+  /* A quote is a tinted panel, which is what a pull quote is: a region
+     the page steps back for. It used to be a two-pixel ink rule down the
+     left edge, which is a full-contrast mark on every quote on the site
+     for the sake of one. */
   .prose-measure :global(blockquote) {
-    border-left: 2px solid var(--line-2);
-    padding-left: 1rem;
-    color: var(--ink-2);
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    border: 0;
+    border-radius: var(--radius);
+    background-color: var(--surface-2);
+    color: var(--ink);
+    font-family: var(--font-display);
+  }
+
+  .prose-measure :global(blockquote > * + *) {
+    margin-top: 0.75rem;
+  }
+
+  .prose-measure :global(blockquote p) {
+    color: var(--ink);
   }
 </style>

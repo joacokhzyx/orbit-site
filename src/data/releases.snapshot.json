@@ -1,0 +1,79 @@
+[
+  {
+    "version": "0.1.0-rc.2",
+    "tag": "v0.1.0-rc.2",
+    "name": "v0.1.0-rc.2",
+    "publishedAt": "2026-07-22T21:55:51Z",
+    "date": "2026-07-22",
+    "prerelease": true,
+    "htmlUrl": "https://github.com/joacokhzyx/orbit-lang/releases/tag/v0.1.0-rc.2",
+    "downloads": [
+      {
+        "id": "linux",
+        "platform": "Linux",
+        "arch": "x86_64",
+        "fileName": "orbit-linux-x86_64",
+        "format": "binary",
+        "formatLabel": "single binary",
+        "sizeBytes": 10277560,
+        "sizeLabel": "9.8 MB",
+        "url": "https://github.com/joacokhzyx/orbit-lang/releases/download/v0.1.0-rc.2/orbit-linux-x86_64"
+      },
+      {
+        "id": "windows",
+        "platform": "Windows",
+        "arch": "x86_64",
+        "fileName": "orbit-windows-x86_64.exe",
+        "format": "exe",
+        "formatLabel": "Windows executable",
+        "sizeBytes": 2043392,
+        "sizeLabel": "1.9 MB",
+        "url": "https://github.com/joacokhzyx/orbit-lang/releases/download/v0.1.0-rc.2/orbit-windows-x86_64.exe"
+      }
+    ]
+  },
+  {
+    "version": "0.1.0-rc.1",
+    "tag": "v0.1.0-rc.1",
+    "name": "v0.1.0-rc.1",
+    "publishedAt": "2026-07-09T17:24:13Z",
+    "date": "2026-07-09",
+    "prerelease": false,
+    "htmlUrl": "https://github.com/joacokhzyx/orbit-lang/releases/tag/v0.1.0-rc.1",
+    "downloads": [
+      {
+        "id": "linux",
+        "platform": "Linux",
+        "arch": "x86_64",
+        "fileName": "orbit-linux-x86_64.tar.gz",
+        "format": "tar.gz",
+        "formatLabel": "tarball",
+        "sizeBytes": 4442740,
+        "sizeLabel": "4.2 MB",
+        "url": "https://github.com/joacokhzyx/orbit-lang/releases/download/v0.1.0-rc.1/orbit-linux-x86_64.tar.gz"
+      },
+      {
+        "id": "windows",
+        "platform": "Windows",
+        "arch": "x86_64",
+        "fileName": "orbit-windows-setup.exe",
+        "format": "setup",
+        "formatLabel": "Windows installer",
+        "sizeBytes": 4404512,
+        "sizeLabel": "4.2 MB",
+        "url": "https://github.com/joacokhzyx/orbit-lang/releases/download/v0.1.0-rc.1/orbit-windows-setup.exe"
+      },
+      {
+        "id": "macos",
+        "platform": "macOS",
+        "arch": "x86_64",
+        "fileName": "orbit-macos-x86_64.tar.gz",
+        "format": "tar.gz",
+        "formatLabel": "tarball",
+        "sizeBytes": 3138856,
+        "sizeLabel": "3.0 MB",
+        "url": "https://github.com/joacokhzyx/orbit-lang/releases/download/v0.1.0-rc.1/orbit-macos-x86_64.tar.gz"
+      }
+    ]
+  }
+]

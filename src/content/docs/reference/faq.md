@@ -24,7 +24,7 @@ Because a service is a thing you deploy, and a service that ships as one file
 with no runtime beside it is the property worth having. The cost is that there
 is no browser target, so you cannot run Orbit in a tab. That is a real
 limitation, and it is in
-[known limitations](/docs/reference/limitations).
+[known limitations](/docs/reference/limitations/).
 
 ## Is the compiler really written in Orbit?
 

@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 
-# Nothing here is private, and nothing here needs a crawler to guess at.
-# The documentation lives in the repository, linked from every page.
+# Nothing here is private. The documentation is published on this site under
+# /docs, and the repository is linked from every page for the documents the
+# site does not carry.
 Sitemap: https://orbit-lang.dev/sitemap-index.xml

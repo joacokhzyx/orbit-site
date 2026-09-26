@@ -9,7 +9,8 @@ import Callout from "../components/Callout.astro";
 import CodeBlock from "../components/CodeBlock.astro";
 import LinkButton from "../components/LinkButton.astro";
 import Prose from "../components/Prose.astro";
-import { REPO, docLink, sourceLink } from "../data/site";
+import { REPO } from "../data/site";
+import { docHref, sourceLink } from "../data/docs";
 
 // Excerpts, not invented samples. Each block is a trimmed copy of the
 // file named in its label, so what a reader copies is what the
@@ -56,6 +57,19 @@ route POST "/posts" {
     return ok 400 "{\\"stored\\":false}"
 }`;
 
+// Excerpt from examples/std_imports.orb, verbatim. The standard library
+// arrived in five waves in September 2026 and this import line is the whole
+// of the new surface: no package manager, no registry, no lockfile, and a
+// path that resolves from anywhere in the tree.
+const imports = `import "std/sys/term/color.orb"
+import "lib/arena.orb"
+
+fn main() -> int {
+    val line = wrapBold("orbit std imports work")
+    print(line)
+    return 0
+}`;
+
 const build = `git clone ${REPO.url}.git
 cd orbit-lang
 python scripts/build_selfhost.py --out orbit
@@ -66,25 +80,25 @@ const next = [
   {
     title: "Clone and build the compiler",
     body: "Two commands with a C compiler and Python. The build reaches a fixed point you can verify, and a committed C file is the trust root.",
-    href: docLink("GETTING_STARTED.md"),
+    href: docHref("GETTING_STARTED.md"),
     label: "Getting started",
   },
   {
     title: "Read the language tour",
     body: "Functions, bindings, models, routes, SQLite reads, and telemetry. Every snippet is runnable and every output is verified.",
-    href: docLink("TOUR.md"),
+    href: docHref("TOUR.md"),
     label: "Language tour",
   },
   {
     title: "Build a real service",
     body: "A blog API with bearer auth, expected outputs included. Then a file server, then deploying one binary.",
-    href: docLink("tutorials/blog-api.md"),
+    href: docHref("tutorials/blog-api.md"),
     label: "Blog API tutorial",
   },
   {
     title: "Check what it can't do",
-    body: "Twelve known limits with workarounds, kept next to the documents that use each feature.",
-    href: docLink("KNOWN_LIMITATIONS.md"),
+    body: "Eight known limits, four of them with a worked-around recipe, kept next to the documents that use each feature.",
+    href: docHref("KNOWN_LIMITATIONS.md"),
     label: "Known limitations",
   },
 ];
@@ -103,15 +117,15 @@ const next = [
       lead="Orbit is a statically typed language for APIs and microservices. You need a C compiler, Python, and git. Nothing else stands between you and a running service."
     >
       <div class="mt-8 flex flex-wrap gap-3">
-        <LinkButton href={docLink("GETTING_STARTED.md")} variant="primary">
+        <LinkButton href={docHref("GETTING_STARTED.md")} variant="primary">
           Getting started
         </LinkButton>
-        <LinkButton href={docLink("TOUR.md")} variant="secondary">Language tour</LinkButton>
+        <LinkButton href={docHref("TOUR.md")} variant="secondary" chevron>Language tour</LinkButton>
       </div>
     </PageHero>
 
     <Section number="01" heading="What a route looks like">
-      <div style="display: grid; gap: 2.5rem; grid-template-columns: 1fr" class="lg:grid-cols-2">
+      <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
         <Prose>
           <p>
             A service is a list of routes. Each one takes a request, does something small, and
@@ -134,7 +148,7 @@ const next = [
       heading="Models are tables"
       lead="Declare a model and the runtime creates its table on startup. Reads and writes work today."
     >
-      <div style="display: grid; gap: 2.5rem; grid-template-columns: 1fr" class="lg:grid-cols-2">
+      <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
         <CodeBlock code={shape} label="examples/posts_crud.orb" />
         <div>
           <Prose>
@@ -151,10 +165,10 @@ const next = [
               removed.
             </p>
           </Prose>
-          <Callout variant="limit" class="mt-6">
+          <Callout variant="limit" class="mt-8">
             <p>
               Tables are created, never migrated. The
-              <a href={docLink("guides/migrations.md")}>migrations guide</a> describes the manual
+              <a href={docHref("guides/migrations.md")}>migrations guide</a> describes the manual
               practice that works today.
             </p>
           </Callout>
@@ -162,16 +176,54 @@ const next = [
       </div>
     </Section>
 
-    <Section number="03" heading="Where to go next">
-      <ol class="grid gap-6 sm:grid-cols-2 sm:gap-x-12">
+    <Section
+      number="03"
+      heading="The standard library is a path"
+      lead="No package manager, no registry, no lockfile. An import is a string, and it resolves from anywhere in the tree."
+    >
+      <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div>
+          <Prose>
+            <p>
+              A path is relative to the file doing the importing, or to the standard library. Those
+              two spellings of the same file both resolve, from any directory:
+            </p>
+            <p>
+              <code>import &quot;std/string/string.orb&quot;</code> reaches the library, and{" "}
+              <code>import &quot;lib/arena.orb&quot;</code> reaches a sibling of the importing file.
+              The search path is the compiler binary's directory, its parent, then the working
+              directory, so a build run from the repository root finds everything.
+            </p>
+            <p>
+              What landed in September: <code>test</code>, <code>string</code>, <code>hash</code>,{" "}
+              <code>collections</code>, <code>fs</code>, <code>io</code>, <code>time</code>,{" "}
+              <code>process</code> and <code>log</code>. Seven earlier stubs were deleted rather
+              than shipped unusable.
+            </p>
+            <p>
+              One naming hazard worth knowing before it costs you an afternoon: a function called{" "}
+              <code>read</code>, <code>write</code>, <code>open</code> or <code>close</code>{" "}
+              collides with the C library of the same name. <code>orbit check</code> passes and the
+              link fails.
+            </p>
+          </Prose>
+        </div>
+        <CodeBlock code={imports} label="examples/std_imports.orb" />
+      </div>
+    </Section>
+
+    <Section number="04" heading="Where to go next">
+      <ol class="grid gap-8 sm:grid-cols-2 sm:gap-x-12 sm:gap-y-12">
         {
           next.map((step, index) => (
-            <li class="rule pt-4">
-              <p class="mono text-small text-ink-3">{String(index + 1).padStart(2, "0")}</p>
+            <li class="pt-8 sm:pt-12">
+              <p class="font-mono text-small text-[var(--ink-3)]">
+                {String(index + 1).padStart(2, "0")}
+              </p>
               <h3 class="text-lead mt-2">{step.title}</h3>
-              <p class="text-body mt-2 text-ink-2">{step.body}</p>
+              <p class="text-body mt-2 text-[var(--ink-2)]">{step.body}</p>
               <a
-                class="text-small mt-3 inline-block text-ink underline decoration-line-2 underline-offset-4 transition-colors hover:decoration-ink"
+                class="mt-3 inline-block text-small text-ink underline decoration-2 decoration-[var(--line-2)] underline-offset-4 transition-[text-decoration-color] hover:decoration-[var(--ink)]"
                 href={step.href}
               >
                 {step.label}
@@ -182,8 +234,8 @@ const next = [
       </ol>
     </Section>
 
-    <Section number="04" heading="Build it yourself" class="pb-4">
-      <div style="display: grid; gap: 2.5rem; grid-template-columns: 1fr" class="lg:grid-cols-[1fr_1.1fr] lg:items-start">
+    <Section number="05" heading="Build it yourself">
+      <div class="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:gap-12 lg:items-start">
         <Prose>
           <p>
             Orbit's own compiler is written in Orbit, so the toolchain is something you can read
@@ -191,7 +243,7 @@ const next = [
           </p>
           <p>
             On Windows the same commands produce <code>.\orbit.exe</code>. The
-            <a href={docLink("SUPPORT.md")}>platform support page</a> lists what is verified
+            <a href={docHref("SUPPORT.md")}>platform support page</a> lists what is verified
             where.
           </p>
         </Prose>
@@ -199,11 +251,11 @@ const next = [
       </div>
     </Section>
 
-    <section class="rule mt-20 py-10">
-      <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div class="measure">
+    <section class="mt-16 pt-16 sm:mt-24 sm:pt-24">
+      <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
+        <div class="max-w-[66ch]">
           <h2 class="text-heading">Prefer the source?</h2>
-          <p class="text-body mt-3 text-ink-2">
+          <p class="text-body mt-3 text-[var(--ink-2)]">
             The compiler, the runtime, the test suite, and the documentation all live in one
             repository. I'd rather you check my claims than take them.
           </p>
