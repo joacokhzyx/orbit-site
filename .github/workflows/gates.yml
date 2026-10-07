@@ -42,6 +42,16 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm build
 
+      # The deployment config is the one file nothing else in this workflow
+      # reads. `astro build` ignores vercel.json, and every gate below runs
+      # against a dist that was already built, so an invalid vercel.json
+      # reaches Vercel and rejects the deployment before a build step runs.
+      # That is exactly what happened: a `$schema` key inside a redirect,
+      # which Vercel's schema rejects via additionalProperties:false. Every
+      # check here passed and the site silently stayed on the old build.
+      - name: Deployment config
+        run: pnpm check:vercel
+
       - name: Accessibility and rendering
         run: |
           pnpm exec playwright install --with-deps chromium

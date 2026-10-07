@@ -5,9 +5,11 @@
   "installCommand": "corepack enable && pnpm install --frozen-lockfile",
   "outputDirectory": "dist",
   "trailingSlash": false,
+  "engines": {
+    "node": "22.x"
+  },
   "redirects": [
     {
-      "$schema": "https://openapi.vercel.sh/vercel.json",
       "source": "/:path*",
       "has": [
         {
