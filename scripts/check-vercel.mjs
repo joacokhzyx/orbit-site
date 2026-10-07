@@ -31,10 +31,20 @@ const CONFIG = "vercel.json";
 /**
  * The invariants that are cheap, offline, and load-bearing.
  *
- * `engines.node` is here because astro 7 declares `node: ">=22.12.0"` and
- * the Vercel preset's default has moved between 18, 20 and 22 over the last
- * few years. Relying on the preset default means the build breaks on a
- * platform-side change that nothing in this repository can see.
+ * On `engines.node`: astro 7 declares `node: ">=22.12.0"`, so a Node older
+ * than 22 cannot build this site and any `engines` value naming one is a
+ * certain failure. But the value is NOT required to be present, and this
+ * check deliberately does not require it. An earlier version of this file
+ * did, and pinning `"node": "22.x"` here made a deployment fail on a
+ * project whose Node version is set in the Vercel dashboard: declaring it in
+ * vercel.json as well conflicts with the project setting rather than
+ * overriding it. Three deployments before this one succeeded with no
+ * `engines` key at all, which is the evidence for leaving it out — the
+ * framework preset already resolves a version astro accepts.
+ *
+ * So: if it is declared it must be new enough, and if it is absent the
+ * preset decides. Requiring it was protecting against a problem while
+ * creating a worse one.
  *
  * The canonical host is checked against the one `src/data/site.ts` and
  * `astro.config.mjs` both use, so the redirect and the markup cannot end up
@@ -45,17 +55,22 @@ const errors = [];
 const raw = readFileSync(resolve(process.cwd(), CONFIG), "utf8");
 const config = JSON.parse(raw);
 
-const nodeMajor = Number.parseInt(String(config.engines?.node ?? "").replace(/\D/g, ""), 10);
-if (!nodeMajor) {
-  errors.push(
-    `${CONFIG}: engines.node is not declared. astro 7 requires node >=22.12.0, and the ` +
-      `Vercel preset's default has changed across major versions. Pin it rather than ` +
-      `inheriting it.`,
-  );
-} else if (nodeMajor < 22) {
-  errors.push(
-    `${CONFIG}: engines.node is ${config.engines.node}; astro 7 requires >=22.12.0.`,
-  );
+/** The lowest Node astro 7 accepts, from its own engines field. */
+const ASTRO_MINIMUM_NODE_MAJOR = 22;
+
+const declaredNode = config.engines?.node;
+if (declaredNode != null) {
+  const major = Number.parseInt(String(declaredNode).replace(/\D/g, ""), 10);
+  if (!major) {
+    errors.push(
+      `${CONFIG}: engines.node is "${declaredNode}", which is not a version.`,
+    );
+  } else if (major < ASTRO_MINIMUM_NODE_MAJOR) {
+    errors.push(
+      `${CONFIG}: engines.node is ${declaredNode}; astro 7 requires >=${ASTRO_MINIMUM_NODE_MAJOR}.12.0. ` +
+        `Declare nothing rather than something too old — the framework preset picks a working version.`,
+    );
+  }
 }
 
 const canonical = "www.orbit-lang.dev";
@@ -83,7 +98,7 @@ if (!apexRedirect) {
 }
 
 if (errors.length === 0) {
-  console.log("vercel.json: engines pinned, apex redirected to the canonical host.");
+  console.log("vercel.json: node version acceptable, apex redirected to the canonical host.");
 }
 
 // Schema validation, skipped rather than failed when there is no network.
