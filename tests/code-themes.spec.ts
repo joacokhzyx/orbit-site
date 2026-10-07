@@ -69,8 +69,26 @@ const ROUTES = htmlFiles(DIST);
  * surface and the contrast gate cover both; the palette has to arrive covers
  * only the one that used not to.
  */
-const CODE_ROUTES = builtRoutesWith("expressive-code", "code-surface");
-const DOC_CODE_ROUTES = builtRoutesWith("expressive-code");
+/**
+ * The marker that means "this page has a code window", as a class selector
+ * rather than the bare word.
+ *
+ * It used to be the string `expressive-code`, which also matches the
+ * `<link rel="stylesheet">` Expressive Code injects into every documentation
+ * page whether or not the page contains any code. Registering the
+ * line-numbers plugin made that stylesheet load unconditionally, which
+ * promoted four code-free pages — faq, limitations, kynx and /docs itself —
+ * into the documentation set, and each then failed the palette assertion for
+ * having zero tokens instead of more than two.
+ *
+ * The failure was the test being right about the thing it checks and wrong
+ * about which pages to check it on. Matching the class is the precise
+ * question: does a window exist here.
+ */
+const EC_BLOCK = 'class="expressive-code"';
+
+const CODE_ROUTES = builtRoutesWith(EC_BLOCK, "code-surface");
+const DOC_CODE_ROUTES = builtRoutesWith(EC_BLOCK);
 
 function builtRoutesWith(...needles: string[]): string[] {
   return ROUTES.filter((route) => {

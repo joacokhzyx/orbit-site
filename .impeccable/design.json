@@ -7,48 +7,46 @@
       "ink": {
         "role": "primary",
         "displayName": "Primary ink",
-        "canonical": "#1a1a18",
+        "canonical": "#f2f1ee",
         "tonalRamp": [
-          "#0e0e0d",
-          "#1a1a18",
-          "#3a3934",
-          "#56554f",
-          "#6b6860",
-          "#8e8c84",
-          "#b4b2ac",
-          "#f0efec"
+          "#0a0a0b",
+          "#131316",
+          "#26262a",
+          "#918f88",
+          "#b8b6b0",
+          "#f2f1ee"
         ],
-        "note": "Three levels are used: ink for primary text and the primary button fill, ink-2 for body copy, ink-3 for labels and metadata. The full ramp is recorded here for tooling; only the three are used."
+        "note": "Three levels are used: ink for primary text and the primary button fill, ink-2 for body copy, ink-3 for labels and metadata. Dark-first: canonical is the value in the scheme the site presents by default, so it is the light ink. The full ramp is recorded here for tooling; only the three are used."
       },
       "paper": {
         "role": "neutral",
         "displayName": "Page",
-        "canonical": "#faf9f7",
+        "canonical": "#0a0a0b",
         "tonalRamp": [
-          "#0b0b0c",
+          "#0a0a0b",
+          "#0e0e10",
           "#131316",
-          "#1b1b1f",
-          "#232327",
+          "#1e1e21",
+          "#2e2617",
           "#f2f1ee",
-          "#f6f5f2",
           "#faf9f7",
           "#ffffff"
         ],
-        "note": "Four surfaces: paper is the page, surface is a raised card, surface-2 a tinted block, sunken code. Warm throughout, never pure white for the page."
+        "note": "Four surfaces: paper is the page, surface is a raised card, surface-2 a tinted block, sunken code. Dark-first, and canonical is the dark ground because that is the scheme the site presents by default. Warm off-black rather than #000: pure black is a value no display can render and it turns every step above it into a hole."
       },
       "line": {
         "role": "neutral",
         "displayName": "Hairline",
-        "canonical": "#e4e2dd",
+        "canonical": "#26262a",
         "tonalRamp": [],
         "note": "A divider that divides content. Exempt from the 3:1 boundary rule, which is why --line-2 exists."
       },
       "line-2": {
         "role": "neutral",
         "displayName": "Control boundary",
-        "canonical": "#8b8880",
+        "canonical": "#6e6e79",
         "tonalRamp": [],
-        "note": "3.36:1 light, 3.68:1 dark on the page. The only value a control may be outlined with."
+        "note": "3.93:1 dark, 3.36:1 light on the page. The only value a control may be outlined with."
       },
       "focus": {
         "role": "primary",
@@ -68,7 +66,11 @@
     "shadow": {
       "sm": "0 1px 2px rgb(26 26 24 / 0.06), 0 1px 3px rgb(26 26 24 / 0.04)",
       "md": "0 4px 12px rgb(26 26 24 / 0.08), 0 2px 4px rgb(26 26 24 / 0.04)",
-      "note": "Two levels. Depth is a surface step first, a shadow second, and a border only when the element has no background of its own."
+      "dark": {
+        "sm": "0 1px 2px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.4)",
+        "md": "0 4px 14px rgb(0 0 0 / 0.6), 0 2px 5px rgb(0 0 0 / 0.45)"
+      },
+      "note": "Two levels, scheme-aware. Depth is a surface step first, a shadow second, and a border only when the element has no background of its own. The dark pair is black at a higher alpha rather than a lighter grey, because a shadow falls on the page outside the card and on a near-black ground the only way for one to register is to be darker than what it darkens. Declared as --elev-sm / --elev-md in each token block and mapped into Tailwind's --shadow-* namespace by @theme, since a same-named token in both places is settled by source order and the light scheme would silently take Tailwind's own default."
     },
     "motion": {
       "duration": {
@@ -122,9 +124,9 @@
     },
     "narrative": {
       "northStar": "Space and a background step separate things. A border is the last resort.",
-      "overview": "A warm neutral system: twelve measured values, four surfaces, three inks, two boundary weights, one focus hue, one state tint. This replaced a two-value one-bit palette with a 2px stipple standing in for every tone, and the replacement is not a regression but the difference between a constraint and a design. The two-value version turned its own rule into the answer: seven full-contrast borders and six outlined surfaces so nothing was distinguished, twenty-one uses of a stipple that read as noise, square corners everywhere so shape carried nothing, solid black rectangles to say 'Prerelease', and rules touching the text they divided.",
+      "overview": "A warm neutral system, dark-first: twelve measured values, four surfaces, three inks, two boundary weights, one focus hue, one state tint. The dark scheme is the ground the site is drawn on and the one it presents by default; light is the alternate, not the origin. Theme authority is ordered — a saved choice wins, then the system preference, and the site's own default sits underneath both as the answer for a browser that reports neither. Forcing dark ahead of the system would override an explicit preference and fails the test that asserts the page honours one. This replaced a two-value one-bit palette with a 2px stipple standing in for every tone, and the replacement is not a regression but the difference between a constraint and a design. The two-value version turned its own rule into the answer: seven full-contrast borders and six outlined surfaces so nothing was distinguished, twenty-one uses of a stipple that read as noise, square corners everywhere so shape carried nothing, solid black rectangles to say 'Prerelease', and rules touching the text they divided.",
       "keyCharacteristics": [
-        "Warm, not cold: the page is #faf9f7, so a raised card reads as a card and not as a hole.",
+        "Warm, not cold, and dark by default: the page is #0a0a0b rather than black or the usual #121212 slate, so a raised card reads as a card and not as a hole.",
         "Two boundary weights and only two: a hairline that divides content, and one that clears 3:1 for a control. Nothing at full contrast.",
         "Three inks for three real levels of information, not three decorative shades.",
         "One focus hue, because a ring the same colour as the text it surrounds is a ring nobody finds.",
@@ -173,5 +175,5 @@
       "automatedLegibilityCheck": "None, deliberately. Three pixel metrics were written and measured against four faces at 64px; the bitmap face scored higher on all three, because its blocks touch and its band is taller and denser than a real face's. A statistic cannot tell a reader that a word does not spell anything. tests/typography.spec.ts keeps the two checks that are true: the declared face is the loaded face, and no line has its ink cut by its own line box."
     }
   },
-  "description": "A warm neutral system where space and a background step separate things, and a border is the last resort."
+  "description": "A warm neutral system, dark-first, where space and a background step separate things, and a border is the last resort."
 }

@@ -1,0 +1,124 @@
+---
+// The developer quickstart at the top of /docs: the pitch on the left, real
+// runnable code on the right.
+//
+// This is the one structural piece of the reference layout the documentation
+// could not get any other way, and it exists because of what the page was.
+// /docs opened with a heading and four paragraphs of markdown, which is the
+// same shape as every other page on the site and therefore carried no more
+// information than any of them. A reader landing on the documentation has one
+// question — what does this look like in code — and the old page made them
+// click through a section heading to find out.
+//
+// So the first thing on the page is the answer: a service that returns
+// something real, next to the sentence saying what it does. The code is not
+// an illustration. It is the file from the repository, and the version in the
+// response is read from the release API at build time, so the snippet cannot
+// claim a release that does not exist.
+//
+// Two columns, and they do not stack until there is no room for them. The
+// asymmetry is deliberate and is the other half of why this reads as a
+// document rather than a page: the prose column is narrower than the code
+// column because the code is the thing being looked at, and a layout that
+// gave them equal width would be saying they are equally important.
+//
+// It is one card rather than two cards side by side. A raised block with a
+// seam down the middle reads as two things that happen to be adjacent; one
+// block with a two-column interior reads as one thing with two parts, which
+// is what it is.
+//
+// Two things about this component that are not style.
+//
+// `not-content` is not optional. src/styles/starlight.css styles prose links
+// as `.sl-markdown-content :is(a):not(:where(.not-content *))`, which is
+// specificity 0,1,1 and unlayered — and Tailwind's `text-paper` is 0,1,0 in
+// `@layer utilities`, so the prose rule wins and the primary button renders
+// its label in the button's own fill. It is invisible. That rule was written
+// to style markdown links and had never met a site component, because until
+// MDX landed no site component could be rendered inside the markdown content
+// at all. `not-content` is Starlight's own escape hatch and it is the correct
+// fix rather than loosening the selector: the prose rule is right about
+// prose, and this is not prose.
+//
+// It stacks rather than splitting into columns, and that is a measurement
+// rather than a preference.
+//
+// Starlight's content column is 44rem, so the card has at most 768px of
+// usable width once the panel's padding is reclaimed. Split two ways with a
+// 2.5rem gap that leaves roughly 270px of prose beside 370px of code. The
+// code column then fits about forty monospace characters, and the shortest
+// real line in this snippet is fifty. So a two-column version of this card
+// cuts off the end of every line it shows — a code window whose whole job is
+// to be read, showing half of itself. The reference splits because its
+// content column is far wider than Starlight's; here the honest arrangement
+// is the text above the code, with the code as wide as the card.
+//
+// The card is held to the content column rather than pushed out of it.
+//
+// It was reaching out with a negative margin to reclaim the panel's padding,
+// which gained 64px and cost a horizontal scrollbar at 768px: the negative
+// margin and the compensating `calc(100% + Nrem)` were each off by a
+// half-rem against Starlight's `--sl-content-pad-x`, so the section ended up
+// exactly 24px wider than the viewport. 64px of card is not worth a
+// scrollbar that appears at a width readers actually use, and the code
+// window measures as fitting at 704px either way.
+import CodeBlock from "./CodeBlock.astro";
+import LinkButton from "./LinkButton.astro";
+import { LATEST } from "../lib/releases.mjs";
+
+/*
+  One route rather than two, and wrapped across lines.
+
+  The home page shows both of health_service.orb's routes and has the full
+  page width to do it. Here the widest line of the verbatim version measures
+  892px against 640px of usable card, so it would scroll — and a hero whose
+  first impression is a cut-off line teaches a reader the wrong thing about
+  what the code does. Splitting the response across two bindings keeps every
+  token the compiler sees and gets the widest line under 400px.
+
+  It is also the better example. Building the body from two pieces is what
+  the language actually looks like when a response carries more than one
+  field, and it shows `+` on strings without needing a paragraph to explain
+  it. The version is read from the release API at build time, so the snippet
+  cannot claim a release that does not exist.
+*/
+const quickstart = `route GET "/health" {
+    val uptime = system.uptime()
+    val body = "{\\"status\\":\\"UP\\",\\"uptime_seconds\\":" + uptime
+    return ok 200 body + ",\\"version\\":\\"${LATEST.version}\\"}"
+}`;
+---
+
+<section
+  class="not-content mx-auto w-full max-w-6xl px-6 pt-2 sm:px-8"
+  aria-labelledby="quickstart-heading"
+>
+  <div
+    class="rounded-[var(--radius-lg)] bg-[var(--surface)] p-6 shadow-[var(--shadow-sm)] sm:p-8"
+  >
+    <div class="max-w-[52ch]">
+      <p class="label">Developer quickstart</p>
+      <h2 id="quickstart-heading" class="text-title mt-4 text-balance font-display">
+        A service is a list of routes.
+      </h2>
+      <p class="mt-4 text-[var(--ink-2)]">
+        Each route takes a request, does one small thing, and returns a status
+        and a body. Orbit compiles it to C, your platform's compiler produces
+        the executable, and the result ships as a single file with no runtime
+        beside it.
+      </p>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <LinkButton href="/docs/start/getting-started/" variant="primary">
+          Getting started
+        </LinkButton>
+        <LinkButton href="/docs/start/tour/" variant="secondary" chevron>
+          Language tour
+        </LinkButton>
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <CodeBlock code={quickstart} label="examples/health_service.orb" />
+    </div>
+  </div>
+</section>

@@ -1,19 +1,19 @@
 ---
 name: Orbit
-description: A warm neutral system where space and a background step separate things, and a border is the last resort.
+description: A warm neutral system, dark-first, where space and a background step separate things, and a border is the last resort.
 colors:
-  paper: "#faf9f7"
-  surface: "#ffffff"
-  surface-2: "#f2f1ee"
-  sunken: "#f6f5f2"
-  ink: "#1a1a18"
-  ink-2: "#56554f"
-  ink-3: "#6b6860"
-  line: "#e4e2dd"
-  line-2: "#8b8880"
-  focus: "#1d4ed8"
-  signal-bg: "#fbf3e2"
-  signal-ink: "#6b4d09"
+  paper: "#0a0a0b"
+  surface: "#131316"
+  surface-2: "#1e1e21"
+  sunken: "#0e0e10"
+  ink: "#f2f1ee"
+  ink-2: "#b8b6b0"
+  ink-3: "#918f88"
+  line: "#26262a"
+  line-2: "#6e6e79"
+  focus: "#8ab0ff"
+  signal-bg: "#2e2617"
+  signal-ink: "#e8c37a"
 typography:
   display:
     fontFamily: "Archivo Variable, Archivo, IBM Plex Sans Variable, system-ui, sans-serif"
@@ -95,9 +95,24 @@ components:
 
 **Creative North Star: "Space and a background step separate things. A border is the last resort."**
 
-The interface is a warm neutral system. Twelve measured values, four surfaces,
-three inks, two boundary weights, one focus hue, one state tint. Depth is a
-shadow or a step in the surface scale, never an outline.
+The interface is a warm neutral system, **dark-first**. Twelve measured values,
+four surfaces, three inks, two boundary weights, one focus hue, one state tint.
+Depth is a shadow or a step in the surface scale, never an outline.
+
+**Dark is the ground the site is drawn on.** The default appearance of every
+page is the dark scheme; light is the alternate, not the origin. What that
+changed is not the hue — the ink was always warm off-white, and it still is —
+but which side of it is the page. The ground is `#0a0a0b` rather than `#000`,
+because pure black is a value no display can render and it turns every step
+above it into a hole. One step of warm off-black reads as deep and still lets
+`--surface` be a surface rather than a border.
+
+The order of authority for the theme is deliberate and is not "dark always":
+a reader who has chosen follows their choice, a reader who has not follows
+their system, and the site's own default sits underneath both as the answer
+for a browser that reports neither. Forcing dark ahead of the system would
+override an explicit preference, and the test that asserts the page honours one
+would fail.
 
 This replaced a two-value one-bit palette: a pixel, a ground, and a 2px stipple
 standing in for every tone between them. Twelve named greys is not a regression.
@@ -118,8 +133,9 @@ had turned its own rule into the answer:
 
 **Key Characteristics:**
 
-- **Warm, not cold.** The page is `#faf9f7`, not white and not grey. A raised
-  card is a step up from it, so it reads as a card and not as a hole.
+- **Warm, not cold, and dark by default.** The page is `#0a0a0b`, not black
+  and not the usual `#121212` slate. A raised card is a step up from it, so it
+  reads as a card and not as a hole.
 - **Two boundary weights, and only two.** `--line` is a hairline you do not
   notice until you look for it, and it divides content. `--line-2` clears 3:1
   and is the only value a control may be outlined with. Nothing in the system
@@ -134,20 +150,23 @@ had turned its own rule into the answer:
 
 ## Colors
 
-| Token | Light | Dark | Role |
+The **Light** column is the alternate scheme. The **Dark** column is the site's
+default appearance and the one every screenshot in review was taken in first.
+
+| Token | Dark (default) | Light | Role |
 | --- | --- | --- | --- |
-| `--paper` | `#faf9f7` | `#131316` | The page. |
-| `--surface` | `#ffffff` | `#1b1b1f` | A raised card. |
-| `--surface-2` | `#f2f1ee` | `#232327` | A tinted or inset block. |
-| `--sunken` | `#f6f5f2` | `#101013` | Code and inline code. |
-| `--ink` | `#1a1a18` | `#f0efec` | Primary text, and the primary button's fill. |
-| `--ink-2` | `#56554f` | `#b4b2ac` | Body copy. |
-| `--ink-3` | `#6b6860` | `#8e8c84` | Labels, numbers, metadata. |
-| `--line` | `#e4e2dd` | `#2b2b30` | A hairline divider. Divides, never encloses. |
-| `--line-2` | `#8b8880` | `#6e6e79` | A control boundary. |
-| `--focus` | `#1d4ed8` | `#8ab0ff` | The focus ring. |
-| `--signal-bg` | `#fbf3e2` | `#2e2617` | The state tint. |
-| `--signal-ink` | `#6b4d09` | `#e8c37a` | Text on the state tint. |
+| `--paper` | `#0a0a0b` | `#faf9f7` | The page. |
+| `--surface` | `#131316` | `#ffffff` | A raised card. |
+| `--surface-2` | `#1e1e21` | `#f2f1ee` | A tinted or inset block. |
+| `--sunken` | `#0e0e10` | `#f6f5f2` | Code and inline code. |
+| `--ink` | `#f2f1ee` | `#1a1a18` | Primary text, and the primary button's fill. |
+| `--ink-2` | `#b8b6b0` | `#56554f` | Body copy. |
+| `--ink-3` | `#918f88` | `#6b6860` | Labels, numbers, metadata. |
+| `--line` | `#26262a` | `#e4e2dd` | A hairline divider. Divides, never encloses. |
+| `--line-2` | `#6e6e79` | `#8b8880` | A control boundary. |
+| `--focus` | `#8ab0ff` | `#1d4ed8` | The focus ring. |
+| `--signal-bg` | `#2e2617` | `#fbf3e2` | The state tint. |
+| `--signal-ink` | `#e8c37a` | `#6b4d09` | Text on the state tint. |
 
 All 48 pairings are measured by `pnpm check:contrast`, which reads both blocks
 and fails on any pair that misses AA. The gate also refuses to pass if a
@@ -155,9 +174,21 @@ and fails on any pair that misses AA. The gate also refuses to pass if a
 how Expressive Code's own fourteen-colour palette was caught painting the code
 window blue-grey on cream.
 
-The measured worst cases: `--ink-3` on `--surface-2` at 4.93:1 light and 4.65:1
-dark; `--line-2` on `--paper` at 3.36:1 and 3.68:1; `--focus` on `--paper` at
-6.37:1 and 8.60:1.
+The measured worst cases, in the scheme each is worst in:
+
+- `--ink-3` on `--surface-2` at 5.14:1 dark, the hardest ground a label is ever
+  set on, and 4.93:1 light. It was `#8e8c84` in the old dark block, which gave
+  4.65:1 there and under a tenth of a ratio of headroom.
+- `--line-2` on `--surface-2` at 3.30:1 dark and 3.13:1 light.
+- `--focus` on `--paper` at 9.17:1 dark and 6.37:1 light.
+- A selection is the focus hue as a ground, so its ink is `--paper` rather
+  than a fixed white. White on the dark focus hue is 1.9:1 and was unreadable
+  before this scheme existed; `--paper` gives 9.3:1 dark and 6.9:1 light, from
+  the same two tokens in either direction.
+
+The syntax palette is measured separately, against whichever surface actually
+paints code: 14 colours, worst case 9.09:1 in dark and 4.90:1 in light, by
+`pnpm check:code-contrast`.
 
 ## Typography
 
@@ -191,6 +222,17 @@ was removed everywhere rather than kept in some places: a page that draws a
 line above most of its sections is a page of ruled boxes, and the ones left
 behind are the ones that no longer look deliberate. `--line` divides inside a
 section — a table row, a quote — and no longer divides between them.
+
+The canonical host is **`www.orbit-lang.dev`**, because that is the address
+production serves. Astro derives every canonical link, every `og:url` and the
+whole sitemap from its one `site:` value, and `src/data/site.ts` carries a
+second copy used as the fallback for the two components that build an
+absolute URL outside a page context. `check:seo` compares them and pins the
+host, because without that check the two drifting apart produces a build
+whose every canonical disagrees with its sitemap — and the gate that reports
+it points at the sitemap, which is not where the mistake was. `vercel.json`
+redirects the apex, since a host that 200s and serves the same content is a
+duplicate-content surface.
 
 ## Elevation & Depth
 
@@ -247,7 +289,36 @@ was the same shape and the shape said nothing.
 - **Link** — `--ink` with a 1px `--line-2` underline that goes `--ink` on
   hover. The underline is the affordance.
 - **Code window** — `--sunken`, `--radius-lg`, a 1px `--line` frame, a title
-  bar split by a hairline, and the measured syntax palette inside.
+  bar split by a hairline, and the measured syntax palette inside. The title
+  bar is `--surface-2`, which on the dark ground is the only way it separates
+  from the code below it: a #101013 title bar on a #0e0e10 surface is a
+  difference of two in one channel, and the hairline then had to do a job
+  the surfaces could have done. **Line numbers** are on, in `--ink-3`, with
+  no rule between the gutter and the code, because a language tour asks the
+  reader to count.
+- **Documentation sections** — four groups, and the hierarchy is stated
+  twice on purpose. A horizontal **rail** under the navbar carries the top
+  level, marked with a 2px underline at the edge that meets the content,
+  because a rail is tabs and a tab is marked the way a tab is marked. The
+  **sidebar** underneath it lists only the pages of the section you are in,
+  flat, with the section's pages marked by a `--surface-2` step the way every
+  other list on this site marks where you are. The rule is drawn here
+  deliberately and is the one exception to "a border is the last resort": the
+  rail and the page behind it are the same colour, and air cannot separate
+  two things that are touching. The source of truth for the four groups is
+  `src/data/docs-sections.ts`, which both the rail and Starlight's sidebar
+  config read, so a page added there appears in both on the same build.
+- **Quickstart card** — the first thing on `/docs`, under the title: the claim
+  and two buttons above, a real code window below. One raised block with a
+  two-column interior rather than two cards, because a seam down the middle
+  reads as two things that happen to be adjacent. It is carried in
+  `.not-content`, which is Starlight's escape hatch for content that is not
+  prose and is load-bearing here: the prose link rule is unlayered at
+  specificity 0,1,1 and beats Tailwind's `text-paper` at 0,1,0, which
+  renders a button's label in the button's own fill.
+- **Card grid** — a layout, not a list. Starlight renders one as a list, and
+  its items carry no list marker here: a bullet beside a raised panel says
+  "item in a series" when the meaning is "a place you can go to".
 
 ## Rules
 
@@ -277,3 +348,7 @@ was the same shape and the shape said nothing.
 - Trust that a palette implies legible text. `pnpm test:a11y` compares every
   run of text against the first opaque background behind it, which is the check
   that would have caught it.
+- Render a site component inside Starlight's markdown without `not-content`.
+  The prose rules are unlayered and specific enough to win against Tailwind's
+  utilities, and until MDX landed nothing could be in there, so the collision
+  had never happened.

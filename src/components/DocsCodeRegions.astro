@@ -1,0 +1,71 @@
+---
+// Nothing to render. This exists for its script.
+//
+// Expressive Code's client script watches every code block and, when one
+// actually scrolls horizontally, gives it `tabindex="0"` and
+// `role="region"` so a keyboard user can reach it and scroll it with arrow
+// keys. That is correct behaviour and worth keeping.
+//
+// It is also silent about the fact that the block scrolls. A focusable
+// region with no accessible name is a stop on the keyboard route through the
+// page that announces only "region" — and `landmark-unique` fails the build
+// outright once there are two of them, because landmarks must be
+// distinguishable. Turning on line numbers is what surfaced it here: the
+// gutter adds width to every block, which pushed several of them over the
+// overflow threshold that the role is conditional on, so pages that had one
+// scrollable code block now have five.
+//
+// Naming them fixes both. The name is taken from the block's own language
+// tag, so a reader who lands on one knows what they have reached before they
+// try to scroll it, and two blocks on a page are never the same landmark.
+//
+// A MutationObserver rather than a one-shot pass because the roles are added
+// by an idle callback after first paint, so a pass at load time would find
+// nothing and the observer catches them wherever they appear — including
+// blocks that only start overflowing when the viewport narrows.
+---
+
+<script>
+  /** The name a human would give this block, from what the block knows. */
+  function labelFor(pre: Element): string | null {
+    const language = pre.getAttribute("data-language");
+    const frame = pre.closest(".expressive-code");
+    // The frame's title bar carries a filename when the author gave one,
+    // which names the block far better than a language does.
+    const caption = frame?.querySelector("figcaption")?.textContent?.trim();
+
+    if (caption) return `${caption} code`;
+    if (language) return `${language} code`;
+    return "Code block";
+  }
+
+  function nameRegions(root: ParentNode): void {
+    for (const pre of root.querySelectorAll<HTMLElement>('pre[role="region"]')) {
+      if (pre.getAttribute("aria-label") || pre.getAttribute("aria-labelledby")) continue;
+      const label = labelFor(pre);
+      if (label) pre.setAttribute("aria-label", label);
+    }
+  }
+
+  nameRegions(document);
+
+  const observer = new MutationObserver((records) => {
+    for (const record of records) {
+      const target = record.target as Element;
+      // The role is set as an attribute change, so watch for the attribute
+      // itself rather than for added nodes — the nodes are all there already.
+      if (target.matches?.('pre[role="region"]')) {
+        const label = labelFor(target);
+        if (label && !target.getAttribute("aria-label")) {
+          target.setAttribute("aria-label", label);
+        }
+      }
+    }
+  });
+
+  observer.observe(document.documentElement, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["role"],
+  });
+</script>

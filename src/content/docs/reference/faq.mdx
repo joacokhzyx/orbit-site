@@ -53,8 +53,13 @@ items, and both are listed rather than worked around silently.
 
 No. Tables are created on startup and never altered. The
 [migrations guide](https://github.com/joacokhzyx/orbit-lang/blob/main/docs/guides/migrations.md)
-in the repository describes the manual practice that works on a development
-machine, and is explicit that it is not a production story.
+in the repository describes the manual practice that works today.
+
+:::caution[That practice drops the table]
+Change the model, drop the table, let startup recreate it, and accept the data
+loss. That works on a development machine, and the guide is explicit that it is
+not a production story.
+:::
 
 ## Is the energy number real?
 
@@ -75,3 +80,4 @@ where they disagree the code is right. Each page links to the file it came from.
 Open an issue. Include the output of `orbit --version`, your platform, and the
 command you ran. If a build step surprises you, the answer should be in the
 repository, and if it isn't, that is a bug in the documentation.
+

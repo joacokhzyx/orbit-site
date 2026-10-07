@@ -108,8 +108,9 @@ const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.title;
         cannot see the toggle in the header, so a reader who chose dark on a
         light system got a light browser chrome to match a dark page. The
         value is the two paper tokens, and the script below keeps it in step
-        with the class. */}
-    <meta name="theme-color" content="#faf9f7" data-theme-color />
+        with the class. It is the dark value, because the dark scheme is the
+        one this site now presents by default. */}
+    <meta name="theme-color" content="#0a0a0b" data-theme-color />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
@@ -127,7 +128,7 @@ const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.title;
         // The two values of --paper, one per theme. The browser chrome is
         // the only thing outside the page that can be themed, so it is
         // written from the same two tokens rather than a third palette.
-        var paper = { light: "#faf9f7", dark: "#131316" };
+        var paper = { light: "#faf9f7", dark: "#0a0a0b" };
         var system = window.matchMedia("(prefers-color-scheme: dark)");
         var chosen = false;
 
@@ -139,7 +140,27 @@ const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.title;
         try {
           var saved = localStorage.getItem("orbit-theme");
           chosen = saved === "light" || saved === "dark";
-          root.classList.toggle("dark", chosen ? saved === "dark" : system.matches);
+          /* Dark-first, and the order of authority is deliberate.
+
+             A reader who has chosen follows their choice, always.
+             A reader who has not follows their system, because that is
+             still their choice and it is the only signal there is.
+             The site's own default — dark — is the floor under both, and
+             it only applies where there is no signal to read at all: no
+             saved value and no media query to ask, which is the case
+             `tests/a11y.spec.ts` exercises when it emulates a scheme and
+             a browser that cannot report one.
+
+             Forcing dark ahead of the system instead would be the
+             louder reading of dark-first, and it is wrong twice over: it
+             overrides an explicit system preference, and it fails the
+             test that asserts the page honours one. The default is
+             where a decision gets made when nothing has decided. */
+          var followsSystem = typeof system.matches === "boolean";
+          root.classList.toggle(
+            "dark",
+            chosen ? saved === "dark" : followsSystem ? system.matches : true,
+          );
           /* A reader who has never chosen a theme follows the system, which
              is what the media-scoped meta used to do for them. */
           system.addEventListener("change", function (event) {
@@ -148,7 +169,9 @@ const ogImageAlt = title ? `${SITE.name} \\ ${title}` : SITE.title;
             }
           });
         } catch (error) {
-          /* Storage can be unavailable. The light default stands. */
+          /* Storage can be unavailable. The dark default stands, because the
+             class is only set inside this branch when a saved value was
+             actually found. */
         }
 
         paint();

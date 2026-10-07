@@ -5,6 +5,20 @@
   "installCommand": "corepack enable && pnpm install --frozen-lockfile",
   "outputDirectory": "dist",
   "trailingSlash": false,
+  "redirects": [
+    {
+      "$schema": "https://openapi.vercel.sh/vercel.json",
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "orbit-lang.dev"
+        }
+      ],
+      "destination": "https://www.orbit-lang.dev/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/_astro/(.*)",

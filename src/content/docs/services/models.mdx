@@ -29,8 +29,9 @@ The mapping is fixed and worth memorising:
 | `float` | `REAL` |
 | a field named `id` | the primary key |
 
-An `id` field is what makes a row addressable, so a model without one has no
-update or delete path.
+:::caution[An id field is what makes a row addressable]
+A model without one has no update or delete path.
+:::
 
 ## Reading
 
@@ -47,8 +48,10 @@ route GET "/posts/:id" {
 }
 ```
 
+:::note[The response body is the row]
 `find` returns whatever the table holds for that id, and nothing is invented
-when the row is absent. The response body is the row, not a wrapper object.
+when the row is absent. The body is the row, not a wrapper object.
+:::
 
 ## Writing
 
@@ -63,6 +66,7 @@ route POST "/posts" {
 }
 ```
 
+:::caution[create() returns false, it does not raise]
 `create` returns `false` in two cases, and it does not raise in either:
 
 - the `id` already exists, because it is the primary key
@@ -70,13 +74,15 @@ route POST "/posts" {
 
 `delete` is the same shape: `true` only when a row was actually removed, so a
 delete of a row that was never there is a `false` and not a crash.
+:::
 
 ## The part that is not finished
 
-Tables are created, never migrated. Adding a field to a model after the table
-exists does not alter it, which means a new field reads as empty rather than
-failing loudly. There is no schema versioning and no transaction-boundary
-contract for application code.
+:::caution[Tables are created, never migrated]
+Adding a field to a model after the table exists does not alter it, which means
+a new field reads as empty rather than failing loudly. There is no schema
+versioning and no transaction-boundary contract for application code.
+:::
 
 The [migrations guide](https://github.com/joacokhzyx/orbit-lang/blob/main/docs/guides/migrations.md)
 in the repository describes the manual practice that works today: change the

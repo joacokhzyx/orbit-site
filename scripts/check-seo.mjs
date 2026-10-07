@@ -61,6 +61,60 @@ function title(html) {
 const sitemap = readFileSync(join(DIST, "sitemap-0.xml"), "utf8");
 const listed = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]));
 
+/*
+ * Which host is canonical, asserted rather than assumed.
+ *
+ * Production serves www.orbit-lang.dev. Astro derives every canonical link,
+ * every og:url and the whole sitemap from one value — `site:` in
+ * astro.config.mjs — and src/data/site.ts carries a second copy used as the
+ * fallback for the two components that build an absolute URL outside a page
+ * context. Two copies of the address is exactly the arrangement this file
+ * exists to catch drift in, so this compares them and pins the host.
+ *
+ * Without it, changing one and not the other produces a build where every
+ * page's canonical disagrees with the sitemap and the gate above reports it
+ * as a coverage failure — which points at the sitemap, which is not where the
+ * mistake was made. Failing here names the actual cause.
+ *
+ * The apex form is checked too, and rejected, because a canonical on the
+ * apex is not a stylistic difference: vercel.json redirects it, and a host
+ * that redirects is not the address that should be in the markup.
+ */
+const CANONICAL_HOST = "www.orbit-lang.dev";
+
+for (const url of listed) {
+  let host;
+  try {
+    host = new URL(url).host;
+  } catch {
+    failures.push(`sitemap entry is not a URL: ${url}`);
+    continue;
+  }
+  if (host !== CANONICAL_HOST) {
+    failures.push(
+      `sitemap lists ${url}, whose host is ${host}. Production serves ${CANONICAL_HOST}; ` +
+        `astro.config.mjs \`site:\` is what writes every canonical and this sitemap`,
+    );
+  }
+}
+
+for (const page of pages) {
+  const canonical = linkRel(page.html, "canonical")?.[1];
+  if (!canonical) continue;
+  let host;
+  try {
+    host = new URL(canonical).host;
+  } catch {
+    failures.push(`${page.route}  ->  canonical is not an absolute URL: ${canonical}`);
+    continue;
+  }
+  if (host !== CANONICAL_HOST) {
+    failures.push(
+      `${page.route}  ->  ${canonical}   (canonical host is ${host}, not ${CANONICAL_HOST})`,
+    );
+  }
+}
+
 for (const page of pages) {
   const isError = page.route === "/404.html";
   const canonical = linkRel(page.html, "canonical")?.[1];

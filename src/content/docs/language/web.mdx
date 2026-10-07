@@ -33,13 +33,15 @@ const body = await response.json();
 // { status: "UP", version: "0.1.0-rc.2", uptime_seconds: 12 }
 ```
 
-Two things follow from Orbit emitting C and not JavaScript:
+Two things follow from Orbit emitting C and not JavaScript.
 
-- **CORS is your front end's job.** Add the headers at the edge, or serve the
-  page from the same origin.
-- **There is no WebAssembly build.** You cannot run Orbit in a tab today. If you
-  need to try a route without a server, the examples in the repository are the
-  fastest path, and they are three commands.
+:::caution[CORS is your front end's job]
+Add the headers at the edge, or serve the page from the same origin.
+:::
+
+**There is no WebAssembly build.** You cannot run Orbit in a tab today. If you
+need to try a route without a server, the examples in the repository are the
+fastest path, and they are three commands.
 
 ## Serving the files it produces
 
@@ -57,8 +59,10 @@ covers Windows, Linux, and one-box clustering.
 
 ## What a request does not get you
 
+:::caution[A mean is not a tail]
 There is no latency distribution, so `p99` is not something you can read off a
-running service today. `system.latency_avg_us()` is a mean, and a mean is not
-a tail. If you need percentiles, the honest answer is that the instrumentation
+running service today. `system.latency_avg_us()` is a mean, and a mean is not a
+tail. If you need percentiles, the honest answer is that the instrumentation
 for them is not built yet, and it is listed as an open item rather than
 improvised from a mean.
+:::

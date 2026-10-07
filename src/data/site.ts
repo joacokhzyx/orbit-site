@@ -2,10 +2,26 @@
 // the canonical URL, the wording of the brand, and the two places the site
 // points outward to. The documentation repository is authoritative for
 // content; this file only records where it lives.
+//
+// The canonical host is `www.orbit-lang.dev`, not the apex, because that is
+// the address production serves. Two consequences worth knowing, both of
+// them reasons this file exists rather than a string inlined into a layout:
+//
+//   - `astro.config.mjs` `site:` and this `url` have to agree. Astro derives
+//     every canonical link, every `og:url` and the whole sitemap from its
+//     own `site:`, and this value is the fallback for the two components
+//     that build an absolute URL outside a page context. If they disagree
+//     the canonical tags and the sitemap disagree, and `check:seo` compares
+//     the two — so the gate fails rather than the site quietly publishing
+//     each page under both hosts.
+//   - The apex is not the canonical address and must not be indexed as one.
+//     `vercel.json` redirects it, because a host that 200s and serves the
+//     same content is a duplicate-content surface, and the one thing worse
+//     than having no canonical is having two that disagree.
 
 export const SITE = {
   name: "Orbit",
-  url: "https://orbit-lang.dev",
+  url: "https://www.orbit-lang.dev",
   /**
    * What the thing IS, and the h1 on the homepage. This is separate from
    * `headline` on purpose: the two used to be the same string, which meant

@@ -1,0 +1,133 @@
+---
+// Starlight's sidebar, showing one section at a time.
+//
+// Starlight's own renders all four groups as collapsible `<details>`, which
+// is a reasonable thing to do and is not what this layout wants. The rail
+// above now carries the top level, so showing all four groups underneath it
+// states the same hierarchy twice, eleven items deep, in the same column —
+// and the effect is the one the redesign set out to remove: a documentation
+// page that reads as a list rather than as a document with a position in it.
+//
+// So the sidebar is filtered to the section the current path belongs to, and
+// rendered flat: the pages of this section, in order, no group label. The
+// rail says which section you are in; repeating it as a heading one inch
+// below would say it twice. That is the same division the reference layout
+// makes, and it is why its sidebar is a flat list.
+//
+// The markup deliberately matches the shape Starlight's own sublist emits —
+// a `<ul>` of `<a>` inside `.sidebar-content`, which is rendered by
+// PageFrame above this component — because src/styles/starlight.css already
+// styles exactly that shape. `.sidebar-content a`, `.sidebar-content
+// summary` and `.sidebar-content a[aria-current="page"]` are the rules that
+// paint the list, and they apply here without a line being added to that
+// file.
+//
+// Two things went away with the `<details>` and both are deliberate. The
+// collapse state has nothing to persist when there is one list, so
+// SidebarPersister and SidebarRestorePoint are not needed and are not
+// imported. And the per-item rule the nested `ul ul li` carried is gone —
+// this file removes twelve of them from the rail for the same reason, and a
+// list with one level does not have a parent to be separated from.
+import MobileMenuFooter from "virtual:starlight/components/MobileMenuFooter";
+
+interface SidebarLink {
+  type: "link";
+  label: string;
+  href: string;
+  isCurrent?: boolean;
+  badge?: { text: string; variant?: string };
+}
+
+interface SidebarGroup {
+  type: "group";
+  label: string;
+  entries: SidebarEntry[];
+  collapsed?: boolean;
+}
+
+type SidebarEntry = SidebarLink | SidebarGroup;
+
+const route = Astro.locals.starlightRoute;
+const all: SidebarEntry[] = (route?.sidebar ?? []) as SidebarEntry[];
+
+/**
+ * The entries of the group holding the current page.
+ *
+ * Matched by href rather than by index, because Starlight hands over
+ * `isCurrent` on the links and that flag is the one piece of this
+ * computation that is already authoritative — it is what `aria-current="page"`
+ * is built from. Matching on it means the filtered list can never disagree
+ * with the highlight inside it.
+ *
+ * The whole sidebar is returned if no group matches, which is what happens
+ * off the documentation entirely. Failing to that keeps a reader on an
+ * unknown path with something to navigate rather than with nothing.
+ */
+/**
+ * Every link inside a group, at any depth.
+ *
+ * Returns the link type rather than the union, because a caller that has
+ * flattened a group only ever renders links — the groups are flattened away
+ * on purpose. Declaring the return type as the union is what made the
+ * renderer below fail typecheck on `link.href`.
+ */
+function flattenLinks(group: SidebarGroup): SidebarLink[] {
+  const out: SidebarLink[] = [];
+  for (const entry of group.entries) {
+    if (entry.type === "link") out.push(entry);
+    else out.push(...flattenLinks(entry));
+  }
+  return out;
+}
+
+/** The group's label and its links, for the flat single-section case. */
+function flatten(group: SidebarGroup): { label: string; links: SidebarLink[] } {
+  return { label: group.label, links: flattenLinks(group) };
+}
+
+const groups = all.filter(
+  (entry): entry is SidebarGroup => entry.type === "group",
+);
+
+const active = groups.find((group) =>
+  flattenLinks(group).some((entry) => entry.isCurrent),
+);
+
+/**
+ * What actually gets drawn.
+ *
+ * One section: its pages, flat, with no label — the rail above already says
+ * which section this is, and repeating it an inch below says it twice.
+ *
+ * Anything else (a path outside the documentation, or a documentation path
+ * whose group somehow did not match): every group with its label, which is
+ * Starlight's own behaviour. A reader on an unknown path keeps something to
+ * navigate with, which is the whole job of a sidebar.
+ */
+const shape: { label?: string; links: SidebarLink[] }[] = active
+  ? [flatten(active)]
+  : groups.map(flatten);
+---
+
+<ul class="list-none m-0 p-0" data-docs-sidebar={active ? "sectioned" : undefined}>
+  {
+    shape.map((group) => (
+      <li class={group.label ? "mt-6 first:mt-0" : undefined}>
+        {group.label && <p class="label pl-3">{group.label}</p>}
+        <ul class="list-none m-0 p-0">
+          {group.links.map((link) => (
+            <li>
+              <a href={link.href} aria-current={link.isCurrent ? "page" : undefined}>
+                <span>{link.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))
+  }
+</ul>
+
+<div class="md:sl-hidden">
+  <MobileMenuFooter />
+</div>

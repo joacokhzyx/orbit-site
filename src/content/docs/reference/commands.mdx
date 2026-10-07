@@ -3,6 +3,8 @@ title: Commands
 description: Every command, what it does, and where its output goes.
 ---
 
+import { Badge } from '@astrojs/starlight/components';
+
 The whole toolchain is one binary after the build. These are its commands.
 
 ## Building
@@ -35,9 +37,11 @@ orbit fmt examples/health_service.orb
 orbit fmt --check compiler
 ```
 
-`fmt` is token-based, not regular-expression based, so it does not reformat
-inside a string. `--check` prints the files that would change and exits
-non-zero, which is what the CI gate uses.
+:::note[The formatter is token-based]
+`fmt` is not regular-expression based, so it does not reformat inside a string.
+`--check` prints the files that would change and exits non-zero, which is what
+the CI gate uses.
+:::
 
 ```sh
 orbit doctor
@@ -68,10 +72,15 @@ in every service without code from you.
 orbit --version
 ```
 
-Prints `orbit 0.1.0`. Services report `0.1.0-rc.2` in `/health`, which is not a
-mistake: the binary version and the response version are tracked separately
-until the pre-release cycle closes. The rule for what counts as breaking is in
+Prints `orbit 0.1.0`.
+
+:::note[Two version numbers, on purpose]
+Services report `0.1.0-rc.2` <Badge text="pre-release" variant="caution" size="small" />
+in `/health`, which is not a mistake: the binary version and the response
+version are tracked separately until the pre-release cycle closes. The rule for
+what counts as breaking is in
 [versioning](https://github.com/joacokhzyx/orbit-lang/blob/main/docs/VERSIONING.md).
+:::
 
 ## Output conventions
 

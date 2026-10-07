@@ -18,6 +18,67 @@ const { code, label, lang = "orbit", class: className = "" } = Astro.props;
 
 const trimmed = code.replace(/^\n+|\n+$/g, "");
 
+/**
+ * The gutter, written as inline style rather than as a stylesheet rule,
+ * and the four things that decide what it says.
+ *
+ * It is emitted per line by the transformer below, as a span prepended to
+ * the line rather than as a counter on `::before`. A real element is what
+ * can be `user-select: none`, and that is the reason: generated content
+ * cannot be told not to be selected as dependably, and a reader dragging
+ * across a snippet to paste it should not paste "12" into the middle of a
+ * function. Expressive Code puts a real element in the gutter for the same
+ * reason, and the Copy button never sees the numbers either way, because
+ * it reads `data-code` rather than the DOM.
+ *
+ * It carries `color` with `!important`, which is load-bearing rather than
+ * defensive. src/styles/global.css paints `.code-surface span` with
+ * `!important` so that no later rule can flatten the measured syntax
+ * palette into one grey, and a gutter made of spans sits squarely inside
+ * that rule — an inline declaration without the keyword loses to it. So
+ * this is the one declaration in the file that has to outrank a rule it
+ * cannot edit, and the alternative was not "no !important" but "a counter,
+ * which dodges the cascade and then depends on `user-select: none` being
+ * honoured on generated content". That is the worse of the two bets.
+ *
+ * And the column width is computed here rather than left to `min-width`,
+ * because a minimum sized by the widest line only aligns the numbers if
+ * every number is the same width. A nine-line snippet has a one-digit
+ * gutter and a hundred-line one has three; the line count is known here,
+ * so the column is exactly as wide as the widest number in it. `ch` is the
+ * mono face's own digit advance, so this is exact rather than approximate,
+ * and JetBrains Mono is tabular already, so no `tabular-nums` is needed
+ * either. `content-box` keeps the 1.25rem of air outside that column
+ * instead of eating it: 1.25rem is the frame's own 4px rhythm at four
+ * steps, and it is the gap between a number and the code it numbers.
+ *
+ * The fourth thing is `--text-micro`, and it is not a style preference —
+ * it is the only size this can be. The gutter is an inline-block, so its
+ * margin box is 25.5px tall at the code's own line-height, while the
+ * `span.line` around it keeps a 20px content box. tests/typography.spec.ts
+ * measures that as 3.5px of ink escaping the bottom of its own box, which
+ * is 14% of a line and over the 12% it allows. The lever is the size and
+ * nothing else: a `line-height` on the gutter only moves the failure onto
+ * the gutter, where the same rule measures it at 20%, and `vertical-align`
+ * leaves the margin box exactly where it was. At `--text-micro` the block
+ * is 21.7px and the escape is 6%. It is also the right answer on its own
+ * terms, which is the part worth keeping: a gutter number set at the
+ * code's own size is competing with the code, and `--ink-3` on its own was
+ * not enough to stop a column of metadata from reading as a column of
+ * content.
+ */
+const GUTTER_STYLE = [
+  "display:inline-block",
+  "box-sizing:content-box",
+  `width:${String(trimmed.split("\n").length).length}ch`,
+  "padding-inline-end:1.25rem",
+  "font-size:var(--text-micro)",
+  "text-align:right",
+  "color:var(--ink-3) !important",
+  "user-select:none",
+  "-webkit-user-select:none",
+].join(";");
+
 /** The header shows the language, but only when the label doesn't say it. */
 const LANG_NAMES: Record<string, string> = {
   orbit: "Orbit",
@@ -43,6 +104,42 @@ const html = highlighter.codeToHtml(trimmed, {
         node.properties.class = `${node.properties.class ?? ""} code-surface`.trim();
         return node;
       },
+      // Line numbers. The documentation half is supposed to be getting these
+      // from `showLineNumbers` in astro.config.mjs, but that property does
+      // not exist in Expressive Code 0.44.2 — it belongs to the
+      // @expressive-code/plugin-line-numbers package, which is not
+      // installed — so the setting is dropped without an error and no
+      // built documentation page has a gutter. This one gets them by hand,
+      // and the geometry below is the geometry Expressive Code's own line
+      // numbers use, so the two halves look like one window once that
+      // package is added. Shiki has no built-in either: `codeToHtml`
+      // emits one `<span class="line">` per line and hands each to this
+      // hook, and the number goes in front of the tokens as the line's
+      // first child.
+      //
+      // Inside the scroll container rather than beside it, so the numbers
+      // scroll out with the code on a narrow screen instead of holding a
+      // fixed column the snippet can no longer afford, and so no line is
+      // re-wrapped to make room for them. That is what a
+      // `grid-template-areas: 'gutter code'` inside the same `pre` does.
+      //
+      // Hidden from the accessibility tree, as GitHub's are: the numbers
+      // are for the eye, and a screen reader reads a file by line anyway,
+      // so announcing one per line adds a token to every line and no way
+      // to reach anything.
+      line(node, line) {
+        node.children.unshift({
+          type: "element",
+          tagName: "span",
+          properties: {
+            class: "code-gutter",
+            style: GUTTER_STYLE,
+            "aria-hidden": "true",
+          },
+          children: [{ type: "text", value: String(line) }],
+        });
+        return node;
+      },
     },
   ] satisfies ShikiTransformer[],
 });
@@ -62,24 +159,89 @@ const html = highlighter.codeToHtml(trimmed, {
   ]}
   aria-labelledby={captionId}
 >
+  { /*
+    THE BAND. The figcaption used to set no background of its own, which
+    was right: the title bar was the code surface with a hairline under it,
+    and the hairline was the whole separator.
+
+    Then --sunken went to #0e0e10, and that composition stopped working.
+    #101013 and #0e0e10 are a difference of two in one channel, and on a
+    near-black ground the eye is at its least sensitive — so the bar had no
+    ground of its own at all, and the only thing separating it from the
+    first line of code was a `--line` hairline. A hairline is what this
+    system reaches for last, and here it had become the only thing there
+    was.
+
+    So the bar is `--surface-2`, which is the system's documented answer to
+    "a title bar": src/styles/starlight.css already points
+    --ec-frm-trmTtbBg at it for the documentation's frames, and this is
+    the same bar on the other half of the site. The hairline stays, because
+    DESIGN.md calls for a title bar split by a hairline and it is the two
+    together that make the band read in the LIGHT scheme, where
+    --surface-2 is only four units below --sunken.
+  */}
   {
     (label || lang !== "orbit") && (
-      <figcaption class="flex min-h-11 items-center justify-between gap-3 border-b border-line pl-4 pr-1.5">
+      <figcaption class="flex min-h-11 items-center justify-between gap-3 border-b border-line bg-[var(--surface-2)] pl-4 pr-1.5">
         <span id={captionId} class="truncate font-mono text-micro text-[var(--ink-2)]">
           {caption}
         </span>
+        { /*
+          THE COPY BUTTON, which the band changed the answer for.
+
+          It was `bg-[var(--surface)]` on a bar with no background of its
+          own, so that #131316 fill was the only thing in the whole title
+          bar that separated itself from the code surface behind it — and
+          #131316 sits five units above #0e0e10, which is a step the eye
+          reads as nothing at all. Screenshotting it at the new --sunken is
+          what settled this rather than the arithmetic: the button was
+          there, it was findable if you already knew where to look, and it
+          looked like a smudge on the corner of the window rather than
+          like a control.
+
+          What changed is what it has to separate itself FROM. The ramp is
+          not symmetric between the two schemes, and that decides the rest
+          of this. Against the old --sunken, `--surface` was nine units
+          above it in the light scheme and five in the dark: a real chip in
+          one and the smudge in the other. Against the `--surface-2` band it
+          is thirteen units above in the light scheme and eleven below in
+          the dark — a real chip in both, and the only value of the twelve
+          that is. So the resting fill stays exactly as it was.
+
+          The hover is the part that had to move, because `--surface-2` is
+          now the colour of the bar the button is on. Two candidates were
+          built and screenshotted before either was written down. Resting
+          `--sunken` and hovering to `--surface` is the nicer object in the
+          dark scheme — a well cut into the bar in the window's own ground
+          — and it is the house recipe, DownloadMatrix's. It was dropped
+          because the light ramp puts `--sunken` four units below
+          `--surface-2`, which measures as a soft edge rather than a chip,
+          and the light scheme is not one this was allowed to weaken.
+
+          So the hover is `--line`, which is less a hairline here than the
+          step adjacent to `--surface-2` in whichever direction that
+          scheme's ramp runs: #e4e2dd below it in the light scheme,
+          #26262a above it in the dark. The chip presses into the bar in
+          the light scheme and lifts out of it in the dark one — the same
+          gesture either way, it stops being part of the bar when you
+          reach for it — and it moves twenty-seven units in the first and
+          nineteen in the second. `--ink` would have moved further and is
+          an inversion, which this system allows exactly once, on the
+          primary button.
+        */}
         <button
           type="button"
           data-copy
           data-code={trimmed}
           data-idle-label="Copy"
-          class="h-11 min-w-11 shrink-0 rounded-[var(--radius-sm)] bg-[var(--surface)] px-3 text-micro text-ink transition-colors hover:bg-[var(--surface-2)]"
+          class="h-11 min-w-11 shrink-0 rounded-[var(--radius-sm)] bg-[var(--surface)] px-3 text-micro text-ink transition-colors hover:bg-[var(--line)]"
         >
           Copy
         </button>
       </figcaption>
     )
   }
+
   <div data-code-host set:html={html} />
   {
     // The button label changes on click, which a screen reader only

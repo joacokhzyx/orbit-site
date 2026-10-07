@@ -50,8 +50,13 @@ route GET "/notes/:id" {
 ```
 
 A segment like `:id` or `{id}` captures one non-empty segment and binds through
-`req.param("id")`. Two limits are worth knowing now: captured values are not
-percent-decoded, and at most 8 captures bind per request.
+`req.param("id")`. Two limits apply to what you get back.
+
+:::caution[Captured values are not percent-decoded]
+`req.param("id")` gives you the segment as it was captured, so anything
+percent-encoded in it is still encoded when you read it. At most 8 captures bind
+per request.
+:::
 
 Static routes win over parameter routes, so both of these can exist without
 colliding:
@@ -66,6 +71,11 @@ route GET "/posts/:id" {
     return ok 200 "{\"post\":\"" + id + "\"}"
 }
 ```
+
+:::note[Static beats parameter]
+`/posts/search` is matched as the static route. A request for that path does not
+reach `/posts/:id`, which is why both can be declared without colliding.
+:::
 
 ## A model is a table
 
@@ -101,9 +111,12 @@ route POST "/posts" {
 }
 ```
 
+:::caution[create() returns false, it does not raise]
 `Model.create()` returns `false` when the id already exists or the payload has
-no usable fields, rather than raising. `Model.delete()` returns `true` only
-when a row was actually removed.
+no usable fields, rather than raising, so a write that did not happen is a value
+you have to test for. `Model.delete()` returns `true` only when a row was
+actually removed.
+:::
 
 ## Telemetry
 

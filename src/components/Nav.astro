@@ -15,6 +15,7 @@
 import Logo from "./Logo.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 import Search from "./Search.astro";
+import DocsSectionRail from "./DocsSectionRail.astro";
 import { NAV } from "../data/site";
 
 interface Props {
@@ -32,9 +33,16 @@ interface Props {
    * field at all. The index and the control travel together.
    */
   search?: boolean;
+  /**
+   * Mount the documentation section rail under the bar. It lives here, and
+   * not in a Starlight component slot, so that it is inside the same sticky
+   * element as the navbar and cannot scroll out from under it — a section
+   * switcher you have to scroll back up to reach is not a switcher.
+   */
+  sections?: boolean;
 }
 
-const { as: Tag = "header", search = false } = Astro.props;
+const { as: Tag = "header", search = false, sections = false } = Astro.props;
 
 const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 
@@ -183,6 +191,8 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
     </div>
   </div>
 
+  {sections && <DocsSectionRail />}
+
   {/* The bar is opaque and it sits on top of the content, so whatever line of
       text happens to be at its edge is cut in half. A rule under it made that
       cut read as an edge; without one it reads as a broken render. A short
@@ -190,7 +200,13 @@ const links = NAV.map((link) => ({ ...link, current: isCurrent(link.href) }));
       content rather than on the background: the bar and the page are the same
       colour here, which is also why a shadow cannot do this job. It takes the
       cut from a slice to a fade, and it is 20px of gradient instead of a line
-      drawn across every page. */}
+      drawn across every page.
+
+      It hangs off the bottom of the whole bar, which on the documentation is
+      two rows deep rather than one. That is the right edge to fade at: the
+      rail scrolls out from under it as a unit, and fading one row while the
+      other stays sharp would draw a line across the page in the one place
+      the redesign is trying not to have one. */}
   <div
     class="pointer-events-none absolute inset-x-0 -bottom-5 h-5 bg-gradient-to-b from-paper to-transparent"
     aria-hidden="true"

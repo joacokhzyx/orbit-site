@@ -65,26 +65,63 @@
      black rectangle to say "prerelease" is shouting about nothing. */
   --signal-bg: #fbf3e2;
   --signal-ink: #6b4d09;
+
+  /* Elevation. Depth is a surface step first and a shadow second, but
+     "second" is not "invisible": this is a 6% warm grey, which reads as a
+     soft edge on #faf9f7. The dark block restates both for its ground,
+     because a #1a1a18 shadow on a near-black ground has no contrast to
+     work with at all. Named `--elev-*` so Tailwind's own `--shadow-sm`
+     cannot win the cascade; `@theme` maps that name here. */
+  --elev-sm: 0 1px 2px rgb(26 26 24 / 0.06), 0 1px 3px rgb(26 26 24 / 0.04);
+  --elev-md: 0 4px 12px rgb(26 26 24 / 0.08), 0 2px 4px rgb(26 26 24 / 0.04);
+  --elev-focus: 0 0 0 3px color-mix(in srgb, var(--focus) 35%, transparent);
 }
 
+/* The dark scheme is the one the site presents by default, and it is the
+   one the reference direction was taken from: a near-black ground, surfaces
+   that step up out of it, and warm ink on top. Four of these twelve moved
+   and eight are unchanged, and the reason the list is short is that the
+   original dark block was already a warm near-black rather than the
+   usual #121212 slate.
+
+   The ground is #0a0a0b and not #000. Pure black is a value no display
+   can render and it makes every step above it read as a hole; one step
+   of warm off-black gives the same depth and lets --surface be a
+   surface rather than a border. Every ratio below is measured by
+   `pnpm check:contrast`, which reads this block as well as the one
+   above — the gate that caught twenty-two failures when the dark block
+   was not being read at all. */
 .dark,
 :root[data-theme="dark"] {
-  --paper: #131316;
-  --surface: #1b1b1f;
-  --surface-2: #232327;
-  --sunken: #101013;
+  --paper: #0a0a0b;
+  --surface: #131316;
+  --surface-2: #1e1e21;
+  --sunken: #0e0e10;
 
-  --ink: #f0efec;
-  --ink-2: #b4b2ac;
-  --ink-3: #8e8c84;
+  --ink: #f2f1ee;
+  --ink-2: #b8b6b0;
+  /* 5.14:1 on --surface-2, the hardest ground a label is ever set on.
+     It was #8e8c84, which measured 4.65:1 there and had less than a
+     tenth of a ratio of headroom. */
+  --ink-3: #918f88;
 
-  --line: #2b2b30;
+  --line: #26262a;
   --line-2: #6e6e79;
 
   --focus: #8ab0ff;
 
   --signal-bg: #2e2617;
   --signal-ink: #e8c37a;
+
+  /* The two elevations, restated for a ground this dark. A card on
+     #0a0a0b is lifted by the step to #131316 first and by these second,
+     and these are black rather than warm grey because a shadow falls on
+     the page outside the card: on a near-black ground the only way for a
+     shadow to register is to be darker than the ground it darkens.
+     Raising the alpha against the light pair keeps the same two-level
+     read — a resting card, and something lifted. */
+  --elev-sm: 0 1px 2px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.4);
+  --elev-md: 0 4px 14px rgb(0 0 0 / 0.6), 0 2px 5px rgb(0 0 0 / 0.45);
 }
 
 @theme inline {
@@ -137,11 +174,18 @@
   --radius-lg: 1rem;
   --radius-pill: 999px;
 
-  /* Two levels of elevation, low and higher. Depth is a shadow or a
-     background step. It was never a full-contrast outline. */
-  --shadow-sm: 0 1px 2px rgb(26 26 24 / 0.06), 0 1px 3px rgb(26 26 24 / 0.04);
-  --shadow-md: 0 4px 12px rgb(26 26 24 / 0.08), 0 2px 4px rgb(26 26 24 / 0.04);
-  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--focus) 35%, transparent);
+  /* Elevation, pointed at the scheme-aware values rather than declared here.
+     Tailwind v4 ships `--shadow-sm` and `--shadow-md` of its own, so the
+     light values cannot be written into this namespace: a token of the same
+     name in both places is settled by source order rather than by intent,
+     and the light scheme quietly took Tailwind's default 0.1-alpha black
+     instead of the warm 6% this system specifies. The real declarations are
+     `--elev-sm` and `--elev-md` in each token block above and below, which
+     flip with the theme, so every `var(--shadow-sm)` in the codebase keeps
+     working and resolves per scheme. */
+  --shadow-sm: var(--elev-sm);
+  --shadow-md: var(--elev-md);
+  --shadow-focus: var(--elev-focus);
 
   /* The measure, in the two places it is used. */
   --container-measure: 66ch;
@@ -155,6 +199,13 @@
   html {
     background-color: var(--paper);
     color: var(--ink);
+    /* Tells the browser which of its own surfaces to paint: the canvas
+       behind the document, the overscroll area, and any control the site
+       does not style. Without it a dark page sits inside a light frame,
+       which is visible on mobile at the end of a short document and in
+       the Safari tab bar. It is a property rather than a token, so it is
+       declared here and re-declared on the dark marker below. */
+    color-scheme: light;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -202,9 +253,17 @@
     border-radius: var(--radius-sm);
   }
 
+  /* --paper, not #ffffff. A selection is the focus hue as a ground, and
+     the focus hue is a different value in each scheme: #1d4ed8 in light
+     and #8ab0ff in dark. White text on the dark one is 1.9:1, which is
+     unreadable, and it was unreadable before this scheme was darkened —
+     the fixed white was the only hard-coded colour left in the file.
+     --paper is the ground of whichever scheme is active, so the ink on
+     a selection is the ink that scheme already proved legible: 6.9:1 on
+     the light focus, 9.3:1 on the dark one. */
   ::selection {
     background-color: var(--focus);
-    color: #ffffff;
+    color: var(--paper);
   }
 
   ::-webkit-scrollbar {
@@ -234,6 +293,17 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+@layer base {
+  /* Both markers, for the same reason every rule in this file that paints
+     is written against the either: the site's toggle writes `.dark` and
+     Starlight writes `data-theme`, and a reader who presses the toggle on
+     /docs gets the class and not the attribute. */
+  .dark,
+  :root[data-theme="dark"] {
+    color-scheme: dark;
   }
 }
 

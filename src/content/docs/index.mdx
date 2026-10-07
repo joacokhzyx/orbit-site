@@ -1,0 +1,91 @@
+---
+title: Documentation
+description: Orbit compiles to C, so what you write is what a C compiler sees. Start here for the install, the syntax, and the reference.
+---
+
+import DocsQuickstart from "../../components/DocsQuickstart.astro";
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+{/*
+  The card below is the first thing on the page, under the title, and it is a
+  component rather than a code fence because the page's whole problem was that
+  it was indistinguishable from every other page: a heading, four paragraphs,
+  and no answer to the one question a reader arrives with. The quickstart is
+  that answer, and the language tour below it is what they read next.
+*/}
+
+<DocsQuickstart />
+
+## Where to go
+
+Two paths, and the difference between them is what you already have in hand.
+Nothing else on this page matters if one of these is the right one.
+
+<div class="not-content grid gap-4 sm:grid-cols-2">
+  <a
+    class="group flex flex-col rounded-[var(--radius-lg)] bg-[var(--surface)] p-6 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow-md)]"
+    href="/docs/start/getting-started/"
+  >
+    <p class="label">New to Orbit</p>
+    <p class="mt-3 font-display text-[length:var(--text-lead)] font-semibold text-[var(--ink)]">
+      Getting started
+    </p>
+    <p class="mt-2 text-small text-[var(--ink-2)]">
+      Build the compiler, start a server, and read a real response. One page,
+      five steps, no choices to make on the way.
+    </p>
+    <p class="mt-4 text-small text-[var(--ink)] underline decoration-[var(--line-2)] decoration-2 underline-offset-4 group-hover:decoration-[var(--ink)]">
+      Install it and run a service
+    </p>
+  </a>
+  <a
+    class="group flex flex-col rounded-[var(--radius-lg)] bg-[var(--surface)] p-6 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow-md)]"
+    href="/docs/start/tour/"
+  >
+    <p class="label">Want to see the language</p>
+    <p class="mt-3 font-display text-[length:var(--text-lead)] font-semibold text-[var(--ink)]">
+      Language tour
+    </p>
+    <p class="mt-2 text-small text-[var(--ink-2)]">
+      Functions, bindings, models, routes and telemetry, every snippet
+      runnable and every output captured from a real run.
+    </p>
+    <p class="mt-4 text-small text-[var(--ink)] underline decoration-[var(--line-2)] decoration-2 underline-offset-4 group-hover:decoration-[var(--ink)]">
+      What the language looks like
+    </p>
+  </a>
+</div>
+
+## The contract, and the limits
+
+Orbit publishes what it can't do, next to the pages that use each feature,
+because finding that out at midnight is a bad way to learn a language. This
+is the short list; [known limitations](/docs/reference/limitations/) is the
+long one, with the workaround for each.
+
+<CardGrid>
+  <Card title="No multipart uploads">
+    The file helper compiles and saves nothing. The file server tutorial
+    uploads raw bodies and says so.
+  </Card>
+  <Card title="No database migrations">
+    Tables are created on startup and never altered. Adding a field later
+    leaves the existing table alone.
+  </Card>
+  <Card title="No p50 or p99">
+    The runtime reports a mean in microseconds, not a distribution. What isn't
+    measured isn't exposed.
+  </Card>
+  <Card title="One host per cluster">
+    The cluster command starts copies on this machine. There is no shared
+    state, no proxying, and no failover.
+  </Card>
+</CardGrid>
+
+## If a number matters to you
+
+The honest state is that the end-to-end performance figures sit inside the
+run-to-run noise of a shared machine, so the home page publishes none. The
+method is written down, and it forbids the two shortcuts that make benchmark
+documents worthless: converting CPU time into joules with a universal factor,
+and reporting only the runs that worked.

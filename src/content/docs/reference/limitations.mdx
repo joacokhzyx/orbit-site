@@ -3,15 +3,19 @@ title: Known limitations
 description: The honest list. What happens today, how to work around it, and what would change it.
 ---
 
+:::note[What was measured]
 Nothing here is a roadmap promise with a date. This is what was measured on this
 build, on a Windows x86-64 host with gcc, in September 2026. Linux paths are
 marked untested where they could not be run.
+:::
 
 ## Multipart uploads are not implemented
 
+:::danger[req.file() saves nothing]
 `req.file()` compiles and maps to a stub that returns a placeholder path and
 saves nothing. Called with one argument it also triggers a C arity warning, so
 you will hear about it.
+:::
 
 **Work around it.** Upload raw bodies. The file server tutorial does exactly
 that and says so in the text, so you are not reading a working example and
@@ -40,9 +44,10 @@ in microseconds. There is no latency distribution and no success and error
 split. `/_ledger` adds per-route request counts, mean milliseconds, and
 database share.
 
-**Work around it.** A mean is not a tail. If you need percentiles for a
-service-level objective, you have to measure them outside the process, and the
-number you get will include your client.
+:::caution[A mean is not a tail]
+If you need percentiles for a service-level objective, you have to measure them
+outside the process, and the number you get will include your client.
+:::
 
 ## Cluster is single-host only
 
@@ -54,9 +59,12 @@ tutorial. `drain` and the rolling restart follow the platform rule below.
 
 ## Graceful shutdown is POSIX only
 
-Drain in-flight requests, then exit, runs on POSIX through `SIGTERM`. On
-Windows the stop is `TerminateProcess`: immediate, with in-flight requests lost.
+Drain in-flight requests, then exit, runs on POSIX through `SIGTERM`.
+
+:::caution[On Windows the stop is immediate]
+The stop is `TerminateProcess`: immediate, with in-flight requests lost.
 `drain` and the graceful phase of `restart` and `down` are best-effort there.
+:::
 
 ## Two servers on one port do not fail loudly on Windows
 

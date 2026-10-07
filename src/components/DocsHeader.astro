@@ -14,7 +14,15 @@
 // `search` is on here and only here. Pagefind indexes the documentation
 // and nothing else, so this is the one bar where a search field has an
 // index behind it.
+//
+// `sections` is on here for the same reason: the documentation is the only
+// part of the site with a hierarchy deeper than one level, so it is the only
+// part that needs the rail. Both flags travel together in practice, and both
+// exist because the alternative is a control on a page where it cannot
+// work.
 import Nav from "./Nav.astro";
+import DocsCodeRegions from "./DocsCodeRegions.astro";
 ---
 
-<Nav as="div" search />
+<Nav as="div" search sections />
+<DocsCodeRegions />

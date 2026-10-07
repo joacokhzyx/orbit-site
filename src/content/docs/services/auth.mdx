@@ -12,9 +12,10 @@ runtime resolves them.
 val token = req.bearer_token()
 ```
 
-This never crashes on a missing header. It returns whatever the header held, so
-an absent token is an empty value you can test rather than an exception you
-have to guard.
+:::note[It never crashes on a missing header]
+It returns whatever the header held, so an absent token is an empty value you
+can test rather than an exception you have to guard.
+:::
 
 ## Checking a role
 
@@ -33,7 +34,12 @@ route DELETE "/notes/:id" {
 ```
 
 `has_role` resolves through the `sessions` table joined to `users.role_name`,
-and it honours `expires_at`. A `0` in `expires_at` means never.
+and it honours `expires_at`.
+
+:::note[A 0 in expires_at means never]
+It is not a date to compare against the clock. A session with `0` in that
+column does not expire.
+:::
 
 The two rejections are distinct on purpose, because a client can act on the
 difference:
@@ -58,7 +64,8 @@ This was checked live against `examples/sqlite_notes.orb`: `401` without a
 token, `403` for a non-admin delete, `200` for an admin delete. The example is
 in the repository and runs as written.
 
-One limit is worth stating here rather than in a footnote: there is no rate
-limiting on the auth path itself. If you need it, the HTTP layer's admission
-gate is a separate concern, described in
+:::caution[There is no rate limiting on the auth path]
+It is worth stating here rather than in a footnote. If you need it, the HTTP
+layer's admission gate is a separate concern, described in
 [Kynx](/docs/services/kynx/).
+:::

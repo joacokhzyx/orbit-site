@@ -10,12 +10,22 @@
 // at the source.
 //
 // 1. The pair is the high-contrast github themes, not the plain ones,
-//    because this site paints code on a warm cream (#f1efe9) rather than
-//    on white, which costs a few tenths of a ratio on every token. The
-//    plain light theme ships two tokens under 4.5:1 there. The
+//    because the light scheme paints code on a warm cream (#f1efe9)
+//    rather than on white, which costs a few tenths of a ratio on every
+//    token. The plain light theme ships two tokens under 4.5:1 there. The
 //    high-contrast light theme still leaves its comment colour at 4.38:1,
 //    so that one is darkened below. `pnpm check:code-contrast` measures the
 //    result and fails the build if a future theme swap regresses it.
+//
+//    The dark half of the pair needed nothing when the ground went to
+//    #0a0a0b, which is worth recording because it was the prediction this
+//    file was rewritten to guard against. A near-black code surface makes
+//    a high-contrast dark theme *easier* to read, not harder: its worst
+//    token went from 4.65:1 to 9.09:1. The direction of the change is the
+//    point. Darkening a surface raises the ratio for light text on it and
+//    lowers it for dark text, so a ground inversion is not the neutral
+//    operation it looks like — it has to be measured per scheme, which is
+//    what the gate below does and what the one-line reason here records.
 //
 // 2. Expressive Code drops every token colour. Its theme normaliser,
 //    ExpressiveCodeTheme.fromJSONString, reads a Shiki 4 theme object and

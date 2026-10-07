@@ -1,0 +1,102 @@
+---
+// The horizontal rail of documentation sections, under the navbar.
+//
+// This is the piece that carries most of why the reference layout reads as
+// organised rather than as a list. It carries the top level of the
+// documentation — Start here, The language, Services, Reference — and the
+// sidebar underneath it then shows only the pages of whichever section is
+// active. Four sections and eleven pages stop competing for the same
+// column, and a reader arriving cold can see the shape of the whole thing
+// in one line before reading a single entry.
+//
+// It is mounted by Nav, not by a Starlight slot, for one practical reason:
+// it has to sit flush under the sticky bar and move with it. A rail inside
+// Starlight's PageFrame would scroll away under the navbar the moment the
+// reader moved down the page, leaving a section switcher that is only
+// reachable by scrolling back to the top — which is the same objection that
+// put the sidebar button where it is.
+//
+// The active marker is an underline, not a fill, and the difference is
+// deliberate. A filled block is this system's language for "you are here"
+// in a list (the sidebar uses it, and so does the navbar), but a rail is
+// not a list of places, it is a set of tabs, and a tab is marked the way a
+// tab is marked: at the edge that meets the content it heads. It is also
+// the one place on the site where a rule is drawn on purpose, which is why
+// it survives the "a border is the last resort" rule — this is the last
+// resort doing its job, marking a boundary air cannot mark because the rail
+// and the page behind it are the same colour.
+import { DOC_SECTIONS, sectionForPath } from "../data/docs-sections";
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const active = sectionForPath(path);
+
+const sections = DOC_SECTIONS.map((section) => ({
+  label: section.label,
+  // A section's destination is its first page, derived rather than written,
+  // so a section can never point at a route that stopped existing.
+  href: section.items[0]?.slug ?? "/docs",
+  current: section.label === active?.label,
+}));
+---
+
+{
+  sections.length > 1 && (
+    <nav
+      aria-label="Documentation sections"
+      class="rail-scroll overflow-x-auto"
+      data-section-rail={sections.some((s) => s.current) ? "active" : undefined}
+    >
+      <ul class="mx-auto flex w-full max-w-6xl items-stretch gap-1 px-6 sm:px-8">
+        {sections.map((section) => (
+          <li>
+            <a
+              href={section.href}
+              aria-current={section.current ? "true" : undefined}
+              class:list={[
+                "text-small relative flex min-h-11 shrink-0 items-center rounded-[var(--radius-sm)] px-3 transition-colors",
+                section.current
+                  ? "text-[var(--ink)]"
+                  : "text-[var(--ink-2)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]",
+              ]}
+            >
+              {section.label}
+              {/* The marker. A 2px band in the ink, sitting on the bottom edge
+                  of the tab, which is the edge that meets the page. It is
+                  inset by the horizontal padding so it reads as belonging to
+                  the label rather than to the container. */}
+              {section.current && (
+                <span
+                  class="absolute inset-x-3 bottom-0 h-0.5 rounded-t-[var(--radius-pill)] bg-[var(--ink)]"
+                  aria-hidden="true"
+                />
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  /* The rail scrolls horizontally below the width at which the four
+     sections stop fitting. `scrollbar-width: none` because a visible
+     scrollbar under a sticky bar is a second horizontal rule on the page,
+     and the rail already answers "there is more this way" by being cut off
+     mid-tab — which is the same affordance a scroll cue gives, without the
+     line. The padding is what stops the last tab being flush against the
+     edge when the rail is scrolled to its end. */
+  .rail-scroll {
+    scrollbar-width: none;
+  }
+
+  .rail-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 30rem) {
+    .rail-scroll > ul {
+      padding-inline-end: 1.5rem;
+    }
+  }
+</style>
